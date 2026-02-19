@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "handled",
-  "homepage": "https://github.com/corypitt/design-system",
+  "homepage": "https://github.com/HandledAI/design-system",
   "items": [
     {
       "name": "button",
