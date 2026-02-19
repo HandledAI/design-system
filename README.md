@@ -1,4 +1,4 @@
-# @cory Design System
+# @handled Design System
 
 A shared design system built on [shadcn/ui](https://ui.shadcn.com), hosted as a custom shadcn registry. Components are customized shadcn primitives distributed via the `shadcn` CLI.
 
@@ -40,7 +40,7 @@ In your project's `components.json`:
 ```json
 {
   "registries": {
-    "@cory": "https://corypitt-design-system.vercel.app/r/{name}.json"
+    "@handled": "https://corypitt-design-system.vercel.app/r/{name}.json"
   }
 }
 ```
@@ -48,7 +48,7 @@ In your project's `components.json`:
 ### 2. Install components
 
 ```bash
-npx shadcn@latest add @cory/button @cory/card @cory/input
+npx shadcn@latest add @handled/button @handled/card @handled/input
 ```
 
 ### 3. Set your theme
