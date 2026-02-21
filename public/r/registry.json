@@ -8,7 +8,10 @@
       "type": "registry:ui",
       "title": "Button",
       "description": "A button component with multiple variants and sizes.",
-      "dependencies": ["@radix-ui/react-slot", "class-variance-authority"],
+      "dependencies": [
+        "@radix-ui/react-slot",
+        "class-variance-authority"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/button.tsx",
@@ -33,7 +36,9 @@
       "type": "registry:ui",
       "title": "Dialog",
       "description": "A modal dialog component built on Radix UI.",
-      "dependencies": ["radix-ui"],
+      "dependencies": [
+        "radix-ui"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/dialog.tsx",
@@ -58,7 +63,9 @@
       "type": "registry:ui",
       "title": "Label",
       "description": "A label component for form elements.",
-      "dependencies": ["@radix-ui/react-label"],
+      "dependencies": [
+        "@radix-ui/react-label"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/label.tsx",
@@ -71,7 +78,9 @@
       "type": "registry:ui",
       "title": "Select",
       "description": "A select dropdown component built on Radix UI.",
-      "dependencies": ["radix-ui"],
+      "dependencies": [
+        "radix-ui"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/select.tsx",
@@ -96,7 +105,9 @@
       "type": "registry:ui",
       "title": "Tabs",
       "description": "A tab navigation component built on Radix UI.",
-      "dependencies": ["radix-ui"],
+      "dependencies": [
+        "radix-ui"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/tabs.tsx",
@@ -109,7 +120,9 @@
       "type": "registry:ui",
       "title": "Badge",
       "description": "A badge component with multiple variants for status indicators.",
-      "dependencies": ["class-variance-authority"],
+      "dependencies": [
+        "class-variance-authority"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/badge.tsx",
@@ -122,7 +135,9 @@
       "type": "registry:ui",
       "title": "Avatar",
       "description": "An avatar component with image and fallback support.",
-      "dependencies": ["radix-ui"],
+      "dependencies": [
+        "radix-ui"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/avatar.tsx",
@@ -135,7 +150,9 @@
       "type": "registry:ui",
       "title": "Dropdown Menu",
       "description": "A dropdown menu component with submenus and keyboard navigation.",
-      "dependencies": ["radix-ui"],
+      "dependencies": [
+        "radix-ui"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/dropdown-menu.tsx",
@@ -148,7 +165,9 @@
       "type": "registry:ui",
       "title": "Tooltip",
       "description": "A tooltip component for contextual information on hover.",
-      "dependencies": ["radix-ui"],
+      "dependencies": [
+        "radix-ui"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/tooltip.tsx",
@@ -161,7 +180,9 @@
       "type": "registry:ui",
       "title": "Sheet",
       "description": "A slide-out panel component for side content.",
-      "dependencies": ["radix-ui"],
+      "dependencies": [
+        "radix-ui"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/sheet.tsx",
@@ -174,7 +195,9 @@
       "type": "registry:ui",
       "title": "Separator",
       "description": "A visual separator for dividing content.",
-      "dependencies": ["radix-ui"],
+      "dependencies": [
+        "radix-ui"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/separator.tsx",
@@ -199,7 +222,9 @@
       "type": "registry:ui",
       "title": "Scroll Area",
       "description": "A custom scrollable area with styled scrollbars.",
-      "dependencies": ["radix-ui"],
+      "dependencies": [
+        "radix-ui"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/scroll-area.tsx",
@@ -215,6 +240,74 @@
       "files": [
         {
           "path": "registry/new-york/ui/textarea.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "sidebar",
+      "type": "registry:ui",
+      "title": "Sidebar",
+      "description": "A responsive sidebar component.",
+      "dependencies": [
+        "@radix-ui/react-slot",
+        "class-variance-authority",
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/sidebar.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/new-york/hooks/use-mobile.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "chart",
+      "type": "registry:ui",
+      "title": "Chart",
+      "description": "A chart component using recharts.",
+      "dependencies": [
+        "recharts"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/chart.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "metric-card",
+      "type": "registry:ui",
+      "title": "Metric Card",
+      "description": "A card to display insights and metrics.",
+      "dependencies": [
+        "date-fns",
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/metric-card.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "activity-log",
+      "type": "registry:ui",
+      "title": "Activity Log",
+      "description": "A quick action activity log component.",
+      "dependencies": [
+        "date-fns",
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/activity-log.tsx",
           "type": "registry:ui"
         }
       ]

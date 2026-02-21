@@ -1,41 +1,279 @@
 import * as React from "react"
+import Link from "next/link"
 
-const components = [
-  "button", "card", "dialog", "input", "label", "select", "table", "tabs",
-  "badge", "avatar", "dropdown-menu", "tooltip", "sheet", "separator",
-  "skeleton", "scroll-area", "textarea",
-]
+import { Button } from "@/registry/new-york/ui/button"
+import { Badge } from "@/registry/new-york/ui/badge"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/registry/new-york/ui/card"
+import { Input } from "@/registry/new-york/ui/input"
+import { Label } from "@/registry/new-york/ui/label"
+import { MetricCard } from "@/registry/new-york/ui/metric-card"
+import { InboxRow, InboxGroupHeader } from "@/registry/new-york/ui/inbox-row"
+import { ActivityRow } from "@/registry/new-york/ui/activity-log"
+import {
+  DetailViewSummary,
+  DetailViewHeader,
+  DetailViewThread,
+  ThreadMessage,
+  Citation,
+} from "@/registry/new-york/ui/detail-view"
 
 export default function Home() {
   return (
-    <div className="max-w-3xl mx-auto flex flex-col min-h-svh px-4 py-8 gap-8">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold tracking-tight">@handled</h1>
-        <p className="text-muted-foreground">
-          Design system registry for HandledAI projects. Install components
-          with the shadcn CLI.
+    <div className="max-w-5xl mx-auto flex flex-col min-h-svh px-4 py-12 gap-12">
+      <header className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-4xl font-bold tracking-tight">@handled</h1>
+          <Link href="/preview">
+            <Button variant="default" className="bg-brand-purple hover:bg-brand-purple/90 text-white">
+              View live preview &rarr;
+            </Button>
+          </Link>
+        </div>
+        <p className="text-muted-foreground text-lg max-w-2xl">
+          Design system registry for HandledAI projects. 
+          Use the CLI to install these components into your applications.
         </p>
+        <pre className="bg-muted rounded-lg p-4 text-sm overflow-x-auto w-fit font-mono border border-border mt-2">
+          npx shadcn@latest add @handled/inbox-row
+        </pre>
       </header>
-      <main className="flex flex-col flex-1 gap-6">
-        <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold">Quick Start</h2>
-          <pre className="bg-muted rounded-lg p-4 text-sm overflow-x-auto">
-            {`npx shadcn@latest add @handled/button`}
-          </pre>
-        </section>
-        <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold">
-            Components ({components.length})
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {components.map((name) => (
-              <div
-                key={name}
-                className="border rounded-md px-3 py-2 text-sm font-mono"
-              >
-                {name}
+      
+      <main className="flex flex-col flex-1 gap-12">
+        <section className="space-y-6">
+          <h2 className="text-2xl font-bold border-b border-border pb-2">Core Components</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            {/* Buttons */}
+            <div id="core-buttons" className="border rounded-xl p-6 space-y-4 scroll-m-20">
+              <h3 className="font-semibold text-lg">Buttons</h3>
+              <div className="flex flex-wrap gap-3">
+                <Button>Primary</Button>
+                <Button variant="secondary">Secondary</Button>
+                <Button variant="destructive">Destructive</Button>
+                <Button variant="outline">Outline</Button>
+                <Button variant="ghost">Ghost</Button>
               </div>
-            ))}
+            </div>
+
+            {/* Badges */}
+            <div id="core-badges" className="border rounded-xl p-6 space-y-4 scroll-m-20">
+              <h3 className="font-semibold text-lg">Badges</h3>
+              <div className="flex flex-wrap gap-3">
+                <Badge>Default</Badge>
+                <Badge variant="secondary">Secondary</Badge>
+                <Badge variant="destructive">Urgent</Badge>
+                <Badge variant="outline">Outline</Badge>
+              </div>
+            </div>
+
+            {/* Inputs & Forms */}
+            <div id="core-input" className="border rounded-xl p-6 space-y-4 scroll-m-20">
+              <h3 className="font-semibold text-lg">Input</h3>
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="email">Email</Label>
+                <Input type="email" id="email" placeholder="Email address" />
+              </div>
+            </div>
+
+            {/* Card */}
+            <div id="core-card" className="border rounded-xl p-6 space-y-4 scroll-m-20">
+              <h3 className="font-semibold text-lg">Card</h3>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Team Members</CardTitle>
+                  <CardDescription>Manage your team settings.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">Content goes here...</p>
+                </CardContent>
+              </Card>
+            </div>
+
+          </div>
+        </section>
+
+        <section className="space-y-6">
+          <h2 className="text-2xl font-bold border-b border-border pb-2">Custom UX Blocks</h2>
+          
+          <div className="grid grid-cols-1 gap-8">
+            
+            {/* Metric Cards */}
+            <div id="custom-metric-cards" className="border rounded-xl p-6 space-y-6 bg-muted/30 scroll-m-20">
+              <h3 className="font-semibold text-lg">Metric Cards</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <MetricCard
+                  title="Referrals at Risk"
+                  value={28}
+                  change={{ value: "2 vs last week", direction: "up", isGood: false }}
+                  showExternalLink
+                  showInfo
+                  dataPoints={[
+                    { label: "No Contact", value: 6, color: "#166534" },
+                    { label: "Stalled", value: 4, color: "#22c55e" },
+                    { label: "Needs Attn", value: 8, color: "#6ee7b7" },
+                    { label: "Auth Delay", value: 5, color: "#ccfbf1" },
+                    { label: "DCS Hold", value: 3, color: "#99f6e4" },
+                    { label: "Expired Referral", value: 2, color: "#f1f5f9" },
+                  ]}
+                />
+                
+                <MetricCard
+                  title="Dropped from Pipeline"
+                  value={47}
+                  change={{ value: "12 vs last week", direction: "down", isGood: true }}
+                  showExternalLink
+                  showInfo
+                  dataPoints={[
+                    { label: "No Contact", value: 12, color: "#166534" },
+                    { label: "Ins. Denied", value: 15, color: "#22c55e" },
+                    { label: "Refused", value: 6, color: "#6ee7b7" },
+                    { label: "Intake Stalled", value: 8, color: "#ccfbf1" },
+                    { label: "Other", value: 6, color: "#f1f5f9" },
+                  ]}
+                />
+
+                <MetricCard
+                  value="4.2 days"
+                  subtitle="median, referrals → scheduled"
+                  change={{ value: "0.8d vs last week", direction: "down", isGood: true }}
+                  footerText="Slowest stage: Contact → Intake (1.5d)"
+                  showInfo
+                />
+
+                <MetricCard
+                  value="53%"
+                  subtitle="referrals → scheduled"
+                  change={{ value: "3% vs last week", direction: "up", isGood: true }}
+                  footerText="Largest drop-off: No Contact (22%)"
+                  showInfo
+                />
+              </div>
+            </div>
+
+            {/* Inbox Row */}
+            <div id="custom-inbox-row" className="border rounded-xl p-6 space-y-4 scroll-m-20">
+              <h3 className="font-semibold text-lg">Inbox Row</h3>
+              <div className="border rounded-lg overflow-hidden">
+                <InboxRow 
+                  itemId="REF-1894"
+                  statusColor="red"
+                  primaryText="James Liu"
+                  secondaryText="Cedars"
+                  tertiaryText="Oncology"
+                  isAtRisk={true}
+                  interactionCount={2}
+                  assignee="Jessica Wong"
+                  status="E&B Verified"
+                  time="Aging 18h"
+                />
+              </div>
+            </div>
+
+            {/* Activity Log Row */}
+            <div id="custom-activity-log" className="border rounded-xl p-6 space-y-4 scroll-m-20">
+              <h3 className="font-semibold text-lg">Activity Log Row</h3>
+              <div className="border rounded-lg overflow-hidden px-4 py-2">
+                <ActivityRow item={{
+                  id: "1",
+                  type: "checkin",
+                  title: "Document Received",
+                  details: "Fax from referring provider",
+                  date: "2024-03-15T10:30:00.000Z",
+                  time: "10:30 AM"
+                }} />
+              </div>
+            </div>
+
+            {/* Detail View Components */}
+            <div id="custom-detail-view" className="border rounded-xl p-6 space-y-4 scroll-m-20">
+              <h3 className="font-semibold text-lg">Detail View (Summary & Citations)</h3>
+              <div className="border rounded-lg p-6 max-w-xl">
+                <DetailViewSummary title="Here's what I found:">
+                  <p className="flex items-center flex-wrap gap-1">
+                    <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full mr-2" />
+                    There are <strong>3 unusual signals</strong> detected today.
+                    <Citation number={1} />
+                    <Citation number={2} />
+                  </p>
+                </DetailViewSummary>
+              </div>
+            </div>
+
+            {/* Inbox Components */}
+            <div id="custom-inbox-components" className="border rounded-xl p-6 space-y-6 scroll-m-20">
+              <h3 className="font-semibold text-lg">Inbox Components</h3>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div className="border rounded-lg overflow-hidden">
+                  <InboxGroupHeader title="E&B Verified" count={3} />
+                  <InboxRow
+                    itemId="REF-1894"
+                    statusColor="red"
+                    primaryText="James Liu"
+                    secondaryText="Cedars"
+                    tertiaryText="Oncology"
+                    isAtRisk
+                    interactionCount={2}
+                    assignee="Jessica Wong"
+                    status="E&B Verified"
+                    time="Aging 18h"
+                  />
+                  <InboxRow
+                    itemId="REF-1903"
+                    statusColor="gray"
+                    primaryText="Michael Brown"
+                    secondaryText="Providence"
+                    tertiaryText="Orthopedics"
+                    interactionCount={1}
+                    assignee="Sarah Johnson"
+                    status="E&B Verified"
+                    time="New today"
+                  />
+                  <InboxRow
+                    itemId="REF-1910"
+                    statusColor="orange"
+                    primaryText="Samantha Rodriguez"
+                    secondaryText="Kaiser"
+                    tertiaryText="Rheumatology"
+                    isAtRisk
+                    interactionCount="4+"
+                    assignee="Michael Chen"
+                    status="E&B Verified"
+                    time="Aging 36h"
+                  />
+                </div>
+
+                <div className="border rounded-lg p-5">
+                  <DetailViewHeader
+                    title="James Liu"
+                    breadcrumbs="REF-1894"
+                    badges={
+                      <>
+                        <Badge variant="destructive" className="bg-red-50 text-red-700 border-red-100 hover:bg-red-100">
+                          ! Urgent
+                        </Badge>
+                        <Badge variant="secondary">Review Required</Badge>
+                      </>
+                    }
+                  />
+                  <DetailViewSummary title="Here's what I found for this patient:">
+                    <p className="flex items-center flex-wrap gap-1">
+                      <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full mr-2" />
+                      There are <strong>2 missing documents</strong> including lab results and recent imaging
+                      <Citation number={1} />
+                    </p>
+                  </DetailViewSummary>
+                  <DetailViewThread title="Suggested Actions" actionCount={2}>
+                    <ThreadMessage subject="Request missing documentation" time="Just now" sender="AI Assistant">
+                      <p className="text-sm">
+                        I can draft a message to the referring provider requesting the missing lab results and imaging.
+                      </p>
+                    </ThreadMessage>
+                  </DetailViewThread>
+                </div>
+              </div>
+            </div>
+
           </div>
         </section>
       </main>
