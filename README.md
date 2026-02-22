@@ -57,7 +57,7 @@ In your project's `components.json`:
 ```json
 {
   "registries": {
-    "@handled": "https://corypitt-design-system.vercel.app/r/{name}.json"
+    "@handled": "https://handled-design-system.vercel.app/r/{name}.json"
   }
 }
 ```
