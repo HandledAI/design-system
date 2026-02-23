@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "incremental": false,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo"
+  },
+  "include": ["index.ts", "lib/**/*.ts", "hooks/**/*.ts", "registry/**/*.ts", "registry/**/*.tsx"],
+  "exclude": ["node_modules", ".next", "app", "components"]
+}
