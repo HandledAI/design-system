@@ -1,6 +1,56 @@
-# @handled Design System
+# @handled-ai/design-system
 
-A shared design system built on [shadcn/ui](https://ui.shadcn.com), hosted as a custom shadcn registry. Components are customized shadcn primitives distributed via the `shadcn` CLI.
+A shared design system built on [shadcn/ui](https://ui.shadcn.com). Use it as an **npm package** in React/Next.js apps or via the **shadcn registry** (copy-paste).
+
+## Install as npm package (recommended)
+
+```bash
+npm install @handled-ai/design-system
+# or
+pnpm add @handled-ai/design-system
+# or
+yarn add @handled-ai/design-system
+```
+
+**Peer dependencies:** Install React and the UI primitives if not already present:
+
+```bash
+pnpm add react react-dom @radix-ui/react-slot @radix-ui/react-label radix-ui class-variance-authority clsx tailwind-merge lucide-react
+# Optional, only if you use Chart / ActivityLog / MetricCard etc.:
+pnpm add date-fns recharts zod
+```
+
+**Use in your app:**
+
+```tsx
+import { Button, Card, cn } from "@handled-ai/design-system"
+
+export function MyPage() {
+  return (
+    <Card>
+      <Button>Click me</Button>
+    </Card>
+  )
+}
+```
+
+**Tailwind:** Components use Tailwind classes. In your Tailwind config (or `postcss.config` for Tailwind v4), include the package in `content` so classes are not purged:
+
+```js
+// tailwind.config.js (v3) or postcss / @config (v4)
+content: [
+  "./src/**/*.{js,ts,jsx,tsx}",
+  "./node_modules/@handled-ai/design-system/dist/**/*.js",
+]
+```
+
+**Theme:** Define the same CSS variables in your app (e.g. in `globals.css`) so tokens like `--primary`, `--background`, `--radius` exist. You can copy the `:root` and `.dark` blocks from this repo’s `app/globals.css`, or use your own palette.
+
+---
+
+## Registry (copy-paste) usage
+
+The project is also published as a custom shadcn registry. Components are copy-pasted into your repo via the `shadcn` CLI.
 
 ## What You Can View
 
@@ -86,7 +136,16 @@ pnpm run registry:build # Build registry JSON files
 - `http://localhost:3000/preview` (or same active port): full prototype
 - `http://localhost:3000/r/registry.json` (or same active port): built registry index
 
-## Publishing Flow
+## Publishing
+
+### Publishing to npm (public package)
+
+1. Bump version in `package.json` (e.g. `0.1.1`).
+2. Build the library: `pnpm run build:lib` (outputs to `dist/`).
+3. Log in to npm: `npm login`.
+4. Publish: `npm publish`. (Scoped package is public thanks to `"publishConfig": { "access": "public" }`.)
+
+### Registry / Vercel
 
 1. Make component changes in `registry/new-york/ui/` (and app previews as needed).
 2. Update `registry.json` entries.
