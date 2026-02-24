@@ -193,6 +193,7 @@ export default function Home() {
                 />
 
                 <MetricCard
+                  title="Time to Schedule"
                   value="4.2 days"
                   subtitle="median, referrals → scheduled"
                   change={{ value: "0.8d vs last week", direction: "down", isGood: true }}
@@ -201,6 +202,7 @@ export default function Home() {
                 />
 
                 <MetricCard
+                  title="Conversion Rate"
                   value="53%"
                   subtitle="referrals → scheduled"
                   change={{ value: "3% vs last week", direction: "up", isGood: true }}
