@@ -190,7 +190,7 @@ export function ConnectedApps() {
             <div className="flex items-center gap-3">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
               <div>
-                <p className="font-bold text-sm">#lunchclub-mercury</p>
+                <p className="font-bold text-sm">#lunchclub-acmeco</p>
                 <p className="text-xs text-muted-foreground font-medium mt-0.5">Slack Channel</p>
               </div>
             </div>

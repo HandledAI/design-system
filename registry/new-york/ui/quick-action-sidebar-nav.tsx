@@ -101,9 +101,9 @@ export function QuickActionSidebarNav({
       >
         <div className="flex-1 overflow-y-auto px-5 pb-6 pt-4">
           <div className="mb-6 text-center">
-            <h2 className="text-5xl font-black tracking-tight text-[#111827]">AXIS</h2>
+            <h2 className="text-5xl font-black tracking-tight text-[#111827]">ACME</h2>
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#7ea095]">
-              For Autism
+              Company
             </p>
           </div>
 
@@ -185,7 +185,7 @@ export function QuickActionSidebarNav({
               </div>
               <span className="flex flex-col">
                 <span className="text-base font-semibold text-[#1f314a]">Jay Corralejo</span>
-                <span className="text-sm text-[#6c7b95]">jcorralejo@axisforautism.com</span>
+                <span className="text-sm text-[#6c7b95]">jcorralejo@acmeco.com</span>
               </span>
             </span>
             <ChevronRight className="h-4 w-4 text-[#8ea0be]" />

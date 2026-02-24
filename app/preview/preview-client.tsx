@@ -362,7 +362,7 @@ export default function PreviewClientPage() {
               <div className="flex h-5 w-5 items-center justify-center rounded-full border border-border bg-foreground text-[10px] text-background">
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3"><circle cx="12" cy="12" r="10"/></svg>
               </div>
-              MERCURY
+              ACME CO
             </div>
             <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide px-2 mt-1 block">Relationship Intelligence</span>
           </SidebarHeader>
@@ -436,7 +436,7 @@ export default function PreviewClientPage() {
             </SidebarGroup>
 
             <SidebarGroup className="mt-4">
-              <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Mercury Assistant</div>
+              <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Acme Co Assistant</div>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
@@ -612,6 +612,7 @@ export default function PreviewClientPage() {
                     />
 
                     <MetricCard
+                      title="Time to Schedule"
                       value="4.2 days"
                       subtitle="median, referrals → scheduled"
                       change={{ value: "0.8d vs last week", direction: "down", isGood: true }}
@@ -620,6 +621,7 @@ export default function PreviewClientPage() {
                     />
 
                     <MetricCard
+                      title="Conversion Rate"
                       value="53%"
                       subtitle="referrals → scheduled"
                       change={{ value: "3% vs last week", direction: "up", isGood: true }}
