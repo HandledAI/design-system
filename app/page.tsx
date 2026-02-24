@@ -210,6 +210,39 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Preview List */}
+            <div id="custom-preview-list" className="border rounded-xl p-6 space-y-4 scroll-m-20">
+              <h3 className="font-semibold text-lg">Preview List</h3>
+              <div className="border rounded-lg overflow-hidden">
+                <PreviewList>
+                  <PreviewListItem
+                    icon={<Square className="w-4 h-4 text-red-500" />}
+                    title="Follow up with Lunchclub"
+                    subtitle="Churn Mitigation"
+                    meta={<span className="text-xs text-muted-foreground">5m ago</span>}
+                  />
+                  <PreviewListItem
+                    icon={<Square className="w-4 h-4 text-blue-500" />}
+                    title="Outbound opportunity: CloudKitchen"
+                    subtitle="Outbound"
+                    meta={<span className="text-xs text-muted-foreground">12m ago</span>}
+                  />
+                  <PreviewListItem
+                    icon={<Square className="w-4 h-4 text-blue-500" />}
+                    title="New CFO welcome: Loom"
+                    subtitle="Relationship"
+                    meta={<span className="text-xs text-muted-foreground">1h ago</span>}
+                  />
+                  <PreviewListItem
+                    icon={<Clock className="w-4 h-4 text-muted-foreground" />}
+                    title="Q3 Review — Acme Corp"
+                    subtitle="2:00 PM – 3:00 PM"
+                    meta={<Badge variant="outline" className="text-[10px] h-5">Upcoming</Badge>}
+                  />
+                </PreviewList>
+              </div>
+            </div>
+
             {/* Inbox Row */}
             <div id="custom-inbox-row" className="border rounded-xl p-6 space-y-4 scroll-m-20">
               <h3 className="font-semibold text-lg">Inbox Row</h3>
