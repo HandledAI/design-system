@@ -4,7 +4,8 @@ import { defineConfig } from "tsup"
 export default defineConfig({
   entry: ["index.ts"],
   format: ["esm"],
-  dts: { tsconfig: "tsconfig.build.json" },
+  dts: true,
+  tsconfig: "tsconfig.build.json",
   outDir: "dist",
   clean: true,
   sourcemap: true,

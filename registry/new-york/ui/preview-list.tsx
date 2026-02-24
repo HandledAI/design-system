@@ -16,7 +16,7 @@ export function PreviewList({
   )
 }
 
-export interface PreviewListItemProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface PreviewListItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   icon?: React.ReactNode
   title: React.ReactNode
   subtitle?: React.ReactNode
