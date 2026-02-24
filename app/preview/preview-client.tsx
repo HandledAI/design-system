@@ -4,12 +4,10 @@ import * as React from "react"
 import Link from "next/link"
 import {
   Inbox,
-  LayoutDashboard,
   ArrowLeft,
+  ChevronDown,
+  ChevronRight,
   Filter,
-  User,
-  LayoutList,
-  List,
   Search,
   FileText,
   Clock,
@@ -27,34 +25,52 @@ import {
   ThumbsUp,
   ThumbsDown,
   X,
+  Zap,
 } from "lucide-react"
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarProvider,
-  SidebarTrigger,
   SidebarHeader,
 } from "@/registry/new-york/ui/sidebar"
 
 import { MetricCard } from "@/registry/new-york/ui/metric-card"
-import { InboxRow, InboxGroupHeader } from "@/registry/new-york/ui/inbox-row"
 import {
-  DetailViewHeader,
-  DetailViewSummary,
   DetailViewThread,
   ThreadMessage,
   Citation,
 } from "@/registry/new-york/ui/detail-view"
-import { Card, CardHeader, CardTitle, CardContent } from "@/registry/new-york/ui/card"
 import { Button } from "@/registry/new-york/ui/button"
 import { Badge } from "@/registry/new-york/ui/badge"
 import { Input } from "@/registry/new-york/ui/input"
+import {
+  TopTasksCard,
+  UpcomingMeetingsCard,
+  RecentlyCompletedCard,
+  CheckInsCard
+} from "@/registry/new-york/ui/dashboard-cards"
+import {
+  EntityPanel,
+  EntityDetails,
+  PotentialContacts,
+  RecentActivity,
+  ConnectedApps,
+} from "@/registry/new-york/ui/entity-panel"
+import { SignalFeedback } from "@/registry/new-york/ui/signal-feedback-inline"
+import {
+  RecommendedActionsSection,
+  type RecommendedAction,
+} from "@/registry/new-york/ui/recommended-actions-section"
+import { QuickActionModal } from "@/registry/new-york/ui/quick-action-modal"
+import { DataTable } from "@/registry/new-york/ui/data-table"
+import { ItemList } from "@/registry/new-york/ui/item-list"
 
 const MOCK_QUEUE = [
   {
@@ -104,86 +120,238 @@ const MOCK_QUEUE = [
   },
 ]
 
+type QueueItem = (typeof MOCK_QUEUE)[number]
+
+const buildRecommendedActions = (item: QueueItem): RecommendedAction[] => [
+  {
+    id: `${item.id}-1`,
+    title: `Reply to ${item.company} treasury thread`,
+    reason: `The account has multiple churn indicators and an open thread without a response. A fast, consultative reply can re-anchor trust before this concern escalates.`,
+    category: item.statusColor === "red" ? "Churn" : "Nurture",
+    priority: item.statusColor === "red" ? "High" : "Medium",
+    dueDate: "Today",
+    confidence: 0.84,
+    signals: ["Balance outflow", "Lower login frequency"],
+    revenueImpact: 12000,
+  },
+  {
+    id: `${item.id}-2`,
+    title: `Schedule a 20-minute risk check-in with ${item.company}`,
+    reason: "A live check-in increases reply rates on sensitive topics and creates room to uncover whether this is operational variance or active vendor evaluation.",
+    category: "Nurture",
+    priority: "Medium",
+    dueDate: "Within 48 hours",
+    confidence: 0.73,
+    signals: ["Slack intent signal", "Unanswered email"],
+    revenueImpact: 7000,
+  },
+  {
+    id: `${item.id}-3`,
+    title: `Prepare a targeted treasury optimization brief`,
+    reason: "Tailored recommendations tied to their observed behavior can convert uncertainty into concrete product value and prevent silent churn.",
+    category: "Expand",
+    priority: "Medium",
+    dueDate: "This week",
+    confidence: 0.68,
+    signals: ["Treasury research mentions", "Usage pattern shift"],
+    revenueImpact: 9000,
+  },
+]
+
+const buildSourceItems = (item: QueueItem) => [
+  {
+    id: 1,
+    summary: `${item.company} balance outflow increased ~34% week-over-week with no matching inbound trend.`,
+    meta: "Product telemetry · 2h ago",
+  },
+  {
+    id: 2,
+    summary: "Login frequency for finance and treasury users dropped over the last 10 days.",
+    meta: "Workspace activity · 6h ago",
+  },
+  {
+    id: 3,
+    summary: "In #treasury-questions, the team asked about alternatives for short-term cash management.",
+    meta: "Slack signal · 1d ago",
+  },
+  {
+    id: 4,
+    summary: "Latest outbound optimization email remains unread with no follow-up response.",
+    meta: "Email thread signal · 2d ago",
+  },
+]
+
 export default function PreviewClientPage() {
   const [currentView, setCurrentView] = React.useState("inbox")
   const [selectedTask, setSelectedTask] = React.useState(MOCK_QUEUE[0])
-  const [showDetailFromInventory, setShowDetailFromInventory] = React.useState(false)
   const [showAllMetrics, setShowAllMetrics] = React.useState(false)
   const [showCoaching, setShowCoaching] = React.useState(true)
+  const [isEntityPanelOpen, setIsEntityPanelOpen] = React.useState(false)
+  const [isQuickActionOpen, setIsQuickActionOpen] = React.useState(false)
+  const [contextExpanded, setContextExpanded] = React.useState(false)
 
-  const renderDetailView = (item: typeof MOCK_QUEUE[0]) => (
-    <div className="max-w-4xl mx-auto p-6 md:p-10">
-      <DetailViewHeader
-        title={item.title}
-        onBack={() => {}}
-        breadcrumbs={item.company}
-        badges={
-          <>
-            {item.statusColor === 'red' && (
-              <Badge variant="destructive" className="bg-red-50 text-red-700 border-red-100 hover:bg-red-100 font-semibold text-[10px] px-2 py-0">
-                ! Urgent
-              </Badge>
+  React.useEffect(() => {
+    setContextExpanded(false)
+  }, [selectedTask.id])
+
+  const renderDetailView = (item: QueueItem) => {
+    const recommendedActions = buildRecommendedActions(item)
+    const sourceItems = buildSourceItems(item)
+
+    return (
+      <div className="mx-auto w-full max-w-3xl p-6 pb-12 md:p-8">
+        <div className="pb-8">
+          <div className="mb-4 flex items-center gap-2">
+            <button
+              type="button"
+              className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Back
+            </button>
+            <span className="text-muted-foreground/40">&middot;</span>
+            <span className="text-xs text-muted-foreground">{item.company}</span>
+          </div>
+
+          <h1 className="mb-3 text-2xl font-bold tracking-tight text-foreground">{item.title}</h1>
+
+          <div className="mb-6 flex flex-wrap items-center gap-2">
+            {item.statusColor === "red" && (
+              <div className="inline-flex items-center gap-1 rounded-md bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
+                <span className="text-[10px] font-bold">!</span> Urgent
+              </div>
             )}
-            <Badge variant="secondary" className="bg-muted text-muted-foreground font-medium border-transparent hover:bg-muted/80 text-[10px] px-2 py-0">
+            <div className="inline-flex items-center gap-1 rounded-md bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
               {item.tag1}
-            </Badge>
-            <Badge variant="outline" className="gap-1 text-muted-foreground text-[10px] px-2 py-0">
-              L {item.company} &gt;
-            </Badge>
-          </>
-        }
-      />
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsEntityPanelOpen(true)}
+              className="ml-1 inline-flex items-center gap-1.5 rounded-md border border-border/60 bg-muted/30 px-2 py-1 transition-colors hover:bg-muted/50"
+            >
+              <div className="flex h-4 w-4 items-center justify-center rounded bg-muted-foreground/10 text-[9px] font-semibold text-muted-foreground">
+                {item.company.substring(0, 1)}
+              </div>
+              <span className="text-xs font-medium text-foreground">{item.company}</span>
+              <ChevronRight className="h-3 w-3 text-muted-foreground/50" />
+            </button>
+          </div>
 
-      <DetailViewSummary
-        title={`Here's what I found for ${item.company}:`}
-        sources={
-          <ul className="list-disc pl-5">
-            <li>Recent transaction logs</li>
-            <li>Treasury Slack channel</li>
-          </ul>
-        }
-      >
-        <p className="flex items-center flex-wrap gap-1">
-          <span className="mr-2 h-1 w-1 rounded-full bg-muted-foreground" />
-          There are <strong>3 unusual signals</strong> including a large balance outflow and reduced login frequency
-          <Citation number={1} />
-          <Citation number={2} />
-          <Citation number={3} />
-        </p>
-        <p className="flex items-center flex-wrap gap-1 mt-2">
-          <span className="mr-2 h-1 w-1 rounded-full bg-muted-foreground" />
-          Scott mentioned in <strong>#treasury-questions</strong> that they are actively looking for treasury management options
-          <Citation number={4} />
-        </p>
-        <p className="flex items-center flex-wrap gap-1 mt-2">
-          <span className="mr-2 h-1 w-1 rounded-full bg-muted-foreground" />
-          You have a recent email thread regarding optimization options that hasn't been replied to
-          <Citation number={6} />
-        </p>
-      </DetailViewSummary>
+          <SignalFeedback.Root
+            onSubmitFeedback={(type, pills, detail) => {
+              console.log("Signal feedback:", { type, pills, detail, taskId: item.id })
+            }}
+          >
+            <div className="overflow-hidden bg-background">
+              <div className="relative z-20 bg-background p-4">
+                <div className="flex gap-4">
+                  <div className="w-1 self-stretch rounded-full bg-brand-purple" />
+                  <div className="flex-1 space-y-3">
+                    <div className="text-sm leading-relaxed text-foreground">
+                      <div className="mb-2 flex items-start justify-between gap-3">
+                        <p className="font-medium">Here&apos;s what I found for {item.company}:</p>
+                        <SignalFeedback.Trigger />
+                      </div>
+                      <ul className="list-disc space-y-2 pl-4 text-muted-foreground marker:text-muted-foreground/60">
+                        <li>
+                          There are <span className="font-medium text-foreground">3 unusual signals</span> including a large balance
+                          outflow and reduced login frequency
+                          <Citation number={1} />
+                          <Citation number={2} />
+                          <Citation number={3} />
+                        </li>
+                        <li>
+                          Scott mentioned in <span className="font-medium text-foreground">#treasury-questions</span> that they are actively
+                          looking for treasury management options
+                          <Citation number={4} />
+                        </li>
+                        <li>
+                          You have a recent email thread regarding optimization options that hasn&apos;t been replied to
+                          <Citation number={6} />
+                        </li>
+                      </ul>
+                      <SignalFeedback.Panel />
+                    </div>
+                  </div>
+                </div>
 
-      <DetailViewThread title="SUGGESTED RESPONSES" actionCount={3}>
-        <ThreadMessage 
-          icon={<Mail className="w-4 h-4 text-red-500" />}
-          subject={`Reply to ${item.company}`} 
-          time="4:15 PM" 
-          messageCount={4} 
-          threadLink="#" 
-          sender="Scott Mitchell to Me" 
-          senderTime="2 hours ago"
-        >
-          <p>
-            Hey Sarah, thanks for checking in. We did move some funds around for a specific vendor payment cycle coming up.
-          </p>
-          <br />
-          <p><strong>Hi Scott,</strong></p>
-          <p>
-            I noticed ~$4.2M moved out over the past week, which is higher than your normal pattern. Totally fine if this is expected (e.g., vendor payments or payroll batch), but if anything felt off or if you're exploring other options, I'd love to help.
-          </p>
-        </ThreadMessage>
-      </DetailViewThread>
-    </div>
-  )
+                <div className="ml-5 mt-4 pl-1">
+                  <button
+                    type="button"
+                    onClick={() => setContextExpanded((previous) => !previous)}
+                    className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 transition-colors hover:text-foreground"
+                  >
+                    Sources
+                    <ChevronDown
+                      className={`h-3.5 w-3.5 transition-transform duration-200 ${contextExpanded ? "rotate-180" : ""}`}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              {contextExpanded && (
+                <div className="overflow-hidden bg-background px-6 pb-6 pt-2">
+                  <div className="space-y-3">
+                    {sourceItems.map((source) => (
+                      <div
+                        key={source.id}
+                        className="group flex items-start gap-3 rounded-lg p-2 text-sm transition-colors hover:bg-muted/30"
+                      >
+                        <span className="mt-0.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-border text-[9px] font-bold text-muted-foreground/60">
+                          {source.id}
+                        </span>
+                        <div className="leading-relaxed text-muted-foreground">
+                          <span>{source.summary}</span>
+                          <span className="mx-1.5 text-muted-foreground/40">|</span>
+                          <span className="text-xs">{source.meta}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </SignalFeedback.Root>
+        </div>
+
+        <RecommendedActionsSection
+          actions={recommendedActions}
+          onQueueAction={(action) => {
+            console.log("Queue recommended action:", action.id)
+          }}
+          onDismissAction={(action) => {
+            console.log("Dismiss recommended action:", action.id)
+          }}
+          onFeedback={(actionId, feedback, comment) => {
+            console.log("Recommended action feedback:", { actionId, feedback, comment })
+          }}
+        />
+
+        <DetailViewThread title="SUGGESTED RESPONSES" actionCount={3}>
+          <ThreadMessage
+            icon={<Mail className="w-4 h-4 text-red-500" />}
+            subject={`Reply to ${item.company}`}
+            time="4:15 PM"
+            messageCount={4}
+            threadLink="#"
+            sender="Scott Mitchell to Me"
+            senderTime="2 hours ago"
+          >
+            <p>Hey Sarah, thanks for checking in. We did move some funds around for a specific vendor payment cycle coming up.</p>
+            <br />
+            <p>
+              <strong>Hi Scott,</strong>
+            </p>
+            <p>
+              I noticed ~$4.2M moved out over the past week, which is higher than your normal pattern. Totally fine if this is
+              expected (e.g., vendor payments or payroll batch), but if anything felt off or if you&apos;re exploring other options,
+              I&apos;d love to help.
+            </p>
+          </ThreadMessage>
+        </DetailViewThread>
+      </div>
+    )
+  }
 
   return (
     <SidebarProvider>
@@ -204,7 +372,7 @@ export default function PreviewClientPage() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg h-9">
+                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9">
                       <Search className="h-4 w-4" />
                       <span className="font-medium text-sm">Search</span>
                     </SidebarMenuButton>
@@ -213,14 +381,14 @@ export default function PreviewClientPage() {
                     <SidebarMenuButton
                       isActive={currentView === "inbox"}
                       onClick={() => setCurrentView("inbox")}
-                      className="gap-3 bg-brand-purple/10 text-brand-purple hover:bg-brand-purple/15 hover:text-brand-purple font-medium rounded-lg h-9"
+                      className="gap-3 bg-brand-purple/10 text-brand-purple hover:bg-brand-purple/15 hover:text-brand-purple font-medium rounded-md h-9"
                     >
                       <Inbox className="h-4 w-4" />
                       <span className="font-semibold text-sm">Unibox</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg h-9">
+                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9">
                       <FileText className="h-4 w-4" />
                       <span className="font-medium text-sm">Drafts</span>
                     </SidebarMenuButton>
@@ -237,7 +405,7 @@ export default function PreviewClientPage() {
                     <SidebarMenuButton 
                       isActive={currentView === "accounts"}
                       onClick={() => setCurrentView("accounts")}
-                      className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg h-9"
+                      className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9"
                     >
                       <Building className="h-4 w-4" />
                       <span className="font-medium text-sm">My Accounts</span>
@@ -247,7 +415,7 @@ export default function PreviewClientPage() {
                     <SidebarMenuButton 
                       isActive={currentView === "activity"}
                       onClick={() => setCurrentView("activity")}
-                      className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg h-9"
+                      className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9"
                     >
                       <Activity className="h-4 w-4" />
                       <span className="font-medium text-sm">Activity</span>
@@ -257,7 +425,7 @@ export default function PreviewClientPage() {
                     <SidebarMenuButton
                       isActive={currentView === "dashboard"}
                       onClick={() => setCurrentView("dashboard")}
-                      className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg h-9"
+                      className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9"
                     >
                       <BarChart2 className="h-4 w-4" />
                       <span className="font-medium text-sm">Insights</span>
@@ -272,13 +440,13 @@ export default function PreviewClientPage() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg h-9">
+                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9">
                       <Plus className="h-4 w-4" />
                       <span className="font-medium text-sm">New chat</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg h-9">
+                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9">
                       <MessageSquare className="h-4 w-4" />
                       <span className="font-medium text-sm">Chats</span>
                     </SidebarMenuButton>
@@ -292,19 +460,19 @@ export default function PreviewClientPage() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg h-9">
+                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9">
                       <Users className="h-4 w-4" />
                       <span className="font-medium text-sm">Account Development</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg h-9">
+                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9">
                       <Users className="h-4 w-4" />
                       <span className="font-medium text-sm">Relationship Management</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg h-9 mt-1">
+                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9 mt-1">
                       <MoreHorizontal className="h-4 w-4" />
                       <span className="font-medium text-sm">... More</span>
                     </SidebarMenuButton>
@@ -312,6 +480,27 @@ export default function PreviewClientPage() {
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
+
+            <SidebarFooter className="mt-auto border-t border-border bg-background p-3">
+              <Button
+                type="button"
+                onClick={() => setIsQuickActionOpen(true)}
+                className="h-11 w-full justify-between rounded-md bg-[#1B4332] px-3 text-white hover:bg-[#245240]"
+              >
+                <span className="flex items-center gap-2 text-sm font-semibold">
+                  <Zap className="h-4 w-4" />
+                  Quick Action
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="rounded-md border border-white/20 bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold">
+                    CMD
+                  </span>
+                  <span className="rounded-md border border-white/20 bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold">
+                    K
+                  </span>
+                </span>
+              </Button>
+            </SidebarFooter>
 
           </SidebarContent>
         </Sidebar>
@@ -358,8 +547,8 @@ export default function PreviewClientPage() {
                     </p>
                     <div className="bg-brand-purple/10 rounded-lg p-5 text-[13px] text-foreground font-medium italic border border-brand-purple/20 relative">
                       <div className="absolute top-0 left-0 w-1 h-full bg-brand-purple rounded-l-lg" />
-                      "Great job catching the churn risk on Lunchclub yesterday. Today, focus on pushing the stalled 
-                      intake pipeline. Try making 2 more touches on accounts that have gone dark this week."
+                      &ldquo;Great job catching the churn risk on Lunchclub yesterday. Today, focus on pushing the stalled
+                      intake pipeline. Try making 2 more touches on accounts that have gone dark this week.&rdquo;
                     </div>
                     
                     <div className="mt-4 flex items-center gap-2">
@@ -479,149 +668,19 @@ export default function PreviewClientPage() {
                   {/* Left Column (2 spans): Tasks and Meetings */}
                   <div className="lg:col-span-2 space-y-6">
                     {/* Top Tasks */}
-                    <Card className="rounded-xl border border-border shadow-sm overflow-hidden">
-                      <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border bg-muted/20">
-                        <CardTitle className="text-sm font-bold tracking-tight">Top Tasks</CardTitle>
-                        <Button variant="ghost" size="sm" onClick={() => setCurrentView("inbox")} className="text-xs h-7 text-brand-purple hover:text-brand-purple/80 hover:bg-brand-purple/10">
-                          View all tasks &rarr;
-                        </Button>
-                      </CardHeader>
-                      <CardContent className="p-0">
-                        <div className="divide-y divide-border">
-                          <div className="p-4 flex items-center justify-between hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => setCurrentView("inbox")}>
-                            <div className="flex items-center gap-3">
-                              <div className="w-2 h-2 rounded-full bg-red-500" />
-                              <div>
-                                <p className="text-sm font-semibold text-foreground">Follow up with Lunchclub</p>
-                                <p className="text-xs text-muted-foreground">Churn Mitigation</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                              <span className="text-[11px] font-medium text-muted-foreground">5m ago</span>
-                              <Badge variant="destructive" className="text-[9px] px-1.5 h-4">Urgent</Badge>
-                            </div>
-                          </div>
-                          <div className="p-4 flex items-center justify-between hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => setCurrentView("inbox")}>
-                            <div className="flex items-center gap-3">
-                              <div className="w-2 h-2 rounded-full bg-blue-500" />
-                              <div>
-                                <p className="text-sm font-semibold text-foreground">Outbound opportunity: CloudKitchen</p>
-                                <p className="text-xs text-muted-foreground">Outbound</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                              <span className="text-[11px] font-medium text-muted-foreground">12m ago</span>
-                              <Badge variant="secondary" className="text-[9px] px-1.5 h-4 bg-blue-100 text-blue-700 border-transparent shadow-none">Pending</Badge>
-                            </div>
-                          </div>
-                          <div className="p-4 flex items-center justify-between hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => setCurrentView("inbox")}>
-                            <div className="flex items-center gap-3">
-                              <div className="w-2 h-2 rounded-full bg-blue-500" />
-                              <div>
-                                <p className="text-sm font-semibold text-foreground">New CFO welcome: Loom</p>
-                                <p className="text-xs text-muted-foreground">Relationship</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                              <span className="text-[11px] font-medium text-muted-foreground">1h ago</span>
-                              <Badge variant="secondary" className="text-[9px] px-1.5 h-4 bg-blue-100 text-blue-700 border-transparent shadow-none">Pending</Badge>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <TopTasksCard onViewAll={() => setCurrentView("inbox")} />
 
                     {/* Meetings */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <Card className="rounded-xl border border-border shadow-sm overflow-hidden">
-                        <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border bg-muted/20">
-                          <CardTitle className="text-sm font-bold tracking-tight">Upcoming Meetings</CardTitle>
-                          <Button variant="ghost" size="sm" className="text-xs h-7 text-brand-purple hover:text-brand-purple/80 hover:bg-brand-purple/10">
-                            View all meetings &rarr;
-                          </Button>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                          <div className="divide-y divide-border">
-                            <div className="p-4 flex items-start gap-3 hover:bg-muted/30 transition-colors cursor-pointer">
-                              <div className="mt-0.5"><Clock className="w-4 h-4 text-blue-500" /></div>
-                              <div>
-                                <p className="text-sm font-semibold text-foreground">Q3 Review - Acme Corp</p>
-                                <p className="text-xs text-muted-foreground">2:00 PM - 3:00 PM</p>
-                              </div>
-                            </div>
-                            <div className="p-4 flex items-start gap-3 hover:bg-muted/30 transition-colors cursor-pointer">
-                              <div className="mt-0.5"><Clock className="w-4 h-4 text-blue-500" /></div>
-                              <div>
-                                <p className="text-sm font-semibold text-foreground">Initial Sync - Initech</p>
-                                <p className="text-xs text-muted-foreground">4:30 PM - 5:00 PM</p>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card className="rounded-xl border border-border shadow-sm overflow-hidden opacity-80 bg-muted/5">
-                        <CardHeader className="pb-3 border-b border-border bg-muted/10">
-                          <CardTitle className="text-sm font-bold tracking-tight text-muted-foreground">Recently Completed</CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                          <div className="divide-y divide-border">
-                            <div className="p-4 flex items-start gap-3 cursor-default">
-                              <div className="mt-0.5"><CheckSquare className="w-4 h-4 text-emerald-500" /></div>
-                              <div>
-                                <p className="text-sm font-semibold text-muted-foreground line-through">Sync - Globex Inc</p>
-                                <p className="text-xs text-muted-foreground">10:00 AM (Completed)</p>
-                              </div>
-                            </div>
-                            <div className="p-4 flex items-start gap-3 cursor-default">
-                              <div className="mt-0.5"><CheckSquare className="w-4 h-4 text-emerald-500" /></div>
-                              <div>
-                                <p className="text-sm font-semibold text-muted-foreground line-through">Check-in - Pied Piper</p>
-                                <p className="text-xs text-muted-foreground">9:00 AM (Completed)</p>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
+                      <UpcomingMeetingsCard />
+                      <RecentlyCompletedCard />
                     </div>
                   </div>
 
                   {/* Right Column: Check-ins and Coaching */}
                   <div className="space-y-6">
                     {/* Check-ins */}
-                    <Card className="rounded-xl border border-border shadow-sm overflow-hidden">
-                      <CardHeader className="pb-3 border-b border-border bg-muted/20">
-                        <CardTitle className="text-sm font-bold tracking-tight">Today's Check-ins</CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-0">
-                        <div className="divide-y divide-border">
-                          <div className="p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                                <CheckSquare className="w-4 h-4 text-emerald-600" />
-                              </div>
-                              <div>
-                                <p className="text-sm font-semibold text-foreground">Morning Standup</p>
-                                <p className="text-[11px] text-muted-foreground">9:00 AM</p>
-                              </div>
-                            </div>
-                            <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 shadow-none border-transparent font-semibold text-[10px]">Done</Badge>
-                          </div>
-                          <div className="p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-                                <Clock className="w-4 h-4 text-muted-foreground" />
-                              </div>
-                              <div>
-                                <p className="text-sm font-semibold text-foreground">Evening Wrap-up</p>
-                                <p className="text-[11px] text-muted-foreground">5:00 PM</p>
-                              </div>
-                            </div>
-                            <Badge variant="outline" className="text-muted-foreground shadow-none font-semibold text-[10px]">Pending</Badge>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <CheckInsCard />
                   </div>
                 </div>
               </div>
@@ -715,7 +774,7 @@ export default function PreviewClientPage() {
                   <div className="flex-1 overflow-y-auto">{renderDetailView(selectedTask)}</div>
                 </div>
               </div>
-            ) : currentView === "accounts" || currentView === "activity" ? (
+            ) : currentView === "accounts" ? (
               <div className="flex flex-col h-full w-full bg-background relative">
                 <div className="absolute top-4 right-4 z-10">
                   <Link href="/">
@@ -726,10 +785,9 @@ export default function PreviewClientPage() {
                   </Link>
                 </div>
 
-                {/* Horizontal Tabs */}
                 <div className="px-4 py-3 border-b border-border flex items-center gap-2 overflow-x-auto shrink-0 mt-2">
                   <Button variant="secondary" size="sm" className="h-7 text-xs rounded-md bg-muted font-medium">
-                    {currentView === "accounts" ? "All Accounts" : "All Activity"} <Badge variant="outline" className="ml-2 h-4 px-1.5 text-[10px]">6</Badge>
+                    All Accounts <Badge variant="outline" className="ml-2 h-4 px-1.5 text-[10px]">6</Badge>
                   </Button>
                   <Button size="sm" className="h-7 text-xs rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-medium">
                     Needs Attention <Badge variant="secondary" className="ml-2 h-4 px-1.5 text-[10px] bg-white/20 text-white border-transparent">11</Badge>
@@ -740,50 +798,66 @@ export default function PreviewClientPage() {
                 </div>
 
                 <div className="flex-1 overflow-auto">
-                  <InboxGroupHeader title="High Priority" count={2} />
-                  
-                  <InboxRow 
-                    itemId={currentView === "accounts" ? "ACC-101" : "ACT-101"}
-                    statusColor="red"
-                    primaryText={currentView === "accounts" ? "Acme Corp" : "Q3 Review Meeting"}
-                    secondaryText={currentView === "accounts" ? "Enterprise" : "Zoom"}
-                    tertiaryText={currentView === "accounts" ? "Software" : "Acme Corp"}
-                    isAtRisk={true}
-                    interactionCount={2}
-                    assignee="Jessica Wong"
-                    status="Action Required"
-                    time="Aging 18h"
-                  />
-                  <InboxRow 
-                    itemId={currentView === "accounts" ? "ACC-102" : "ACT-102"}
-                    statusColor="orange"
-                    primaryText={currentView === "accounts" ? "Globex Inc" : "Renewal Discussion"}
-                    secondaryText={currentView === "accounts" ? "Mid-Market" : "In-Person"}
-                    tertiaryText={currentView === "accounts" ? "Manufacturing" : "Globex Inc"}
-                    isAtRisk={true}
-                    interactionCount="4+"
-                    assignee="Michael Chen"
-                    status="Action Required"
-                    time="Aging 36h"
-                  />
+                  <DataTable />
+                </div>
+              </div>
+            ) : currentView === "activity" ? (
+              <div className="relative flex h-full w-full flex-col bg-background">
+                <div className="absolute top-4 right-4 z-10">
+                  <Link href="/">
+                    <Button variant="ghost" size="sm" className="h-8 gap-2 text-xs text-muted-foreground hover:text-foreground bg-background/50 backdrop-blur-sm">
+                      <ArrowLeft className="h-3.5 w-3.5" />
+                      Exit Preview
+                    </Button>
+                  </Link>
+                </div>
 
-                  <InboxGroupHeader title="Normal Priority" count={2} />
-                  <InboxRow 
-                    itemId={currentView === "accounts" ? "ACC-103" : "ACT-103"}
-                    statusColor="gray"
-                    primaryText={currentView === "accounts" ? "Initech" : "Check-in Call"}
-                    secondaryText={currentView === "accounts" ? "SMB" : "Phone"}
-                    tertiaryText={currentView === "accounts" ? "Technology" : "Initech"}
-                    interactionCount={1}
-                    assignee="Sarah Johnson"
-                    status="On Track"
-                    time="New today"
-                  />
+                <div className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
+                  <ItemList />
                 </div>
               </div>
             ) : null}
           </div>
         </main>
+
+        <EntityPanel isOpen={isEntityPanelOpen} onClose={setIsEntityPanelOpen}>
+          <EntityDetails onClose={() => setIsEntityPanelOpen(false)} />
+          <PotentialContacts />
+          <RecentActivity 
+            items={[
+              {
+                icon: <MessageCircle className="w-4 h-4" />,
+                title: "Call with Sarah Chen — Treasury strategy discussion",
+                details: "Strong interest in yield optimization and cash management.",
+                time: "335d ago",
+                source: "Gong"
+              },
+              {
+                icon: <Users className="w-4 h-4 text-orange-500" />,
+                title: "Mike Rodriguez",
+                details: "New VP Engineering may impact API integration priorities.",
+                time: "344d ago",
+                source: "Company Blog"
+              },
+              {
+                icon: <Mail className="w-4 h-4" />,
+                title: "Payment Operations Manager",
+                details: "Payment ops expansion indicates transaction volume growth.",
+                time: "343d ago",
+                source: "AngelList"
+              }
+            ]}
+          />
+          <ConnectedApps />
+        </EntityPanel>
+        <QuickActionModal
+          open={isQuickActionOpen}
+          onOpenChange={setIsQuickActionOpen}
+          onCreateTask={(draft) => {
+            console.log("Quick action created:", draft)
+          }}
+        />
+
       </div>
     </SidebarProvider>
   )

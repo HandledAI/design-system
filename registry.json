@@ -341,6 +341,351 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "item-list-filter",
+      "type": "registry:ui",
+      "title": "Item List Filter",
+      "description": "Filter controls tailored for grouped queue list layouts.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "dropdown-menu"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/item-list-filter.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "item-list-display",
+      "type": "registry:ui",
+      "title": "Item List Display",
+      "description": "Grouping and density controls for queue-style list presentations.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "dropdown-menu",
+        "select"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/item-list-display.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "item-list-toolbar",
+      "type": "registry:ui",
+      "title": "Item List Toolbar",
+      "description": "Toolbar composed of quick views, list filtering, and display controls.",
+      "registryDependencies": [
+        "item-list-filter",
+        "item-list-display"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/item-list-toolbar.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "item-list",
+      "type": "registry:ui",
+      "title": "Item List",
+      "description": "Queue-style list with grouped rows and quick view controls.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "badge",
+        "item-list-toolbar"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/item-list.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "data-table-filter",
+      "type": "registry:ui",
+      "title": "Data Table Filter",
+      "description": "A nested category filter control for data tables.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "dropdown-menu"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/data-table-filter.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "data-table-display",
+      "type": "registry:ui",
+      "title": "Data Table Display",
+      "description": "Display and sorting controls for data tables.",
+      "dependencies": [
+        "lucide-react",
+        "@tanstack/react-table"
+      ],
+      "registryDependencies": [
+        "button",
+        "dropdown-menu",
+        "select"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/data-table-display.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "data-table-quick-views",
+      "type": "registry:ui",
+      "title": "Data Table Quick Views",
+      "description": "Quick-view chip controls for data table presets.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "dropdown-menu"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/data-table-quick-views.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "data-table-toolbar",
+      "type": "registry:ui",
+      "title": "Data Table Toolbar",
+      "description": "Toolbar composing table filter and display controls.",
+      "dependencies": [
+        "@tanstack/react-table"
+      ],
+      "registryDependencies": [
+        "data-table-filter",
+        "data-table-display"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/data-table-toolbar.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "data-table",
+      "type": "registry:ui",
+      "title": "Data Table",
+      "description": "A full featured data table with quick views and controls.",
+      "dependencies": [
+        "lucide-react",
+        "@tanstack/react-table"
+      ],
+      "registryDependencies": [
+        "badge",
+        "data-table-filter",
+        "data-table-display",
+        "data-table-quick-views",
+        "data-table-toolbar"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/data-table.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "performance-metrics-table",
+      "type": "registry:ui",
+      "title": "Performance Metrics Table",
+      "description": "A configurable inline metrics table with progress bars and compact controls.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "avatar",
+        "button",
+        "dropdown-menu",
+        "input",
+        "scroll-area",
+        "table"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/performance-metrics-table.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "entity-panel",
+      "type": "registry:ui",
+      "title": "Entity Panel",
+      "description": "Panel components for viewing entity details.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "sheet",
+        "card",
+        "badge",
+        "button",
+        "input"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/entity-panel.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "dashboard-cards",
+      "type": "registry:ui",
+      "title": "Dashboard Cards",
+      "description": "Pre-built card components for a dashboard layout.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "card",
+        "button",
+        "badge",
+        "preview-list"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/dashboard-cards.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "preview-list",
+      "type": "registry:ui",
+      "title": "Preview List",
+      "description": "A list component with bounded item counts and flexible row slots.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/preview-list.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "signal-feedback-inline",
+      "type": "registry:ui",
+      "title": "Signal Feedback Inline",
+      "description": "Inline feedback controls for evaluating signal quality.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/signal-feedback-inline.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "recommended-actions-section",
+      "type": "registry:ui",
+      "title": "Recommended Actions Section",
+      "description": "Action recommendation cards with quick controls and feedback.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "badge",
+        "button",
+        "tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/recommended-actions-section.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "quick-action-chat-area",
+      "type": "registry:ui",
+      "title": "Quick Action Chat Area",
+      "description": "A compact task composer with priority controls and quick submit.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/quick-action-chat-area.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "quick-action-modal",
+      "type": "registry:ui",
+      "title": "Quick Action Modal",
+      "description": "Modal workflow for choosing templates and creating quick tasks.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "dialog",
+        "quick-action-chat-area"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/quick-action-modal.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "quick-action-sidebar-nav",
+      "type": "registry:ui",
+      "title": "Quick Action Sidebar Nav",
+      "description": "Sidebar navigation layout with embedded quick-action trigger and modal.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "quick-action-modal"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/quick-action-sidebar-nav.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }
