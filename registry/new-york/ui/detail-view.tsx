@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ArrowLeft, ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, MessageSquare } from "lucide-react"
+import { ArrowLeft, ChevronDown, ChevronUp, MessageSquare } from "lucide-react"
 import { HoverCard as HoverCardPrimitive } from "radix-ui"
 import { cn } from "@/lib/utils"
 import { Button } from "./button"
@@ -45,10 +45,12 @@ export function DetailViewSummary({
   title = "Here's what I found",
   children,
   sources,
+  actions,
 }: {
   title?: string
   children: React.ReactNode
   sources?: React.ReactNode
+  actions?: React.ReactNode
 }) {
   const [showSources, setShowSources] = React.useState(false)
 
@@ -57,16 +59,9 @@ export function DetailViewSummary({
       {/* Blue left border */}
       <div className="absolute left-0 top-1 bottom-1 w-1 bg-brand-purple rounded-full" />
       
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-start justify-between mb-4 gap-3">
         <h2 className="text-base font-semibold text-foreground">{title}</h2>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
-            <ThumbsUp className="w-3.5 h-3.5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
-            <ThumbsDown className="w-3.5 h-3.5" />
-          </Button>
-        </div>
+        {actions}
       </div>
 
       <div className="space-y-3 text-sm text-foreground/90">

@@ -1,253 +1,262 @@
 "use client"
 
 import * as React from "react"
-import { Check, ThumbsDown, ThumbsUp } from "lucide-react"
+import { Check, CirclePlus, Lock, ThumbsDown } from "lucide-react"
 
-const positivePills = ["Right timing", "Accurate data", "Good account fit", "Actionable", "Other"]
-const negativePills = ["Bad timing", "Inaccurate data", "Wrong account", "Already handled", "Not actionable", "Other"]
+const dismissReasons = [
+  "Bad timing",
+  "Inaccurate data",
+  "Wrong account",
+  "Already handled",
+  "Not actionable",
+  "Other",
+]
 
-type FeedbackType = "up" | "down"
+type ApprovalState = "pending" | "confirming" | "dismissing" | "approved" | "dismissed"
 
-interface SignalFeedbackState {
-  thumbState: FeedbackType | null
-  selectedPills: string[]
-  detailText: string
-  notedType: FeedbackType | null
-  otherSelected: boolean
-  hasRequiredInput: boolean
-  handleThumbClick: (type: FeedbackType) => void
-  togglePill: (pill: string) => void
-  setDetailText: (text: string) => void
-  handleSubmit: () => void
+interface SignalApprovalContextValue {
+  approvalState: ApprovalState
+  companyName: string
+  approve: () => void
+  dismiss: (reasons: string[], detail: string) => void
+  requestApproval: () => void
+  requestDismiss: () => void
+  cancel: () => void
 }
 
-const SignalFeedbackCtx = React.createContext<SignalFeedbackState | null>(null)
+const SignalApprovalCtx = React.createContext<SignalApprovalContextValue | null>(null)
 
-function useSignalFeedback() {
-  const ctx = React.useContext(SignalFeedbackCtx)
-  if (!ctx) throw new Error("SignalFeedback components must be used within SignalFeedback.Root")
+export function useSignalApproval() {
+  const ctx = React.useContext(SignalApprovalCtx)
+  if (!ctx) throw new Error("SignalApproval components must be used within SignalApproval.Root")
   return ctx
 }
 
-interface SignalFeedbackRootProps {
+interface RootProps {
   children: React.ReactNode
-  onSubmitFeedback?: (type: FeedbackType, pills: string[], detail: string) => void
+  companyName: string
+  onApprove?: () => void
+  onDismiss?: (reasons: string[], detail: string) => void
 }
 
-function Root({ children, onSubmitFeedback }: SignalFeedbackRootProps) {
-  const [thumbState, setThumbState] = React.useState<FeedbackType | null>(null)
-  const [selectedPills, setSelectedPills] = React.useState<string[]>([])
-  const [detailText, setDetailText] = React.useState("")
-  const [notedType, setNotedType] = React.useState<FeedbackType | null>(null)
-  const notedTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+function Root({ children, companyName, onApprove, onDismiss }: RootProps) {
+  const [approvalState, setApprovalState] = React.useState<ApprovalState>("pending")
 
-  React.useEffect(() => {
-    return () => {
-      if (notedTimeoutRef.current) {
-        clearTimeout(notedTimeoutRef.current)
-      }
-    }
+  const requestApproval = React.useCallback(() => {
+    setApprovalState("confirming")
   }, [])
 
-  const otherSelected = selectedPills.includes("Other")
-  const hasRequiredInput =
-    thumbState === "down"
-      ? selectedPills.length > 0 && (!otherSelected || detailText.trim().length > 0)
-      : selectedPills.length > 0 || detailText.trim().length > 0
-
-  const togglePill = React.useCallback((pill: string) => {
-    setSelectedPills((previous) =>
-      previous.includes(pill) ? previous.filter((value) => value !== pill) : [...previous, pill]
-    )
+  const requestDismiss = React.useCallback(() => {
+    setApprovalState("dismissing")
   }, [])
 
-  const handleThumbClick = React.useCallback((type: FeedbackType) => {
-    setThumbState((previous) => (previous === type ? null : type))
-    setSelectedPills([])
-    setDetailText("")
+  const cancel = React.useCallback(() => {
+    setApprovalState("pending")
   }, [])
 
-  const handleSubmit = React.useCallback(() => {
-    if (!thumbState || !hasRequiredInput) return
+  const approve = React.useCallback(() => {
+    setApprovalState("approved")
+    onApprove?.()
+  }, [onApprove])
 
-    onSubmitFeedback?.(thumbState, selectedPills, detailText.trim())
-    setNotedType(thumbState)
-    setThumbState(null)
-    setSelectedPills([])
-    setDetailText("")
-
-    if (notedTimeoutRef.current) {
-      clearTimeout(notedTimeoutRef.current)
-    }
-
-    notedTimeoutRef.current = setTimeout(() => {
-      setNotedType(null)
-    }, 3000)
-  }, [detailText, hasRequiredInput, onSubmitFeedback, selectedPills, thumbState])
+  const dismiss = React.useCallback(
+    (reasons: string[], detail: string) => {
+      setApprovalState("dismissed")
+      onDismiss?.(reasons, detail)
+    },
+    [onDismiss]
+  )
 
   return (
-    <SignalFeedbackCtx.Provider
-      value={{
-        thumbState,
-        selectedPills,
-        detailText,
-        notedType,
-        otherSelected,
-        hasRequiredInput,
-        handleThumbClick,
-        togglePill,
-        setDetailText,
-        handleSubmit,
-      }}
+    <SignalApprovalCtx.Provider
+      value={{ approvalState, companyName, approve, dismiss, requestApproval, requestDismiss, cancel }}
     >
       {children}
-    </SignalFeedbackCtx.Provider>
+    </SignalApprovalCtx.Provider>
   )
 }
 
-function Trigger() {
-  const { thumbState, notedType, handleThumbClick } = useSignalFeedback()
+function Actions() {
+  const { approvalState, companyName, approve, dismiss, requestApproval, requestDismiss, cancel } =
+    useSignalApproval()
+  const [selectedReasons, setSelectedReasons] = React.useState<string[]>([])
+  const [detailText, setDetailText] = React.useState("")
 
-  if (notedType) {
+  const otherSelected = selectedReasons.includes("Other")
+  const canSubmitDismiss = selectedReasons.length > 0 && (!otherSelected || detailText.trim().length > 0)
+
+  const toggleReason = (reason: string) => {
+    setSelectedReasons((prev) =>
+      prev.includes(reason) ? prev.filter((r) => r !== reason) : [...prev, reason]
+    )
+  }
+
+  const handleDismissSubmit = () => {
+    if (!canSubmitDismiss) return
+    dismiss(selectedReasons, detailText.trim())
+    setSelectedReasons([])
+    setDetailText("")
+  }
+
+  const handleCancel = () => {
+    cancel()
+    setSelectedReasons([])
+    setDetailText("")
+  }
+
+  if (approvalState === "approved") {
+    return (
+      <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600">
+        <Check className="h-3.5 w-3.5" />
+        <span>Opportunity Created</span>
+      </div>
+    )
+  }
+
+  if (approvalState === "dismissed") {
     return (
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <Check className="h-3.5 w-3.5 text-emerald-500" />
-        <span>{notedType === "up" ? "Noted" : "Recorded"}</span>
+        <ThumbsDown className="h-3.5 w-3.5" />
+        <span>Signal Dismissed</span>
+      </div>
+    )
+  }
+
+  if (approvalState === "confirming") {
+    return (
+      <div className="space-y-3">
+        <div className="rounded-md border border-border bg-muted/30 p-3">
+          <p className="text-sm text-foreground">
+            This will create an Opportunity in Salesforce for <strong>{companyName}</strong>. Confirm?
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={approve}
+            className="inline-flex h-7 items-center gap-1.5 rounded-md bg-foreground px-3 text-xs font-semibold text-background transition-colors hover:bg-foreground/90"
+          >
+            <Check className="h-3 w-3" />
+            Confirm
+          </button>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="inline-flex h-7 items-center rounded-md border border-border px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (approvalState === "dismissing") {
+    return (
+      <div className="space-y-3">
+        <p className="text-xs font-medium text-muted-foreground">What&apos;s the issue with this signal?</p>
+        <div className="flex flex-wrap gap-1.5">
+          {dismissReasons.map((reason) => {
+            const selected = selectedReasons.includes(reason)
+            return (
+              <button
+                key={reason}
+                type="button"
+                onClick={() => toggleReason(reason)}
+                className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                  selected
+                    ? "border-red-200 bg-red-100 text-red-700"
+                    : "border-border bg-background text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                }`}
+              >
+                {reason}
+              </button>
+            )
+          })}
+        </div>
+
+        {(selectedReasons.length > 0 || otherSelected) && (
+          <input
+            type="text"
+            value={detailText}
+            onChange={(e) => setDetailText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && canSubmitDismiss) handleDismissSubmit()
+            }}
+            placeholder={otherSelected ? "Please describe (required)" : "Provide additional feedback..."}
+            className="h-7 w-full rounded-md border border-border bg-muted/20 px-2.5 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+        )}
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleDismissSubmit}
+            disabled={!canSubmitDismiss}
+            className={`inline-flex h-7 items-center gap-1.5 rounded-md px-3 text-xs font-semibold transition-colors ${
+              canSubmitDismiss
+                ? "bg-foreground text-background hover:bg-foreground/90"
+                : "cursor-not-allowed bg-muted text-muted-foreground"
+            }`}
+          >
+            Submit
+          </button>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="inline-flex h-7 items-center rounded-md border border-border px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-2">
       <button
         type="button"
-        onClick={() => handleThumbClick("up")}
-        aria-label="Helpful signal"
-        className={`rounded p-1.5 transition-colors ${
-          thumbState === "up"
-            ? "bg-emerald-100 text-emerald-700"
-            : "text-muted-foreground hover:bg-muted hover:text-foreground"
-        }`}
+        onClick={requestApproval}
+        className="inline-flex h-7 items-center gap-1.5 rounded-md border border-border bg-foreground px-3 text-xs font-semibold text-background shadow-none transition-colors hover:bg-foreground/90"
       >
-        <ThumbsUp className="h-3.5 w-3.5" fill={thumbState === "up" ? "currentColor" : "none"} />
+        <CirclePlus className="h-3.5 w-3.5" />
+        Create Opportunity
       </button>
       <button
         type="button"
-        onClick={() => handleThumbClick("down")}
-        aria-label="Unhelpful signal"
-        className={`rounded p-1.5 transition-colors ${
-          thumbState === "down"
-            ? "bg-red-100 text-red-700"
-            : "text-muted-foreground hover:bg-muted hover:text-foreground"
-        }`}
+        onClick={requestDismiss}
+        className="inline-flex h-7 items-center gap-1.5 rounded-md border border-border px-3 text-xs font-medium text-muted-foreground shadow-none transition-colors hover:bg-muted hover:text-foreground"
       >
-        <ThumbsDown className="h-3.5 w-3.5" fill={thumbState === "down" ? "currentColor" : "none"} />
+        <ThumbsDown className="h-3.5 w-3.5" />
+        Not Helpful
       </button>
     </div>
   )
 }
 
-function Panel() {
-  const {
-    thumbState,
-    selectedPills,
-    detailText,
-    otherSelected,
-    hasRequiredInput,
-    togglePill,
-    setDetailText,
-    handleSubmit,
-  } = useSignalFeedback()
-
-  if (!thumbState) return null
-
-  const pills = thumbState === "up" ? positivePills : negativePills
+function Gate({ children }: { children: React.ReactNode }) {
+  const { approvalState } = useSignalApproval()
+  const isLocked =
+    approvalState === "pending" || approvalState === "confirming" || approvalState === "dismissing"
 
   return (
-    <div className="mt-4 space-y-3 border-t border-border/60 pt-4">
-      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70">How&apos;s this signal?</p>
-
-      <div className="space-y-2">
-        <p className="text-xs text-muted-foreground">{thumbState === "up" ? "What was useful?" : "What&apos;s the issue?"}</p>
-        <div className="flex flex-wrap gap-1.5">
-          {pills.map((pill) => {
-            const selected = selectedPills.includes(pill)
-            return (
-              <button
-                key={pill}
-                type="button"
-                onClick={() => togglePill(pill)}
-                className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors ${
-                  selected
-                    ? thumbState === "up"
-                      ? "border-emerald-200 bg-emerald-100 text-emerald-700"
-                      : "border-red-200 bg-red-100 text-red-700"
-                    : "border-border bg-background text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                }`}
-              >
-                {pill}
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
-      {(thumbState === "down" || selectedPills.length > 0) && (
-        <div className="space-y-1.5">
-          <input
-            type="text"
-            value={detailText}
-            onChange={(event) => setDetailText(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && hasRequiredInput) {
-                handleSubmit()
-              }
-            }}
-            placeholder={
-              thumbState === "up"
-                ? "Tell us what made this signal useful"
-                : "Tell us what is inaccurate or not useful"
-            }
-            className="h-8 w-full rounded-md border border-border bg-background px-2.5 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-ring"
-          />
-          {otherSelected && detailText.trim().length === 0 && (
-            <p className="text-[10px] text-red-500">Please add a short note when selecting Other.</p>
-          )}
+    <div className="relative">
+      {isLocked && (
+        <div className="pointer-events-none absolute inset-x-0 top-4 z-10 flex justify-center">
+          <div className="flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground shadow-sm">
+            <Lock className="h-3 w-3" />
+            Approve or dismiss the signal above to unlock
+          </div>
         </div>
       )}
-
-      <button
-        type="button"
-        onClick={handleSubmit}
-        disabled={!hasRequiredInput}
-        className={`h-8 w-full rounded-md text-xs font-semibold transition-colors ${
-          hasRequiredInput
-            ? "bg-foreground text-background hover:bg-foreground/90"
-            : "cursor-not-allowed bg-muted text-muted-foreground"
-        }`}
+      <div
+        className={`transition-opacity duration-300 ${isLocked ? "pointer-events-none select-none opacity-40" : "opacity-100"}`}
       >
-        Submit
-      </button>
+        {children}
+      </div>
     </div>
   )
 }
 
-export const SignalFeedback = { Root, Trigger, Panel }
-
-interface SignalFeedbackInlineProps {
-  onSubmitFeedback?: (type: FeedbackType, pills: string[], detail: string) => void
-}
-
-export function SignalFeedbackInline({ onSubmitFeedback }: SignalFeedbackInlineProps) {
-  return (
-    <Root onSubmitFeedback={onSubmitFeedback}>
-      <div className="space-y-0">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-foreground">How&apos;s this signal?</p>
-          <Trigger />
-        </div>
-        <Panel />
-      </div>
-    </Root>
-  )
-}
+export const SignalApproval = { Root, Actions, Gate }
