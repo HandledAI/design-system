@@ -884,10 +884,11 @@ function EmailHeader({
         </div>
       </div>
 
-      <div className={`flex flex-wrap items-start gap-x-3 gap-y-2 px-4 py-2 border-b border-border/30 ${hasUnconfirmedTo ? "bg-amber-50/35" : ""}`}>
-        <span className="text-xs text-muted-foreground w-10 shrink-0 mt-1">To</span>
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-1.5">
+      <div className={`flex items-start gap-3 px-4 py-2 border-b border-border/30 ${hasUnconfirmedTo ? "bg-amber-50/35" : ""}`}>
+        <span className="text-xs text-muted-foreground w-10 shrink-0 mt-1.5">To</span>
+        <div className="flex-1 min-w-0 flex flex-wrap gap-2">
+          <div className="flex-grow min-w-[200px]">
+            <div className="flex flex-wrap items-center gap-1.5">
             {toContacts.map((contact, index) => (
               <div
                 key={`${contact.name}-${index}`}
@@ -1004,8 +1005,9 @@ function EmailHeader({
               ) : null}
             </div>
           )}
+          </div>
         </div>
-        <div className="ml-[3.25rem] mt-1 flex w-full items-center justify-end gap-1.5 shrink-0 lg:ml-4 lg:w-auto">
+        <div className="flex items-center justify-end gap-1.5 shrink-0 ml-auto mt-1">
           {accountContacts && accountContacts.length > 0 && (
             <AccountContactsPopover
               contacts={accountContacts}
@@ -1492,8 +1494,9 @@ function SuggestedActionCard({
       {isCall && (
         <div className="mx-4 mt-3 rounded-md border border-border/60 bg-muted/[0.16] px-4 py-3">
           <div className="flex items-start gap-3">
-            <span className="text-xs text-muted-foreground w-12 shrink-0 mt-1">To</span>
-            <div className="flex-1 min-w-0">
+          <span className="text-xs text-muted-foreground w-12 shrink-0 mt-1">To</span>
+          <div className="flex-1 min-w-0 flex flex-wrap gap-2">
+            <div className="flex-grow min-w-[200px]">
               {callContact ? (
                 <>
                   <ContactCard
@@ -1510,7 +1513,7 @@ function SuggestedActionCard({
                 <div className="text-sm text-muted-foreground">No contact selected.</div>
               )}
             </div>
-            <div className="ml-[3.25rem] mt-1 flex w-full items-center justify-end gap-1.5 shrink-0 lg:ml-4 lg:w-auto">
+            <div className="flex items-center justify-end gap-1.5 shrink-0 ml-auto mt-1">
               {accountContacts && accountContacts.length > 0 && (
                 <AccountContactsPopover
                   contacts={accountContacts}
@@ -1529,11 +1532,12 @@ function SuggestedActionCard({
                 onClick={onOpenAccountDetails}
                 className="h-7 rounded-md border border-border bg-background px-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
               >
-                Account details
-              </button>
-            </div>
+              Account details
+            </button>
           </div>
         </div>
+      </div>
+    </div>
       )}
 
       
