@@ -57,7 +57,31 @@ export default function Home() {
     { key: "zendesk", label: "Zendesk", url: BRAND_ICONS.zendesk },
   ] as const
 
+  const graphicAssets = [
+    {
+      key: "credentials-graphic",
+      label: "Credentials Graphic",
+      url: "https://bqvtedneuaozpgcgcxow.supabase.co/storage/v1/object/public/media/Graphics/Credentials.svg",
+    },
+    {
+      key: "mission-control-graphic",
+      label: "Mission Control Graphic",
+      url: "https://bqvtedneuaozpgcgcxow.supabase.co/storage/v1/object/public/media/Graphics/MissionControl.svg",
+    },
+    {
+      key: "communication-graphic",
+      label: "Communication Graphic",
+      url: "https://bqvtedneuaozpgcgcxow.supabase.co/storage/v1/object/public/media/Graphics/PatientAccess.svg",
+    },
+    {
+      key: "revenue-operations-graphic",
+      label: "Revenue Operations Graphic",
+      url: "https://bqvtedneuaozpgcgcxow.supabase.co/storage/v1/object/public/media/Graphics/RevenueCycle.svg",
+    },
+  ] as const
+
   const iconBucketBaseUrl = BRAND_ICONS.gdoc.replace(/\/gdoc\.a1\.svg$/, "")
+  const graphicBucketBaseUrl = graphicAssets[0].url.replace(/\/Credentials\.svg$/, "")
 
   return (
     <div className="max-w-5xl mx-auto flex flex-col min-h-svh px-4 py-12 gap-12">
@@ -123,6 +147,7 @@ export default function Home() {
               <h3 className="font-semibold text-muted-foreground mb-2">Assets</h3>
               <ul className="space-y-1.5 list-disc list-inside pl-4 text-foreground/80">
                 <li><a href="#assets-icons" className="hover:text-brand-purple hover:underline">Icon Assets + URLs</a></li>
+                <li><a href="#assets-graphics" className="hover:text-brand-purple hover:underline">Graphic Assets + URLs</a></li>
               </ul>
             </div>
           </div>
@@ -699,6 +724,48 @@ export default function Home() {
                       <td className="px-3 py-2">
                         <div className="w-8 h-8 rounded-md border border-border/60 bg-muted/20 flex items-center justify-center">
                           <img src={asset.url} alt={asset.label} className="w-4 h-4 object-contain" />
+                        </div>
+                      </td>
+                      <td className="px-3 py-2 font-medium text-foreground whitespace-nowrap">{asset.label}</td>
+                      <td className="px-3 py-2">
+                        <a
+                          href={asset.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="font-mono text-xs text-muted-foreground hover:text-foreground underline-offset-4 hover:underline break-all"
+                        >
+                          {asset.url}
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="assets-graphics" className="border rounded-xl p-6 space-y-4 scroll-m-20">
+            <h3 className="font-semibold text-lg">Graphic Assets + URLs</h3>
+            <p className="text-sm text-muted-foreground">
+              Storage bucket base URL:{" "}
+              <code className="rounded bg-muted px-1.5 py-0.5 text-xs">{graphicBucketBaseUrl}</code>
+            </p>
+
+            <div className="overflow-x-auto rounded-md border border-border/60">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/40">
+                  <tr className="text-left">
+                    <th className="px-3 py-2 font-medium text-muted-foreground">Preview</th>
+                    <th className="px-3 py-2 font-medium text-muted-foreground">Asset</th>
+                    <th className="px-3 py-2 font-medium text-muted-foreground">URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {graphicAssets.map((asset) => (
+                    <tr key={asset.key} className="border-t border-border/40 align-middle">
+                      <td className="px-3 py-2">
+                        <div className="w-48 h-28 rounded-md border border-border/60 bg-muted/20 p-3 flex items-center justify-center">
+                          <img src={asset.url} alt={asset.label} className="max-w-full max-h-full object-contain" />
                         </div>
                       </td>
                       <td className="px-3 py-2 font-medium text-foreground whitespace-nowrap">{asset.label}</td>
