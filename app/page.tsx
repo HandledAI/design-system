@@ -16,7 +16,7 @@ import {
   SourceList,
 } from "@/registry/new-york/ui/detail-view"
 import { SuggestedActions, type SuggestedAction } from "@/registry/new-york/ui/suggested-actions"
-import { SignalApproval } from "@/registry/new-york/ui/signal-feedback-inline"
+import { SignalApprovalRoot, SignalApprovalActions, SignalApprovalGate } from "@/registry/new-york/ui/signal-feedback-inline"
 import { PreviewList, PreviewListItem } from "@/registry/new-york/ui/preview-list"
 import {
   TopTasksCard,
@@ -341,10 +341,10 @@ export default function Home() {
             <div id="custom-detail-view" className="border rounded-xl p-6 space-y-4 scroll-m-20">
               <h3 className="font-semibold text-lg">Detail View (Summary, Citations & Sources)</h3>
               <div className="border rounded-lg p-6 max-w-xl">
-                <SignalApproval.Root companyName="Lunchclub">
+                <SignalApprovalRoot companyName="Lunchclub">
                   <DetailViewSummary
                     title="Here's what I found:"
-                    actions={<SignalApproval.Actions />}
+                    actions={<SignalApprovalActions />}
                     sources={
                       <SourceList sources={[
                         { id: 1, summary: "Balance outflow increased ~34% week-over-week with no matching inbound trend.", meta: "Product telemetry · 2h ago" },
@@ -359,7 +359,7 @@ export default function Home() {
                       <Citation number={2} source={{ id: 2, summary: "Login frequency for finance users dropped over the last 10 days.", meta: "Workspace activity · 6h ago" }} />
                     </p>
                   </DetailViewSummary>
-                </SignalApproval.Root>
+                </SignalApprovalRoot>
               </div>
             </div>
 
@@ -407,7 +407,7 @@ export default function Home() {
                 </div>
 
                 <div className="border rounded-lg p-5">
-                  <SignalApproval.Root companyName="Cedars">
+                  <SignalApprovalRoot companyName="Cedars">
                     <DetailViewHeader
                       title="James Liu"
                       breadcrumbs="REF-1894"
@@ -422,7 +422,7 @@ export default function Home() {
                     />
                     <DetailViewSummary
                       title="Here's what I found for this patient:"
-                      actions={<SignalApproval.Actions />}
+                      actions={<SignalApprovalActions />}
                     >
                       <p className="flex items-center flex-wrap gap-1">
                         <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full mr-2" />
@@ -430,7 +430,7 @@ export default function Home() {
                         <Citation number={1} />
                       </p>
                     </DetailViewSummary>
-                    <SignalApproval.Gate>
+                    <SignalApprovalGate>
                       <SuggestedActions
                         actions={[
                           {
@@ -476,8 +476,8 @@ export default function Home() {
                           },
                         ] satisfies SuggestedAction[]}
                       />
-                    </SignalApproval.Gate>
-                  </SignalApproval.Root>
+                    </SignalApprovalGate>
+                  </SignalApprovalRoot>
                 </div>
               </div>
             </div>

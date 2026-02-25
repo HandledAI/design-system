@@ -6,7 +6,6 @@ import {
   Inbox,
   ArrowLeft,
   ChevronDown,
-  ChevronUp,
   ChevronRight,
   Filter,
   Search,
@@ -50,7 +49,6 @@ import {
 import { MetricCard } from "@/registry/new-york/ui/metric-card"
 import {
   Citation,
-  SourceList,
   type SourceDef,
 } from "@/registry/new-york/ui/detail-view"
 import { Button } from "@/registry/new-york/ui/button"
@@ -70,6 +68,8 @@ import {
   ConnectedApps,
 } from "@/registry/new-york/ui/entity-panel"
 import { SignalApproval } from "@/registry/new-york/ui/signal-feedback-inline"
+import { ScoreBreakdown, type ScoreFactor } from "@/registry/new-york/ui/score-breakdown"
+import { ScoreAnalysisModal } from "@/registry/new-york/ui/score-analysis-modal"
 import {
   SuggestedActions,
   type SuggestedAction,
@@ -321,6 +321,66 @@ const buildSourceItems = (item: QueueItem): SourceDef[] => [
   },
 ]
 
+const SIGNAL_SCORE_DATA: Record<string, {
+  score: number
+  factors: ScoreFactor[]
+  whyNow: string
+  evidence: string[]
+  confidence: number
+}> = {
+  Lunchclub: {
+    score: 78,
+    factors: [
+      { key: "trigger", label: "Trigger strength", score: 85, why: "Large balance outflow pattern — strong churn signal for banking infrastructure" },
+      { key: "fit", label: "Company fit", score: 72, why: "Series B, 150+ employees — matches retention ICP" },
+      { key: "timing", label: "Timing", score: 82, why: "Outflow detected within critical 30-day window" },
+      { key: "signals", label: "Market signals", score: 68, why: "Competitor mentions in Slack channel suggest active evaluation" },
+      { key: "competitive", label: "Competitive risk", score: null, risk: "High", why: "Active competitor evaluation detected in #treasury-questions" },
+    ],
+    whyNow: "Large sustained outflows and competitor evaluation signals suggest immediate churn risk requiring proactive intervention.",
+    evidence: [
+      "Balance outflow of $4.2M over past week (3.2x normal activity)",
+      "Login frequency dropped 34% for finance users",
+      "Competitor mentions detected in Slack channel",
+    ],
+    confidence: 87,
+  },
+  CloudKitchen: {
+    score: 84,
+    factors: [
+      { key: "trigger", label: "Trigger strength", score: 92, why: "New VP Finance hire — strong buying signal for banking infrastructure" },
+      { key: "fit", label: "Company fit", score: 88, why: "Series B, 200+ employees, high-growth — matches our ICP" },
+      { key: "timing", label: "Timing", score: 78, why: "12 days into role — within the 90-day evaluation window" },
+      { key: "signals", label: "Market signals", score: 72, why: "3 finance/treasury job postings suggest active buildout" },
+      { key: "competitive", label: "Competitive risk", score: null, risk: "Low", why: "No existing platform account detected — net new prospect" },
+    ],
+    whyNow: "New VP Finance hire at a high-growth Series B company creates a strong buying window for banking infrastructure.",
+    evidence: [
+      "Jackie Lee joined as VP Finance 12 days ago",
+      "3 open finance/treasury roles indicate team buildout",
+      "No existing banking platform detected — greenfield opportunity",
+    ],
+    confidence: 91,
+  },
+}
+
+const getSignalScore = (company: string) => {
+  return SIGNAL_SCORE_DATA[company] ?? {
+    score: 65,
+    factors: [
+      { key: "trigger", label: "Trigger strength", score: 70, why: "Moderate signal detected based on account activity" },
+      { key: "fit", label: "Company fit", score: 65, why: "Reasonable fit based on company profile" },
+      { key: "timing", label: "Timing", score: 58, why: "Within general evaluation window" },
+    ],
+    whyNow: "Moderate signals detected that warrant review and potential outreach.",
+    evidence: [
+      "Activity patterns suggest potential opportunity",
+      "Company profile aligns with target segment",
+    ],
+    confidence: 72,
+  }
+}
+
 export default function PreviewClientPage() {
   const [currentView, setCurrentView] = React.useState("inbox")
   const [inboxViewMode, setInboxViewMode] = React.useState<"inbox" | "list" | "detail">("inbox")
@@ -330,11 +390,12 @@ export default function PreviewClientPage() {
   const [showCoaching, setShowCoaching] = React.useState(true)
   const [isEntityPanelOpen, setIsEntityPanelOpen] = React.useState(false)
   const [isQuickActionOpen, setIsQuickActionOpen] = React.useState(false)
-  const [contextExpanded, setContextExpanded] = React.useState(false)
   const [showRecentActivity, setShowRecentActivity] = React.useState(false)
   const [extraActions, setExtraActions] = React.useState<SuggestedAction[]>([])
   const [inboxAssignee, setInboxAssignee] = React.useState<AssigneeFilter>("me")
   const [inboxFilters, setInboxFilters] = React.useState<Record<string, string>>({})
+  const [signalScoreModalOpen, setSignalScoreModalOpen] = React.useState(false)
+  const [scoreBreakdownExpanded, setScoreBreakdownExpanded] = React.useState(false)
 
   const INBOX_FILTER_CATEGORIES: InboxFilterCategory[] = React.useMemo(
     () => [
@@ -397,8 +458,8 @@ export default function PreviewClientPage() {
   }, [inboxViewMode])
 
   React.useEffect(() => {
-    setContextExpanded(false)
     setShowRecentActivity(false)
+    setScoreBreakdownExpanded(false)
   }, [selectedTask.id])
 
   const handleDuplicate = React.useCallback((id: number | string) => {
@@ -421,6 +482,9 @@ export default function PreviewClientPage() {
         companyName={item.company}
         onApprove={() => {
           console.log("Approved signal — creating Salesforce opportunity:", { taskId: item.id, company: item.company })
+        }}
+        onApproveFeedback={(reasons, detail) => {
+          console.log("Approval feedback:", { taskId: item.id, company: item.company, reasons, detail })
         }}
         onDismiss={(reasons, detail) => {
           console.log("Dismissed signal:", { taskId: item.id, reasons, detail })
@@ -464,78 +528,130 @@ export default function PreviewClientPage() {
             </button>
           </div>
 
-            <div className="mb-8 border border-border rounded-lg bg-card">
-              <div className="p-5">
-                <h3 className="text-sm font-bold text-foreground mb-1">Account brief: {item.company}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                  We detected signals that suggest a potential opportunity with this account.
+            <div className="mb-8">
+                <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Signal brief</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-2">
+                  We detected signals that suggest a potential opportunity with {item.company}.
                 </p>
 
-                <ul className="list-disc space-y-2 pl-4 text-sm text-muted-foreground marker:text-muted-foreground/60 mb-4">
-                  <li>
-                    There are <span className="font-medium text-foreground">3 unusual signals</span> including a large balance
-                    outflow and reduced login frequency
-                    <Citation number={1} source={sourceItems[0]} />
-                    <Citation number={2} source={sourceItems[1]} />
-                    <Citation number={3} source={sourceItems[2]} />
-                  </li>
-                  <li>
-                    Scott mentioned in <span className="font-medium text-foreground">#treasury-questions</span> that they are actively
-                    looking for treasury management options
-                    <Citation number={4} source={sourceItems[2]} />
-                  </li>
-                  <li>
-                    You have a recent email thread regarding optimization options that hasn&apos;t been replied to
-                    <Citation number={6} source={sourceItems[3]} />
-                  </li>
-                </ul>
+                {/* Why Now -- pulled from score analysis */}
+                {(() => {
+                  const signalData = getSignalScore(item.company)
+                  return (
+                    <p className="text-sm text-foreground/90 leading-relaxed mb-4">
+                      {signalData.whyNow}
+                    </p>
+                  )
+                })()}
 
-                <button
-                  type="button"
-                  onClick={() => setContextExpanded((previous) => !previous)}
-                  className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70 transition-colors hover:text-foreground mb-4"
-                >
-                  Sources
-                  <ChevronDown
-                    className={`h-3.5 w-3.5 transition-transform duration-200 ${contextExpanded ? "rotate-180" : ""}`}
-                  />
-                </button>
+                {/* Signal Score */}
+                {(() => {
+                  const signalData = getSignalScore(item.company)
+                  const pct = signalData.score
+                  const scoreColor = pct >= 70 ? "text-emerald-600" : pct >= 40 ? "text-amber-600" : "text-red-600"
+                  const barColor = pct >= 70 ? "bg-emerald-500" : pct >= 40 ? "bg-amber-500" : "bg-red-500"
+                  const scoreLabel = pct >= 70 ? "HIGH" : pct >= 40 ? "MEDIUM" : "LOW"
 
-                {contextExpanded && (
-                  <div className="mb-4">
-                    <SourceList sources={sourceItems} />
-                  </div>
-                )}
+                  const evidenceWithCitations: React.ReactNode[] = [
+                    <>
+                      There are <span className="font-medium text-foreground">3 unusual signals</span> including a large balance
+                      outflow and reduced login frequency
+                      <Citation number={1} source={sourceItems[0]} />
+                      <Citation number={2} source={sourceItems[1]} />
+                      <Citation number={3} source={sourceItems[2]} />
+                    </>,
+                    <>
+                      Scott mentioned in <span className="font-medium text-foreground">#treasury-questions</span> that they are actively
+                      looking for treasury management options
+                      <Citation number={4} source={sourceItems[2]} />
+                    </>,
+                    <>
+                      You have a recent email thread regarding optimization options that hasn&apos;t been replied to
+                      <Citation number={5} source={sourceItems[3]} />
+                    </>,
+                  ]
 
-                <div className="border-t border-border pt-4">
-                  <SignalApproval.Actions />
-                </div>
-              </div>
+                  return (
+                    <div className="mb-5 rounded-md border border-border bg-muted/20 p-3">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Signal Score</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold text-foreground">{signalData.score}/100</span>
+                          <span className={`text-[10px] font-bold uppercase ${scoreColor}`}>{scoreLabel}</span>
+                        </div>
+                      </div>
+                      <div className="h-1.5 bg-muted rounded-full overflow-hidden mb-2">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+                          style={{ width: `${signalData.score}%` }}
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setScoreBreakdownExpanded((prev) => !prev)}
+                          className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${scoreBreakdownExpanded ? "rotate-180" : ""}`} />
+                          Score breakdown
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSignalScoreModalOpen(true)}
+                          className="text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors ml-auto"
+                        >
+                          View full analysis
+                        </button>
+                      </div>
+
+                      {scoreBreakdownExpanded && (
+                        <div className="mt-3">
+                          <ScoreBreakdown
+                            factors={signalData.factors}
+                            onFactorFeedback={(key, type) =>
+                              console.log("Signal factor feedback:", { company: item.company, factor: key, type })
+                            }
+                          />
+                        </div>
+                      )}
+
+                      <ScoreAnalysisModal
+                        open={signalScoreModalOpen}
+                        onOpenChange={setSignalScoreModalOpen}
+                        title={`Signal Score: ${item.company}`}
+                        description="Composite score based on trigger strength, company fit, timing, and market signals"
+                        score={signalData.score}
+                        whyNow={signalData.whyNow}
+                        evidence={evidenceWithCitations}
+                        confidence={signalData.confidence}
+                        confidenceDescription="Based on signal scoring model trained on historical conversion data and signal outcomes."
+                        factors={signalData.factors}
+                        onFactorFeedback={(key, type) =>
+                          console.log("Signal factor feedback:", { company: item.company, factor: key, type })
+                        }
+                      />
+                    </div>
+                  )
+                })()}
+
+                <SignalApproval.Actions />
             </div>
 
-          <div className="mb-8 overflow-hidden bg-background">
-            <div className="relative z-20 bg-background p-4">
-              <div className="flex gap-4">
-                <div className="w-1 self-stretch rounded-full bg-slate-400/80" />
-                <div className="min-w-0 flex-1">
+          <div className="mb-8">
                   <button
                     type="button"
                     onClick={() => setShowRecentActivity((prev) => !prev)}
-                    className="flex w-full items-center justify-between gap-3 text-left"
+                    className="flex w-full items-center justify-between gap-2 py-2 rounded-md transition-colors hover:bg-muted/40 -mx-2 px-2"
                   >
-                    <p className="text-sm font-semibold text-foreground">Activity timeline: {item.company}</p>
-                    <span className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                      {showRecentActivity ? "Hide" : "Show"} (7)
-                      {showRecentActivity ? (
-                        <ChevronUp className="h-3.5 w-3.5" />
-                      ) : (
-                        <ChevronDown className="h-3.5 w-3.5" />
-                      )}
-                    </span>
+                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Activity timeline</h3>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[11px] font-medium text-muted-foreground">7 events</span>
+                      <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${showRecentActivity ? "rotate-180" : ""}`} />
+                    </div>
                   </button>
 
                   {showRecentActivity ? (
-                    <div className="mt-4 border-t border-border/40 pt-4">
+                    <div className="mt-3">
                       <TimelineActivity
                         events={[
                           {
@@ -656,9 +772,6 @@ export default function PreviewClientPage() {
                       />
                     </div>
                   ) : null}
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
