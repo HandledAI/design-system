@@ -690,23 +690,37 @@ function AccountContactsPopover({
   trigger: React.ReactNode
 }) {
   const [open, setOpen] = React.useState(false)
+  const triggerRef = React.useRef<HTMLDivElement>(null)
+  const [popoverStyle, setPopoverStyle] = React.useState<React.CSSProperties>({})
+
+  React.useEffect(() => {
+    if (open && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect()
+      const popoverWidth = Math.min(448, window.innerWidth - 32)
+      let left = rect.right - popoverWidth
+      if (left < 16) left = 16
+      if (left + popoverWidth > window.innerWidth - 16) left = window.innerWidth - 16 - popoverWidth
+      setPopoverStyle({ position: "fixed", top: rect.bottom + 4, left })
+    }
+  }, [open])
 
   return (
-    <div className="relative">
-      <div onClick={() => setOpen(!open)}>{trigger}</div>
+    <div>
+      <div ref={triggerRef} onClick={() => setOpen(!open)}>{trigger}</div>
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute top-full right-0 mt-1 bg-background border border-border rounded-lg shadow-xl z-50 w-[28rem] max-w-[calc(100vw-2rem)] py-2 animate-in fade-in slide-in-from-top-1 duration-150">
+          <div style={popoverStyle} className="fixed bg-background border border-border rounded-lg shadow-xl z-50 w-[28rem] max-w-[calc(100vw-2rem)] py-2 animate-in fade-in slide-in-from-top-1 duration-150">
             <div className="px-3 py-1.5 text-[11px] font-medium text-muted-foreground/60 uppercase tracking-wide">
               Account Contacts
             </div>
             <div className="max-h-48 overflow-y-auto">
               {contacts.map((c, i) => (
-                <button
+                <div
                   key={i}
+                  role="button"
                   onClick={() => { (onSelectTo ?? onSelect)(c); setOpen(false) }}
-                  className="flex items-center gap-3 w-full px-3 py-2 text-left hover:bg-muted/50 transition-colors"
+                  className="flex items-center gap-3 w-full px-3 py-2 text-left hover:bg-muted/50 transition-colors cursor-pointer"
                 >
                   <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[10px] font-medium text-muted-foreground shrink-0">
                     {c.name.split(" ").map((n) => n[0]).join("")}
@@ -793,7 +807,7 @@ function AccountContactsPopover({
                       <img src={BRAND_ICONS.salesforce} alt="Salesforce" className="w-3.5 h-3.5 object-contain" />
                     </button>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
             {onViewAll && (
@@ -886,8 +900,7 @@ function EmailHeader({
 
       <div className={`flex items-start gap-3 px-4 py-2 border-b border-border/30 ${hasUnconfirmedTo ? "bg-amber-50/35" : ""}`}>
         <span className="text-xs text-muted-foreground w-10 shrink-0 mt-1.5">To</span>
-        <div className="flex-1 min-w-0 flex flex-wrap gap-2">
-          <div className="flex-grow min-w-[200px]">
+        <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-1.5">
             {toContacts.map((contact, index) => (
               <div
@@ -1005,9 +1018,7 @@ function EmailHeader({
               ) : null}
             </div>
           )}
-          </div>
-        </div>
-        <div className="flex items-center justify-end gap-1.5 shrink-0 ml-auto mt-1">
+          <div className="flex items-center flex-wrap gap-1.5 mt-1.5">
           {accountContacts && accountContacts.length > 0 && (
             <AccountContactsPopover
               contacts={accountContacts}
@@ -1038,6 +1049,7 @@ function EmailHeader({
           >
             Add Cc/Bcc
           </button>
+          </div>
         </div>
       </div>
 
@@ -1492,52 +1504,45 @@ function SuggestedActionCard({
 
       {/* Call contact card */}
       {isCall && (
-        <div className="mx-4 mt-3 rounded-md border border-border/60 bg-muted/[0.16] px-4 py-3">
+        <div className="mx-4 mt-3 rounded-md border border-border/60 bg-muted/[0.16] px-3 py-2.5">
           <div className="flex items-start gap-3">
-          <span className="text-xs text-muted-foreground w-12 shrink-0 mt-1">To</span>
-          <div className="flex-1 min-w-0 flex flex-wrap gap-2">
-            <div className="flex-grow min-w-[200px]">
+            <span className="text-xs text-muted-foreground w-10 shrink-0 mt-1.5">To</span>
+            <div className="flex-1 min-w-0">
               {callContact ? (
-                <>
-                  <ContactCard
-                    contact={callContact}
-                    showPhone
-                    onConfirm={() => setCallContact(callContact ? { ...callContact, confirmed: true } : undefined)}
-                    onRemove={() => setCallContact(undefined)}
-                  />
-                  <div className="mt-1 text-[11px] text-muted-foreground">
-                    Calling: {callContact.phone ?? callContact.phones?.[0] ?? "no phone"}
-                  </div>
-                </>
+                <ContactCard
+                  contact={callContact}
+                  showPhone
+                  onConfirm={() => setCallContact(callContact ? { ...callContact, confirmed: true } : undefined)}
+                  onRemove={() => setCallContact(undefined)}
+                />
               ) : (
                 <div className="text-sm text-muted-foreground">No contact selected.</div>
               )}
+              <div className="flex items-center flex-wrap gap-1.5 mt-1.5">
+                {accountContacts && accountContacts.length > 0 && (
+                  <AccountContactsPopover
+                    contacts={accountContacts}
+                    onSelect={(c) => setCallContact({ ...c, confirmed: true })}
+                    onViewAll={onOpenAccountDetails}
+                    onOpenRecentActivity={onOpenRecentActivity}
+                    trigger={
+                      <button className="h-7 rounded-md border border-border bg-background px-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors">
+                        Contacts
+                      </button>
+                    }
+                  />
+                )}
+                <button
+                  type="button"
+                  onClick={onOpenAccountDetails}
+                  className="h-7 rounded-md border border-border bg-background px-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+                >
+                  Account details
+                </button>
+              </div>
             </div>
-            <div className="flex items-center justify-end gap-1.5 shrink-0 ml-auto mt-1">
-              {accountContacts && accountContacts.length > 0 && (
-                <AccountContactsPopover
-                  contacts={accountContacts}
-                  onSelect={(c) => setCallContact({ ...c, confirmed: true })}
-                  onViewAll={onOpenAccountDetails}
-                  onOpenRecentActivity={onOpenRecentActivity}
-                  trigger={
-                    <button className="h-7 rounded-md border border-border bg-background px-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors">
-                      Contacts
-                    </button>
-                  }
-                />
-              )}
-              <button
-                type="button"
-                onClick={onOpenAccountDetails}
-                className="h-7 rounded-md border border-border bg-background px-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
-              >
-              Account details
-            </button>
           </div>
         </div>
-      </div>
-    </div>
       )}
 
       
@@ -1797,7 +1802,7 @@ export function SuggestedActions({
         {visibleActions.map((action) => (
           <div
             key={action.id}
-            className="group bg-background border border-border rounded-md shadow-sm hover:shadow-md transition-all duration-200"
+            className="group bg-background border border-border rounded-md overflow-hidden shadow-sm hover:shadow-md transition-all duration-200"
           >
             <SuggestedActionCard
               action={action}
