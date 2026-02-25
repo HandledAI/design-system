@@ -39,6 +39,7 @@ import { PerformanceMetricsTableShowcase } from "@/app/performance-metrics-table
 import { ActivityDetailShowcase } from "@/app/activity-detail-showcase"
 import { ViewModeToggleShowcase } from "@/app/view-mode-toggle-showcase"
 import { SuggestedActionsShowcase } from "@/app/suggested-actions-showcase"
+import { ChartShowcase } from "@/app/chart-showcase"
 import { Clock, Square } from "lucide-react"
 import { BRAND_ICONS } from "@/lib/icons"
 
@@ -106,7 +107,7 @@ export default function Home() {
         {/* Table of Contents */}
         <div className="mt-8 p-6 rounded-xl border border-border bg-card">
           <h2 className="text-lg font-bold mb-4">Table of Contents</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
             <div>
               <h3 className="font-semibold text-muted-foreground mb-2">Core Components</h3>
               <ul className="space-y-1.5 list-disc list-inside pl-4 text-foreground/80">
@@ -142,6 +143,19 @@ export default function Home() {
                 <li><a href="#custom-view-mode-toggle" className="hover:text-brand-purple hover:underline">View Mode Toggle</a></li>
                 <li><a href="#custom-suggested-actions" className="hover:text-brand-purple hover:underline">Suggested Actions</a></li>
                 <li><a href="#custom-entity-panel" className="hover:text-brand-purple hover:underline">Entity Panel Sections</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-muted-foreground mb-2">Chart Components</h3>
+              <ul className="space-y-1.5 list-disc list-inside pl-4 text-foreground/80">
+                <li><a href="#chart-pipeline-overview" className="hover:text-brand-purple hover:underline">Pipeline Overview</a></li>
+                <li><a href="#chart-sankey" className="hover:text-brand-purple hover:underline">Sankey Diagram</a></li>
+                <li><a href="#chart-volume-analysis" className="hover:text-brand-purple hover:underline">Volume Analysis</a></li>
+                <li><a href="#chart-donut" className="hover:text-brand-purple hover:underline">Donut Chart</a></li>
+                <li><a href="#chart-trend-area" className="hover:text-brand-purple hover:underline">Trend Area Chart</a></li>
+                <li><a href="#chart-bar" className="hover:text-brand-purple hover:underline">Bar Chart</a></li>
+                <li><a href="#chart-bar-list" className="hover:text-brand-purple hover:underline">Styled Bar List</a></li>
+                <li><a href="#chart-report-card" className="hover:text-brand-purple hover:underline">Report Card Wrapper</a></li>
               </ul>
             </div>
             <div>
@@ -736,6 +750,13 @@ export default function Home() {
               </div>
             </div>
 
+          </div>
+        </section>
+
+        <section className="space-y-6">
+          <h2 className="text-2xl font-bold border-b border-border pb-2">Chart Components</h2>
+          <div className="grid grid-cols-1 gap-8">
+            <ChartShowcase />
           </div>
         </section>
 

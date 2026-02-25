@@ -37,8 +37,11 @@ const DEMO_FILTER_CATEGORIES: ItemListFilterCategory[] = [
 ]
 
 const DEMO_DEFAULT_DISPLAY: ItemListDisplayState = {
+  viewMode: "list",
   grouping: "stage",
-  density: "comfortable",
+  subGrouping: "none",
+  ordering: "priority",
+  orderingDirection: "desc",
   showContactSignals: true,
   showOwner: true,
   showStatus: true,
