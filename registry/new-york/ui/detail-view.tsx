@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { ArrowLeft, ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, MessageSquare } from "lucide-react"
+import { HoverCard as HoverCardPrimitive } from "radix-ui"
 import { cn } from "@/lib/utils"
 import { Button } from "./button"
 import { Badge } from "./badge"
@@ -74,31 +75,84 @@ export function DetailViewSummary({
 
       {sources && (
         <div className="mt-4">
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
+            type="button"
             onClick={() => setShowSources(!showSources)}
-            className="h-6 px-0 text-xs font-semibold text-muted-foreground hover:text-foreground uppercase tracking-wider bg-transparent"
+            className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground/70 hover:text-foreground transition-colors uppercase tracking-wider"
           >
-            SOURCES
-            {showSources ? (
-              <ChevronUp className="w-3.5 h-3.5 ml-1" />
-            ) : (
-              <ChevronDown className="w-3.5 h-3.5 ml-1" />
-            )}
-          </Button>
-          {showSources && <div className="mt-2 text-sm text-muted-foreground">{sources}</div>}
+            Sources
+            <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-200", showSources && "rotate-180")} />
+          </button>
+          {showSources && <div className="mt-3">{sources}</div>}
         </div>
       )}
     </div>
   )
 }
 
-export function Citation({ number }: { number: number | string }) {
-  return (
-    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-muted border border-border text-[9px] font-medium text-muted-foreground ml-1 align-middle cursor-pointer hover:bg-muted/80">
+export type SourceDef = {
+  id: number | string
+  summary: string
+  meta: string
+}
+
+export function Citation({
+  number,
+  source,
+}: {
+  number: number | string
+  source?: SourceDef
+}) {
+  const badge = (
+    <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-muted border border-border text-[9px] font-medium text-muted-foreground ml-1 align-middle cursor-pointer select-none hover:bg-foreground hover:text-background hover:border-foreground transition-all duration-150">
       {number}
     </span>
+  )
+
+  if (!source) return badge
+
+  return (
+    <HoverCardPrimitive.Root openDelay={200} closeDelay={100}>
+      <HoverCardPrimitive.Trigger asChild>{badge}</HoverCardPrimitive.Trigger>
+      <HoverCardPrimitive.Portal>
+        <HoverCardPrimitive.Content
+          side="top"
+          align="start"
+          sideOffset={6}
+          className="z-50 w-72 rounded-md border bg-popover p-0 text-popover-foreground shadow-md outline-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2"
+        >
+          <div className="p-3 cursor-pointer hover:bg-muted/40 rounded-md transition-colors">
+            <div className="text-xs text-foreground leading-relaxed">{source.summary}</div>
+            <div className="text-[11px] text-muted-foreground/60 mt-1.5">{source.meta}</div>
+          </div>
+        </HoverCardPrimitive.Content>
+      </HoverCardPrimitive.Portal>
+    </HoverCardPrimitive.Root>
+  )
+}
+
+export function SourceList({ sources }: { sources: SourceDef[] }) {
+  return (
+    <div className="space-y-0.5">
+      {sources.map((source) => (
+        <SourceItem key={source.id} source={source} />
+      ))}
+    </div>
+  )
+}
+
+function SourceItem({ source }: { source: SourceDef }) {
+  return (
+    <div className="group flex items-start gap-3 cursor-pointer py-2.5 px-2 -mx-2 rounded-lg text-sm transition-colors hover:bg-muted/40">
+      <span className="flex-shrink-0 mt-0.5 w-5 text-right text-xs font-medium text-muted-foreground/50 group-hover:text-foreground/70 transition-colors">
+        {source.id}
+      </span>
+      <div className="text-muted-foreground leading-relaxed min-w-0">
+        <span>{source.summary}</span>
+        <span className="mx-1.5 text-muted-foreground/30">|</span>
+        <span className="text-xs text-muted-foreground/50">{source.meta}</span>
+      </div>
+    </div>
   )
 }
 
