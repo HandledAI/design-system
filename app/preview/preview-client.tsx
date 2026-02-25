@@ -6,7 +6,6 @@ import {
   Inbox,
   ArrowLeft,
   ChevronDown,
-  ChevronUp,
   ChevronRight,
   Filter,
   Search,
