@@ -127,11 +127,7 @@ export function RecentActivity({
         <Input placeholder="Search activity..." className="h-9 text-sm bg-background border-border shadow-none" />
       </div>
 
-      <div className="rounded-md border border-border/60 bg-muted/10 p-3">
-        <div className="mb-2 flex items-center justify-between">
-          <p className="text-xs font-medium text-muted-foreground">Timeline events</p>
-          <span className="text-[11px] text-muted-foreground">{items.length}</span>
-        </div>
+      <div>
         <TimelineActivity events={items} />
       </div>
     </div>

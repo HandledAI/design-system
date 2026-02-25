@@ -614,13 +614,49 @@ export default function Home() {
                   <EntityDetails />
                 </div>
                 <div className="space-y-8 border p-6 rounded-lg bg-card">
+                  <ContactList
+                    title="Contacts"
+                    count="3 contacts"
+                    contacts={[
+                      {
+                        id: "entity-contact-1",
+                        name: "Jackie Lee",
+                        role: "VP Finance",
+                        badge: { label: "Engaged", color: "green" },
+                        channels: [
+                          { type: "linkedin", icon: <img src={BRAND_ICONS.linkedin} alt="LinkedIn" className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
+                          { type: "gmail", icon: <img src={BRAND_ICONS.gmail.icon} alt="Gmail" className="w-3.5 h-3.5 object-contain" />, label: "Email" },
+                        ],
+                      },
+                      {
+                        id: "entity-contact-2",
+                        name: "Marcus Webb",
+                        role: "CEO",
+                        badge: { label: "Take Action", color: "amber" },
+                        channels: [
+                          { type: "linkedin", icon: <img src={BRAND_ICONS.linkedin} alt="LinkedIn" className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
+                          { type: "salesforce", icon: <img src={BRAND_ICONS.salesforce} alt="Salesforce" className="w-3.5 h-3.5 object-contain" />, label: "Salesforce" },
+                          { type: "gmail", icon: <img src={BRAND_ICONS.gmail.icon} alt="Gmail" className="w-3.5 h-3.5 object-contain" />, label: "Email" },
+                        ],
+                      },
+                      {
+                        id: "entity-contact-3",
+                        name: "Priya Shah",
+                        role: "Head of Ops",
+                        badge: { label: "Not Engaged", color: "muted" },
+                        channels: [
+                          { type: "linkedin", icon: <img src={BRAND_ICONS.linkedin} alt="LinkedIn" className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
+                        ],
+                      },
+                    ] satisfies ContactItem[]}
+                  />
                   <PotentialContacts />
                   <RecentActivity 
                     items={[
                       {
                         id: "1",
                         icon: <img src={BRAND_ICONS.gong} alt="Gong" className="w-4 h-4 object-contain" />,
-                        title: <>Call summary logged for <span className="font-medium text-foreground">Sarah Chen</span></>,
+                        title: <span>Call summary logged for <span className="font-medium text-foreground">Sarah Chen</span></span>,
                         time: "335d ago",
                         preview: "Treasury strategy discussion and technical review planning.",
                         source: {
@@ -639,7 +675,7 @@ export default function Home() {
                       {
                         id: "2",
                         icon: <img src={BRAND_ICONS.gmail.icon} alt="Gmail" className="w-4 h-4 object-contain" />,
-                        title: <>Email thread: <span className="font-medium text-foreground">Treasury deep-dive follow-up</span></>,
+                        title: <span>Email thread: <span className="font-medium text-foreground">Treasury deep-dive follow-up</span></span>,
                         time: "Today",
                         preview: "Latest reply confirms next Tuesday deep-dive and API doc request.",
                         email: {
@@ -650,21 +686,14 @@ export default function Home() {
                           bcc: "deal-notes@handled.ai",
                           date: "Today, 9:15 AM",
                           subject: "Re: Treasury deep-dive follow-up",
-                          body: (
-                            <>
-                              Hi Sarah,{"\n\n"}
-                              Perfect - confirmed for Tuesday at 2 PM. API docs attached. Happy to set up a sandbox for your engineering team.{"\n\n"}
-                              Best,{"\n"}
-                              Jordan
-                            </>
-                          ),
+                          body: "Hi Sarah,\n\nPerfect - confirmed for Tuesday at 2 PM. API docs attached. Happy to set up a sandbox for your engineering team.\n\nBest,\nJordan",
                         },
                         isInteractive: true,
                       },
                       {
                         id: "3",
                         icon: <img src={BRAND_ICONS.zendesk} alt="Zendesk" className="w-4 h-4 object-contain" />,
-                        title: <>Ticket updated: <span className="font-medium text-foreground">#1024 - API Rate Limiting</span></>,
+                        title: <span>Ticket updated: <span className="font-medium text-foreground">#1024 - API Rate Limiting</span></span>,
                         time: "343d ago",
                         preview: "Status: Open · Priority: High",
                         source: {
