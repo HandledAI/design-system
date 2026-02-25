@@ -841,8 +841,8 @@ export function DataTable() {
             confidence={data.confidence}
             confidenceDescription={data.confidenceDescription}
             factors={data.factors}
-            onFactorFeedback={(key, type) =>
-              console.log("Factor feedback:", { account: scoreModal.row.name, factor: key, type })
+            onFactorFeedback={(key, type, detail) =>
+              console.log("Factor feedback:", { account: scoreModal.row.name, factor: key, type, detail })
             }
           />
         )

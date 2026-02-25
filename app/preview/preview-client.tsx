@@ -69,7 +69,6 @@ import {
 } from "@/registry/new-york/ui/entity-panel"
 import { SignalApproval } from "@/registry/new-york/ui/signal-feedback-inline"
 import { ScoreBreakdown, type ScoreFactor } from "@/registry/new-york/ui/score-breakdown"
-import { ScoreAnalysisModal } from "@/registry/new-york/ui/score-analysis-modal"
 import {
   SuggestedActions,
   type SuggestedAction,
@@ -394,8 +393,7 @@ export default function PreviewClientPage() {
   const [extraActions, setExtraActions] = React.useState<SuggestedAction[]>([])
   const [inboxAssignee, setInboxAssignee] = React.useState<AssigneeFilter>("me")
   const [inboxFilters, setInboxFilters] = React.useState<Record<string, string>>({})
-  const [signalScoreModalOpen, setSignalScoreModalOpen] = React.useState(false)
-  const [scoreBreakdownExpanded, setScoreBreakdownExpanded] = React.useState(false)
+  const [evidenceExpanded, setEvidenceExpanded] = React.useState(false)
 
   const INBOX_FILTER_CATEGORIES: InboxFilterCategory[] = React.useMemo(
     () => [
@@ -459,7 +457,7 @@ export default function PreviewClientPage() {
 
   React.useEffect(() => {
     setShowRecentActivity(false)
-    setScoreBreakdownExpanded(false)
+    setEvidenceExpanded(false)
   }, [selectedTask.id])
 
   const handleDuplicate = React.useCallback((id: number | string) => {
@@ -480,6 +478,7 @@ export default function PreviewClientPage() {
     return (
       <SignalApproval.Root
         companyName={item.company}
+        opportunityUrl={`https://acme.lightning.force.com/lightning/r/Opportunity/006${item.id}/view`}
         onApprove={() => {
           console.log("Approved signal — creating Salesforce opportunity:", { taskId: item.id, company: item.company })
         }}
@@ -586,55 +585,41 @@ export default function PreviewClientPage() {
                           style={{ width: `${signalData.score}%` }}
                         />
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setScoreBreakdownExpanded((prev) => !prev)}
-                          className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${scoreBreakdownExpanded ? "rotate-180" : ""}`} />
-                          Score breakdown
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setSignalScoreModalOpen(true)}
-                          className="text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors ml-auto"
-                        >
-                          View full analysis
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setEvidenceExpanded((prev) => !prev)}
+                        className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${evidenceExpanded ? "rotate-180" : ""}`} />
+                        View more
+                      </button>
 
-                      {scoreBreakdownExpanded && (
-                        <div className="mt-3">
+                      {evidenceExpanded && (
+                        <div className="mt-3 space-y-3">
+                          <ul className="space-y-2">
+                            {evidenceWithCitations.map((item_ev, index) => (
+                              <li key={index} className="flex items-start gap-2 text-sm">
+                                <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
+                                <span className="text-muted-foreground leading-relaxed">{item_ev}</span>
+                              </li>
+                            ))}
+                          </ul>
+
                           <ScoreBreakdown
                             factors={signalData.factors}
-                            onFactorFeedback={(key, type) =>
-                              console.log("Signal factor feedback:", { company: item.company, factor: key, type })
+                            onFactorFeedback={(key, type, detail) =>
+                              console.log("Signal factor feedback:", { company: item.company, factor: key, type, detail })
                             }
                           />
+
+                          <SignalApproval.Actions />
                         </div>
                       )}
-
-                      <ScoreAnalysisModal
-                        open={signalScoreModalOpen}
-                        onOpenChange={setSignalScoreModalOpen}
-                        title={`Signal Score: ${item.company}`}
-                        description="Composite score based on trigger strength, company fit, timing, and market signals"
-                        score={signalData.score}
-                        whyNow={signalData.whyNow}
-                        evidence={evidenceWithCitations}
-                        confidence={signalData.confidence}
-                        confidenceDescription="Based on signal scoring model trained on historical conversion data and signal outcomes."
-                        factors={signalData.factors}
-                        onFactorFeedback={(key, type) =>
-                          console.log("Signal factor feedback:", { company: item.company, factor: key, type })
-                        }
-                      />
                     </div>
                   )
                 })()}
 
-                <SignalApproval.Actions />
+                {!evidenceExpanded && <SignalApproval.Actions />}
             </div>
 
           <div className="mb-8">
@@ -649,6 +634,14 @@ export default function PreviewClientPage() {
                       <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${showRecentActivity ? "rotate-180" : ""}`} />
                     </div>
                   </button>
+
+                  {!showRecentActivity && (
+                    <div className="flex items-center gap-2 px-2 py-1.5 text-xs text-muted-foreground">
+                      <MessageSquare className="h-3 w-3 shrink-0" />
+                      <span className="truncate">Contact record updated for <span className="font-medium text-foreground">Robert Choi</span></span>
+                      <span className="shrink-0 text-muted-foreground/60">&middot; 1d ago</span>
+                    </div>
+                  )}
 
                   {showRecentActivity ? (
                     <div className="mt-3">

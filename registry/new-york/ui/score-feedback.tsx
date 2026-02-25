@@ -9,7 +9,6 @@ const positivePills = [
   "Accurate data",
   "Good prospect fit",
   "Actionable",
-  "Other",
 ]
 
 const negativePills = [
@@ -21,17 +20,25 @@ const negativePills = [
   "Other",
 ]
 
+interface SubmittedScoreFeedback {
+  type: "up" | "down"
+  pills: string[]
+  detail: string
+}
+
 interface ScoreFeedbackState {
   thumbState: "up" | "down" | null
   selectedPills: string[]
   detailText: string
   notedType: "up" | "down" | null
+  submittedFeedback: SubmittedScoreFeedback | null
   otherSelected: boolean
   hasRequiredInput: boolean
   handleThumbClick: (type: "up" | "down") => void
   togglePill: (pill: string) => void
   setDetailText: (text: string) => void
   handleSubmit: () => void
+  editSubmitted: () => void
 }
 
 const ScoreFeedbackCtx = React.createContext<ScoreFeedbackState | null>(null)
@@ -52,6 +59,7 @@ function Root({ children, onSubmitFeedback }: RootProps) {
   const [selectedPills, setSelectedPills] = React.useState<string[]>([])
   const [detailText, setDetailTextState] = React.useState("")
   const [notedType, setNotedType] = React.useState<"up" | "down" | null>(null)
+  const [submittedFeedback, setSubmittedFeedback] = React.useState<SubmittedScoreFeedback | null>(null)
 
   const otherSelected = selectedPills.includes("Other")
 
@@ -75,12 +83,21 @@ function Root({ children, onSubmitFeedback }: RootProps) {
   const handleSubmit = React.useCallback(() => {
     if (!thumbState) return
     onSubmitFeedback?.(thumbState, selectedPills, detailText)
+    setSubmittedFeedback({ type: thumbState, pills: [...selectedPills], detail: detailText.trim() })
     setNotedType(thumbState)
     setThumbState(null)
     setSelectedPills([])
     setDetailTextState("")
     setTimeout(() => setNotedType(null), 3000)
   }, [thumbState, selectedPills, detailText, onSubmitFeedback])
+
+  const editSubmitted = React.useCallback(() => {
+    if (!submittedFeedback) return
+    setThumbState(submittedFeedback.type)
+    setSelectedPills([...submittedFeedback.pills])
+    setDetailTextState(submittedFeedback.detail)
+    setNotedType(null)
+  }, [submittedFeedback])
 
   return (
     <ScoreFeedbackCtx.Provider
@@ -89,12 +106,14 @@ function Root({ children, onSubmitFeedback }: RootProps) {
         selectedPills,
         detailText,
         notedType,
+        submittedFeedback,
         otherSelected,
         hasRequiredInput,
         handleThumbClick,
         togglePill,
         setDetailText: setDetailTextState,
         handleSubmit,
+        editSubmitted,
       }}
     >
       {children}
@@ -103,15 +122,47 @@ function Root({ children, onSubmitFeedback }: RootProps) {
 }
 
 function Trigger({ className }: { className?: string }) {
-  const { thumbState, notedType, handleThumbClick } = useScoreFeedback()
+  const { thumbState, notedType, submittedFeedback, handleThumbClick, editSubmitted } = useScoreFeedback()
 
-  if (notedType) {
+  if (notedType || (submittedFeedback && !thumbState)) {
     return (
-      <div className={cn("flex items-center gap-1 shrink-0", className)}>
-        <Check className="w-3 h-3 text-emerald-500" />
-        <span className="text-[11px] text-muted-foreground">
-          {notedType === "up" ? "Noted" : "Recorded"}
-        </span>
+      <div className={cn("shrink-0", className)}>
+        <div className="flex items-center gap-1">
+          <Check className="w-3 h-3 text-emerald-500" />
+          <span className="text-[11px] text-muted-foreground">
+            {notedType
+              ? notedType === "up" ? "Noted" : "Recorded"
+              : submittedFeedback?.type === "up" ? "Noted" : "Recorded"}
+          </span>
+        </div>
+        {submittedFeedback && (submittedFeedback.pills.length > 0 || submittedFeedback.detail) && (
+          <button
+            type="button"
+            onClick={editSubmitted}
+            className="mt-1.5 w-full text-left space-y-1 group cursor-pointer"
+          >
+            {submittedFeedback.pills.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {submittedFeedback.pills.map((p) => (
+                  <span
+                    key={p}
+                    className={cn(
+                      "rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors group-hover:opacity-80",
+                      submittedFeedback.type === "up"
+                        ? "border-emerald-200/60 bg-emerald-50/50 text-emerald-700/70"
+                        : "border-red-200/60 bg-red-50/50 text-red-700/70"
+                    )}
+                  >
+                    {p}
+                  </span>
+                ))}
+              </div>
+            )}
+            {submittedFeedback.detail && (
+              <p className="text-[11px] text-muted-foreground/70 leading-snug group-hover:text-muted-foreground transition-colors">{submittedFeedback.detail}</p>
+            )}
+          </button>
+        )}
       </div>
     )
   }
@@ -191,29 +242,27 @@ function Panel({ className }: { className?: string }) {
           </div>
         </div>
 
-        {(thumbState === "down" || selectedPills.length > 0) && (
-          <div className="space-y-1">
-            <input
-              type="text"
-              value={detailText}
-              onChange={(e) => setDetailText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && hasRequiredInput) handleSubmit()
-              }}
-              placeholder={
-                thumbState === "up"
-                  ? "e.g., This score accurately reflects the situation"
-                  : "e.g., The risk factors are outdated"
-              }
-              className="w-full text-xs bg-background border border-border rounded-md px-2.5 py-2 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring"
-            />
-            {otherSelected && detailText.trim().length === 0 && (
-              <span className="text-[10px] text-red-500">
-                Please describe when &ldquo;Other&rdquo; is selected
-              </span>
-            )}
-          </div>
-        )}
+        <div className="space-y-1">
+          <input
+            type="text"
+            value={detailText}
+            onChange={(e) => setDetailText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && hasRequiredInput) handleSubmit()
+            }}
+            placeholder={
+              thumbState === "up"
+                ? "Tell us more (optional)"
+                : "e.g., The risk factors are outdated"
+            }
+            className="w-full text-xs bg-background border border-border rounded-md px-2.5 py-2 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+          {otherSelected && detailText.trim().length === 0 && (
+            <span className="text-[10px] text-red-500">
+              Please describe when &ldquo;Other&rdquo; is selected
+            </span>
+          )}
+        </div>
 
         <div className="flex items-center gap-2 pt-1">
           <button

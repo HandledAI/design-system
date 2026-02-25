@@ -25,7 +25,7 @@ interface ScoreAnalysisModalProps {
   confidence: number
   confidenceDescription?: string
   factors?: ScoreFactor[]
-  onFactorFeedback?: (factorKey: string, type: "up" | "down" | null) => void
+  onFactorFeedback?: (factorKey: string, type: "up" | "down" | null, detail?: string) => void
 }
 
 function getScoreLabel(score: number, denominator: number) {
