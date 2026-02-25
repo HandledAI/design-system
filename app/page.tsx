@@ -16,6 +16,7 @@ import {
   SourceList,
 } from "@/registry/new-york/ui/detail-view"
 import { SuggestedActions, type SuggestedAction } from "@/registry/new-york/ui/suggested-actions"
+import { SignalApproval } from "@/registry/new-york/ui/signal-feedback-inline"
 import { PreviewList, PreviewListItem } from "@/registry/new-york/ui/preview-list"
 import {
   TopTasksCard,
@@ -340,22 +341,25 @@ export default function Home() {
             <div id="custom-detail-view" className="border rounded-xl p-6 space-y-4 scroll-m-20">
               <h3 className="font-semibold text-lg">Detail View (Summary, Citations & Sources)</h3>
               <div className="border rounded-lg p-6 max-w-xl">
-                <DetailViewSummary
-                  title="Here's what I found:"
-                  sources={
-                    <SourceList sources={[
-                      { id: 1, summary: "Balance outflow increased ~34% week-over-week with no matching inbound trend.", meta: "Product telemetry · 2h ago" },
-                      { id: 2, summary: "Login frequency for finance users dropped over the last 10 days.", meta: "Workspace activity · 6h ago" },
-                    ]} />
-                  }
-                >
-                  <p className="flex items-center flex-wrap gap-1">
-                    <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full mr-2" />
-                    There are <strong>3 unusual signals</strong> detected today.
-                    <Citation number={1} source={{ id: 1, summary: "Balance outflow increased ~34% week-over-week with no matching inbound trend.", meta: "Product telemetry · 2h ago" }} />
-                    <Citation number={2} source={{ id: 2, summary: "Login frequency for finance users dropped over the last 10 days.", meta: "Workspace activity · 6h ago" }} />
-                  </p>
-                </DetailViewSummary>
+                <SignalApproval.Root companyName="Lunchclub">
+                  <DetailViewSummary
+                    title="Here's what I found:"
+                    actions={<SignalApproval.Actions />}
+                    sources={
+                      <SourceList sources={[
+                        { id: 1, summary: "Balance outflow increased ~34% week-over-week with no matching inbound trend.", meta: "Product telemetry · 2h ago" },
+                        { id: 2, summary: "Login frequency for finance users dropped over the last 10 days.", meta: "Workspace activity · 6h ago" },
+                      ]} />
+                    }
+                  >
+                    <p className="flex items-center flex-wrap gap-1">
+                      <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full mr-2" />
+                      There are <strong>3 unusual signals</strong> detected today.
+                      <Citation number={1} source={{ id: 1, summary: "Balance outflow increased ~34% week-over-week with no matching inbound trend.", meta: "Product telemetry · 2h ago" }} />
+                      <Citation number={2} source={{ id: 2, summary: "Login frequency for finance users dropped over the last 10 days.", meta: "Workspace activity · 6h ago" }} />
+                    </p>
+                  </DetailViewSummary>
+                </SignalApproval.Root>
               </div>
             </div>
 
@@ -403,70 +407,77 @@ export default function Home() {
                 </div>
 
                 <div className="border rounded-lg p-5">
-                  <DetailViewHeader
-                    title="James Liu"
-                    breadcrumbs="REF-1894"
-                    badges={
-                      <>
-                        <Badge variant="destructive" className="bg-red-50 text-red-700 border-red-100 hover:bg-red-100">
-                          ! Urgent
-                        </Badge>
-                        <Badge variant="secondary">Review Required</Badge>
-                      </>
-                    }
-                  />
-                  <DetailViewSummary title="Here's what I found for this patient:">
-                    <p className="flex items-center flex-wrap gap-1">
-                      <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full mr-2" />
-                      There are <strong>2 missing documents</strong> including lab results and recent imaging
-                      <Citation number={1} />
-                    </p>
-                  </DetailViewSummary>
-                  <SuggestedActions
-                    actions={[
-                      {
-                        id: "showcase-email",
-                        type: "email",
-                        label: "Reply to James Liu",
-                        status: "pending",
-                        followUp: { enabled: true, days: 3 },
-                        replyTo: {
-                          from: "Dr. Patel",
-                          time: "1 hour ago",
-                          content: "Hi, I wanted to follow up on the referral for James Liu. Are we still waiting on lab results?",
-                        },
-                        content: "Hi Dr. Patel,\n\nThank you for following up. We are still waiting on the CBC and metabolic panel from LabCorp, as well as the recent MRI imaging. I will reach out to the referring provider to expedite these.\n\nBest,\nSarah",
-                      },
-                      {
-                        id: "showcase-ticket",
-                        type: "ticket",
-                        label: "Create Zendesk ticket",
-                        status: "pending",
-                        followUp: { enabled: false, days: 1 },
-                        ticket: {
-                          system: "Zendesk",
-                          priority: "High",
-                          type: "Support Request",
-                          subject: "James Liu - Missing documentation for referral REF-1894",
-                          description: "Missing lab results (CBC, metabolic panel) and recent MRI imaging for patient referral. Referring provider has not responded to initial request.",
-                        },
-                      },
-                      {
-                        id: "showcase-slack",
-                        type: "slack",
-                        label: "Message team on Slack",
-                        status: "pending",
-                        followUp: { enabled: true, days: 1 },
-                        replyTo: {
-                          from: "Michael Chen",
-                          channel: "#referrals",
-                          time: "Yesterday",
-                          content: "Has anyone been able to get the missing docs for the Liu referral?",
-                        },
-                        content: "Hey team - I am following up with LabCorp directly for the missing results on REF-1894. Should have an update by end of day.",
-                      },
-                    ] satisfies SuggestedAction[]}
-                  />
+                  <SignalApproval.Root companyName="Cedars">
+                    <DetailViewHeader
+                      title="James Liu"
+                      breadcrumbs="REF-1894"
+                      badges={
+                        <>
+                          <Badge variant="destructive" className="bg-red-50 text-red-700 border-red-100 hover:bg-red-100">
+                            ! Urgent
+                          </Badge>
+                          <Badge variant="secondary">Review Required</Badge>
+                        </>
+                      }
+                    />
+                    <DetailViewSummary
+                      title="Here's what I found for this patient:"
+                      actions={<SignalApproval.Actions />}
+                    >
+                      <p className="flex items-center flex-wrap gap-1">
+                        <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full mr-2" />
+                        There are <strong>2 missing documents</strong> including lab results and recent imaging
+                        <Citation number={1} />
+                      </p>
+                    </DetailViewSummary>
+                    <SignalApproval.Gate>
+                      <SuggestedActions
+                        actions={[
+                          {
+                            id: "showcase-email",
+                            type: "email",
+                            label: "Reply to James Liu",
+                            status: "pending",
+                            followUp: { enabled: true, days: 3 },
+                            replyTo: {
+                              from: "Dr. Patel",
+                              time: "1 hour ago",
+                              content: "Hi, I wanted to follow up on the referral for James Liu. Are we still waiting on lab results?",
+                            },
+                            content: "Hi Dr. Patel,\n\nThank you for following up. We are still waiting on the CBC and metabolic panel from LabCorp, as well as the recent MRI imaging. I will reach out to the referring provider to expedite these.\n\nBest,\nSarah",
+                          },
+                          {
+                            id: "showcase-ticket",
+                            type: "ticket",
+                            label: "Create Zendesk ticket",
+                            status: "pending",
+                            followUp: { enabled: false, days: 1 },
+                            ticket: {
+                              system: "Zendesk",
+                              priority: "High",
+                              type: "Support Request",
+                              subject: "James Liu - Missing documentation for referral REF-1894",
+                              description: "Missing lab results (CBC, metabolic panel) and recent MRI imaging for patient referral. Referring provider has not responded to initial request.",
+                            },
+                          },
+                          {
+                            id: "showcase-slack",
+                            type: "slack",
+                            label: "Message team on Slack",
+                            status: "pending",
+                            followUp: { enabled: true, days: 1 },
+                            replyTo: {
+                              from: "Michael Chen",
+                              channel: "#referrals",
+                              time: "Yesterday",
+                              content: "Has anyone been able to get the missing docs for the Liu referral?",
+                            },
+                            content: "Hey team - I am following up with LabCorp directly for the missing results on REF-1894. Should have an update by end of day.",
+                          },
+                        ] satisfies SuggestedAction[]}
+                      />
+                    </SignalApproval.Gate>
+                  </SignalApproval.Root>
                 </div>
               </div>
             </div>

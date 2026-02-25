@@ -69,7 +69,7 @@ import {
   RecentActivity,
   ConnectedApps,
 } from "@/registry/new-york/ui/entity-panel"
-import { SignalFeedback } from "@/registry/new-york/ui/signal-feedback-inline"
+import { SignalApproval } from "@/registry/new-york/ui/signal-feedback-inline"
 import {
   SuggestedActions,
   type SuggestedAction,
@@ -417,6 +417,15 @@ export default function PreviewClientPage() {
     const sourceItems = buildSourceItems(item)
 
     return (
+      <SignalApproval.Root
+        companyName={item.company}
+        onApprove={() => {
+          console.log("Approved signal — creating Salesforce opportunity:", { taskId: item.id, company: item.company })
+        }}
+        onDismiss={(reasons, detail) => {
+          console.log("Dismissed signal:", { taskId: item.id, reasons, detail })
+        }}
+      >
       <div className="mx-auto w-full max-w-3xl p-6 pb-12 md:p-8">
         <div className="pb-8">
           <div className="mb-4 flex items-center gap-2">
@@ -455,11 +464,6 @@ export default function PreviewClientPage() {
             </button>
           </div>
 
-          <SignalFeedback.Root
-            onSubmitFeedback={(type, pills, detail) => {
-              console.log("Signal feedback:", { type, pills, detail, taskId: item.id })
-            }}
-          >
             <div className="overflow-hidden bg-background mb-8">
               <div className="relative z-20 bg-background p-4">
                 <div className="flex gap-4">
@@ -468,7 +472,7 @@ export default function PreviewClientPage() {
                     <div className="text-sm leading-relaxed text-foreground">
                       <div className="mb-2 flex items-start justify-between gap-3">
                         <p className="text-sm font-semibold text-foreground">Account brief: {item.company}</p>
-                        <SignalFeedback.Trigger />
+                        <SignalApproval.Actions />
                       </div>
                       <ul className="list-disc space-y-2 pl-4 text-muted-foreground marker:text-muted-foreground/60">
                         <li>
@@ -488,7 +492,6 @@ export default function PreviewClientPage() {
                           <Citation number={6} source={sourceItems[3]} />
                         </li>
                       </ul>
-                      <SignalFeedback.Panel />
                     </div>
                   </div>
                 </div>
@@ -513,7 +516,6 @@ export default function PreviewClientPage() {
                 </div>
               )}
             </div>
-          </SignalFeedback.Root>
 
           <div className="mb-8 overflow-hidden bg-background">
             <div className="relative z-20 bg-background p-4">
@@ -664,25 +666,28 @@ export default function PreviewClientPage() {
           </div>
         </div>
 
-        <SuggestedActions
-          actions={suggestedActions}
-          accountContacts={ACCOUNT_CONTACTS}
-          signature={EMAIL_SIGNATURE}
-          onDismiss={(id) => console.log("Dismiss action:", id)}
-          onSend={(id) => console.log("Send action:", id)}
-          onSaveDraft={(id) => console.log("Save draft:", id)}
-          onDuplicate={handleDuplicate}
-          onOpenAccountDetails={() => setIsEntityPanelOpen(true)}
-          onOpenRecentActivity={() => {
-            setIsEntityPanelOpen(true)
-            setTimeout(() => {
-              document.getElementById("entity-recent-activity")?.scrollIntoView({ behavior: "smooth", block: "start" })
-            }, 150)
-          }}
-          onMarkComplete={(id) => console.log("Mark complete:", id)}
-          onDispatchAgent={(id) => console.log("Dispatch agent:", id)}
-        />
+        <SignalApproval.Gate>
+          <SuggestedActions
+            actions={suggestedActions}
+            accountContacts={ACCOUNT_CONTACTS}
+            signature={EMAIL_SIGNATURE}
+            onDismiss={(id) => console.log("Dismiss action:", id)}
+            onSend={(id) => console.log("Send action:", id)}
+            onSaveDraft={(id) => console.log("Save draft:", id)}
+            onDuplicate={handleDuplicate}
+            onOpenAccountDetails={() => setIsEntityPanelOpen(true)}
+            onOpenRecentActivity={() => {
+              setIsEntityPanelOpen(true)
+              setTimeout(() => {
+                document.getElementById("entity-recent-activity")?.scrollIntoView({ behavior: "smooth", block: "start" })
+              }, 150)
+            }}
+            onMarkComplete={(id) => console.log("Mark complete:", id)}
+            onDispatchAgent={(id) => console.log("Dispatch agent:", id)}
+          />
+        </SignalApproval.Gate>
       </div>
+      </SignalApproval.Root>
     )
   }
 
