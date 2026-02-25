@@ -342,4 +342,9 @@ function Gate({ children }: { children: React.ReactNode }) {
   )
 }
 
+export {
+  Root as SignalApprovalRoot,
+  Actions as SignalApprovalActions,
+  Gate as SignalApprovalGate,
+}
 export const SignalApproval = { Root, Actions, Gate }
