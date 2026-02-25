@@ -12,12 +12,22 @@ const dismissReasons = [
   "Other",
 ]
 
-type ApprovalState = "pending" | "confirming" | "dismissing" | "approved" | "dismissed"
+const approveReasons = [
+  "Right timing",
+  "Accurate data",
+  "Good prospect fit",
+  "Actionable",
+  "Other",
+]
+
+type ApprovalState = "pending" | "confirming" | "approving-feedback" | "dismissing" | "approved" | "dismissed"
 
 interface SignalApprovalContextValue {
   approvalState: ApprovalState
   companyName: string
   approve: () => void
+  submitApproveFeedback: (reasons: string[], detail: string) => void
+  skipApproveFeedback: () => void
   dismiss: (reasons: string[], detail: string) => void
   requestApproval: () => void
   requestDismiss: () => void
@@ -36,10 +46,11 @@ interface RootProps {
   children: React.ReactNode
   companyName: string
   onApprove?: () => void
+  onApproveFeedback?: (reasons: string[], detail: string) => void
   onDismiss?: (reasons: string[], detail: string) => void
 }
 
-function Root({ children, companyName, onApprove, onDismiss }: RootProps) {
+function Root({ children, companyName, onApprove, onApproveFeedback, onDismiss }: RootProps) {
   const [approvalState, setApprovalState] = React.useState<ApprovalState>("pending")
 
   const requestApproval = React.useCallback(() => {
@@ -55,9 +66,21 @@ function Root({ children, companyName, onApprove, onDismiss }: RootProps) {
   }, [])
 
   const approve = React.useCallback(() => {
-    setApprovalState("approved")
+    setApprovalState("approving-feedback")
     onApprove?.()
   }, [onApprove])
+
+  const submitApproveFeedback = React.useCallback(
+    (reasons: string[], detail: string) => {
+      setApprovalState("approved")
+      onApproveFeedback?.(reasons, detail)
+    },
+    [onApproveFeedback]
+  )
+
+  const skipApproveFeedback = React.useCallback(() => {
+    setApprovalState("approved")
+  }, [])
 
   const dismiss = React.useCallback(
     (reasons: string[], detail: string) => {
@@ -69,7 +92,7 @@ function Root({ children, companyName, onApprove, onDismiss }: RootProps) {
 
   return (
     <SignalApprovalCtx.Provider
-      value={{ approvalState, companyName, approve, dismiss, requestApproval, requestDismiss, cancel }}
+      value={{ approvalState, companyName, approve, submitApproveFeedback, skipApproveFeedback, dismiss, requestApproval, requestDismiss, cancel }}
     >
       {children}
     </SignalApprovalCtx.Provider>
@@ -77,13 +100,14 @@ function Root({ children, companyName, onApprove, onDismiss }: RootProps) {
 }
 
 function Actions() {
-  const { approvalState, companyName, approve, dismiss, requestApproval, requestDismiss, cancel } =
+  const { approvalState, companyName, approve, submitApproveFeedback, skipApproveFeedback, dismiss, requestApproval, requestDismiss, cancel } =
     useSignalApproval()
   const [selectedReasons, setSelectedReasons] = React.useState<string[]>([])
   const [detailText, setDetailText] = React.useState("")
 
   const otherSelected = selectedReasons.includes("Other")
   const canSubmitDismiss = selectedReasons.length > 0 && (!otherSelected || detailText.trim().length > 0)
+  const canSubmitApprove = selectedReasons.length > 0 && (!otherSelected || detailText.trim().length > 0)
 
   const toggleReason = (reason: string) => {
     setSelectedReasons((prev) =>
@@ -94,6 +118,12 @@ function Actions() {
   const handleDismissSubmit = () => {
     if (!canSubmitDismiss) return
     dismiss(selectedReasons, detailText.trim())
+    setSelectedReasons([])
+    setDetailText("")
+  }
+
+  const handleApproveSubmit = () => {
+    submitApproveFeedback(selectedReasons, detailText.trim())
     setSelectedReasons([])
     setDetailText("")
   }
@@ -109,6 +139,59 @@ function Actions() {
       <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600">
         <Check className="h-3.5 w-3.5" />
         <span>Opportunity Created</span>
+      </div>
+    )
+  }
+
+  if (approvalState === "approving-feedback") {
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 mb-2">
+          <Check className="h-3.5 w-3.5" />
+          <span>Opportunity Created</span>
+        </div>
+        <p className="text-xs font-medium text-muted-foreground">Quick feedback &mdash; what made this signal useful?</p>
+        <div className="flex flex-wrap gap-1.5">
+          {approveReasons.map((reason) => {
+            const selected = selectedReasons.includes(reason)
+            return (
+              <button
+                key={reason}
+                type="button"
+                onClick={() => toggleReason(reason)}
+                className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                  selected
+                    ? "border-emerald-200 bg-emerald-100 text-emerald-700"
+                    : "border-border bg-background text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                }`}
+              >
+                {reason}
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleApproveSubmit}
+            disabled={selectedReasons.length === 0}
+            className={`inline-flex h-7 items-center gap-1.5 rounded-md px-3 text-xs font-semibold transition-colors ${
+              selectedReasons.length > 0
+                ? "bg-foreground text-background hover:bg-foreground/90"
+                : "cursor-not-allowed bg-muted text-muted-foreground"
+            }`}
+          >
+            Submit
+          </button>
+          <button
+            type="button"
+            onClick={skipApproveFeedback}
+            className="inline-flex h-7 items-center rounded-md border border-border px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            Skip
+          </button>
+        </div>
       </div>
     )
   }

@@ -30,6 +30,8 @@ import {
 } from "@/registry/new-york/ui/data-table-quick-views"
 import { DataTableToolbar } from "@/registry/new-york/ui/data-table-toolbar"
 import { type DataTableFilterCategory } from "@/registry/new-york/ui/data-table-filter"
+import { ScoreAnalysisModal } from "@/registry/new-york/ui/score-analysis-modal"
+import type { ScoreFactor } from "@/registry/new-york/ui/score-breakdown"
 
 type DataRow = {
   id: string
@@ -309,6 +311,65 @@ const ROWS: DataRow[] = [
   },
 ]
 
+type ScoreAnalysisData = {
+  title: string
+  description: string
+  whyNow: string
+  evidence: string[]
+  confidence: number
+  confidenceDescription: string
+  factors: ScoreFactor[]
+}
+
+const SCORE_ANALYSIS: Record<string, (row: DataRow) => ScoreAnalysisData> = {
+  Risk: (row) => ({
+    title: "Risk Score Analysis",
+    description:
+      "Estimated probability of churn within the next 90 days based on activity and support signals",
+    whyNow:
+      row.riskScore >= 60
+        ? "Critical risk factors detected requiring immediate intervention to prevent churn."
+        : "Account health is stable, but monitoring recent support interactions is recommended.",
+    evidence: [
+      "Recent decline in weekly active users (-12%)",
+      "Unresolved critical support ticket (>48h)",
+      "Competitor presence detected in recent conversations",
+    ],
+    confidence: 89,
+    confidenceDescription:
+      "Based on risk scoring model trained on historical customer data and outcomes.",
+    factors: [
+      { key: "engagement", label: "Engagement drop", score: Math.min(row.riskScore + 10, 100), why: "Weekly active users declined 12% over past 30 days" },
+      { key: "support", label: "Support load", score: Math.min(row.riskScore + 5, 100), why: "Unresolved critical ticket open for >48h" },
+      { key: "competitive", label: "Competitive risk", score: null, risk: row.riskScore >= 60 ? "High" as const : "Low" as const, why: "Competitor mentions detected in recent conversations" },
+      { key: "usage", label: "Product usage", score: Math.max(100 - row.riskScore, 10), why: "Core feature adoption remains consistent" },
+    ],
+  }),
+  Expansion: (row) => ({
+    title: "Expansion Score Analysis",
+    description:
+      "Likelihood of successful upsell and cross-sell opportunities based on usage and engagement",
+    whyNow:
+      row.expansionScore >= 70
+        ? "Usage patterns and growth signals indicate readiness for additional product adoption."
+        : "Moderate expansion potential; consider targeted engagement to increase adoption.",
+    evidence: [
+      "Treasury utilization above 85th percentile vs peers",
+      "Frequent feature requests for advanced functionality",
+      "Recent team expansion in finance department",
+    ],
+    confidence: 81,
+    confidenceDescription:
+      "Based on expansion model trained on historical upsell outcomes and usage patterns.",
+    factors: [
+      { key: "usage-depth", label: "Usage depth", score: Math.min(row.expansionScore + 8, 100), why: "Active usage across 4+ core product features" },
+      { key: "growth", label: "Growth signals", score: row.expansionScore, why: row.growthIndicators.length > 0 ? row.growthIndicators.join(", ") + " detected" : "No active growth signals" },
+      { key: "fit", label: "Product fit", score: Math.min(row.expansionScore + 12, 100), why: "Company profile matches high-expansion ICP" },
+      { key: "timing", label: "Timing", score: null, risk: row.expansionScore >= 70 ? "Low" as const : "Medium" as const, why: "Within typical evaluation window for upsell" },
+    ],
+  }),
+}
+
 const QUICK_VIEW_FILTERS: Record<string, (row: DataRow) => boolean> = {
   "Balance Flight Detected": (row) => row.riskScore >= 60,
   "Not Touched in 30+ Days": (row) => row.lastInteractionDays >= 30,
@@ -432,6 +493,10 @@ export function DataTable() {
   )
   const [activeQuickView, setActiveQuickView] =
     React.useState<DataTableQuickViewValue>(null)
+  const [scoreModal, setScoreModal] = React.useState<{
+    row: DataRow
+    type: "Risk" | "Expansion"
+  } | null>(null)
 
   React.useEffect(() => {
     if (!activeQuickView) {
@@ -519,34 +584,50 @@ export function DataTable() {
         id: "riskScore",
         header: "Risk Score",
         cell: (info) => (
-          <Badge
-            variant="outline"
-            className={cn(
-              "px-2 py-0.5 text-xs font-medium",
-              info.getValue() >= 60
-                ? "border-red-200 bg-red-50 text-red-700"
-                : "border-border bg-muted/50 text-foreground"
-            )}
+          <div
+            className="inline-flex cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation()
+              setScoreModal({ row: info.row.original, type: "Risk" })
+            }}
           >
-            {info.getValue()}%
-          </Badge>
+            <Badge
+              variant="outline"
+              className={cn(
+                "px-2 py-0.5 text-xs font-medium hover:underline decoration-dotted underline-offset-2",
+                info.getValue() >= 60
+                  ? "border-red-200 bg-red-50 text-red-700"
+                  : "border-border bg-muted/50 text-foreground"
+              )}
+            >
+              {info.getValue()}%
+            </Badge>
+          </div>
         ),
       }),
       columnHelper.accessor("expansionScore", {
         id: "expansionScore",
         header: "Expansion Score",
         cell: (info) => (
-          <Badge
-            variant="outline"
-            className={cn(
-              "px-2 py-0.5 text-xs font-medium",
-              info.getValue() >= 70
-                ? "border-blue-200 bg-blue-50 text-blue-700"
-                : "border-border bg-muted/50 text-foreground"
-            )}
+          <div
+            className="inline-flex cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation()
+              setScoreModal({ row: info.row.original, type: "Expansion" })
+            }}
           >
-            {info.getValue()}%
-          </Badge>
+            <Badge
+              variant="outline"
+              className={cn(
+                "px-2 py-0.5 text-xs font-medium hover:underline decoration-dotted underline-offset-2",
+                info.getValue() >= 70
+                  ? "border-blue-200 bg-blue-50 text-blue-700"
+                  : "border-border bg-muted/50 text-foreground"
+              )}
+            >
+              {info.getValue()}%
+            </Badge>
+          </div>
         ),
       }),
       columnHelper.accessor("growthIndicators", {
@@ -745,6 +826,27 @@ export function DataTable() {
           </tbody>
         </table>
       </div>
+
+      {scoreModal && (() => {
+        const data = SCORE_ANALYSIS[scoreModal.type](scoreModal.row)
+        return (
+          <ScoreAnalysisModal
+            open
+            onOpenChange={(open) => { if (!open) setScoreModal(null) }}
+            title={data.title}
+            description={data.description}
+            score={scoreModal.type === "Risk" ? scoreModal.row.riskScore : scoreModal.row.expansionScore}
+            whyNow={data.whyNow}
+            evidence={data.evidence}
+            confidence={data.confidence}
+            confidenceDescription={data.confidenceDescription}
+            factors={data.factors}
+            onFactorFeedback={(key, type) =>
+              console.log("Factor feedback:", { account: scoreModal.row.name, factor: key, type })
+            }
+          />
+        )
+      })()}
     </div>
   )
 }
