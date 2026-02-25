@@ -9,6 +9,7 @@ export interface InboxRowProps extends React.HTMLAttributes<HTMLDivElement> {
   secondaryText: string
   tertiaryText: string
   isAtRisk?: boolean
+  isSelected?: boolean
   contactMethods?: { phone?: boolean; email?: boolean; message?: boolean }
   interactionCount: number | string
   assignee: string
@@ -26,6 +27,7 @@ export const InboxRow = React.forwardRef<HTMLDivElement, InboxRowProps>(
       secondaryText,
       tertiaryText,
       isAtRisk = false,
+      isSelected = false,
       contactMethods = { phone: true, email: true, message: true },
       interactionCount,
       assignee,
@@ -39,17 +41,18 @@ export const InboxRow = React.forwardRef<HTMLDivElement, InboxRowProps>(
       <div
         ref={ref}
         className={cn(
-          "group flex items-center gap-4 py-3 px-4 border-b border-border hover:bg-muted/50 cursor-pointer bg-background transition-colors text-sm",
+          "group flex items-center gap-4 py-2.5 px-4 border-b border-border cursor-pointer transition-colors text-[13px] border-l-2",
+          isSelected
+            ? "bg-muted/30 border-l-brand-purple"
+            : "bg-background hover:bg-muted/50 border-l-transparent",
           className
         )}
         {...props}
       >
-        {/* ID */}
-        <div className="w-24 shrink-0 text-muted-foreground font-medium text-[13px]">
+        <div className="w-[100px] shrink-0 text-muted-foreground font-mono text-xs">
           {itemId}
         </div>
 
-        {/* Main Content (Status + Name via Facility -> Specialty) */}
         <div className="flex-1 min-w-0 flex items-center gap-3">
           <div
             className={cn("w-2 h-2 rounded-full shrink-0", {
@@ -59,35 +62,32 @@ export const InboxRow = React.forwardRef<HTMLDivElement, InboxRowProps>(
             })}
           />
           <div className="flex items-center gap-1.5 truncate">
-            <span className="font-semibold text-foreground">{primaryText}</span>
-            <span className="text-muted-foreground">via {secondaryText}</span>
-            <span className="text-muted-foreground">&rarr;</span>
-            <span className="text-muted-foreground">{tertiaryText}</span>
+            <span className="font-semibold text-foreground text-sm">{primaryText}</span>
+            <span className="text-muted-foreground text-xs">via {secondaryText}</span>
+            <span className="text-muted-foreground text-xs">&rarr;</span>
+            <span className="text-muted-foreground text-xs">{tertiaryText}</span>
           </div>
         </div>
 
-        {/* Badges / Risk */}
         <div className="w-24 shrink-0 flex items-center justify-end px-2">
           {isAtRisk && (
-            <div className="flex items-center gap-1 text-red-600 bg-red-50 px-2 py-0.5 rounded-md text-[11px] font-medium border border-red-100">
+            <div className="flex items-center gap-1 text-red-600 bg-red-50 px-1.5 py-0.5 rounded-md text-[10px] font-semibold border border-red-100">
               <AlertCircle className="w-3 h-3" />
               At Risk
             </div>
           )}
         </div>
 
-        {/* Contact Icons */}
         <div className="flex items-center gap-2 text-muted-foreground/40 shrink-0 w-20 justify-center">
           <Phone className={cn("w-3.5 h-3.5", contactMethods.phone && "text-muted-foreground/80")} />
           <Mail className={cn("w-3.5 h-3.5", contactMethods.email && "text-muted-foreground/80")} />
           <MessageSquare className={cn("w-3.5 h-3.5", contactMethods.message && "text-muted-foreground/80")} />
         </div>
 
-        {/* Interaction Count */}
         <div className="w-12 shrink-0 flex items-center justify-center">
           <div
             className={cn(
-              "text-[11px] font-medium px-1.5 py-0.5 rounded border",
+              "text-[10px] font-semibold px-1.5 py-0.5 rounded border",
               typeof interactionCount === "string" && interactionCount.includes("+")
                 ? "bg-red-50 border-red-200 text-red-700"
                 : Number(interactionCount) > 2
@@ -99,20 +99,17 @@ export const InboxRow = React.forwardRef<HTMLDivElement, InboxRowProps>(
           </div>
         </div>
 
-        {/* Assignee */}
-        <div className="w-32 shrink-0 text-[13px] font-medium text-foreground truncate">
+        <div className="w-32 shrink-0 text-xs font-medium text-foreground truncate">
           {assignee}
         </div>
 
-        {/* Status */}
         <div className="w-28 shrink-0">
-          <div className="inline-flex items-center bg-muted/80 px-2 py-0.5 rounded text-[11px] font-medium text-muted-foreground">
+          <div className="inline-flex items-center bg-muted/80 px-2 py-0.5 rounded text-[10px] font-medium text-muted-foreground">
             {status}
           </div>
         </div>
 
-        {/* Time */}
-        <div className="w-24 shrink-0 text-right text-[12px] text-muted-foreground">
+        <div className="w-24 shrink-0 text-right text-xs text-muted-foreground">
           {time}
         </div>
       </div>

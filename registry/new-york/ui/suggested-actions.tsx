@@ -725,12 +725,10 @@ function AccountContactsPopover({
                   <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[10px] font-medium text-muted-foreground shrink-0">
                     {c.name.split(" ").map((n) => n[0]).join("")}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-foreground">{c.name}</div>
-                    <div className="text-xs text-muted-foreground leading-tight break-all">
-                      <span className="break-normal">{c.role}</span>
-                      <span> · </span>
-                      <span>{c.email ?? c.emails?.[0] ?? c.phone ?? c.phones?.[0] ?? ""}</span>
+                  <div className="flex-1 min-w-0 overflow-hidden">
+                    <div className="truncate text-sm font-medium text-foreground">{c.name}</div>
+                    <div className="truncate text-xs text-muted-foreground leading-tight">
+                      {c.role} · {c.email ?? c.emails?.[0] ?? c.phone ?? c.phones?.[0] ?? ""}
                     </div>
                     {c.lastActivity && (
                       <button
@@ -740,14 +738,14 @@ function AccountContactsPopover({
                           onOpenRecentActivity?.()
                           setOpen(false)
                         }}
-                        className="mt-1.5 inline-flex items-center gap-1.5 rounded-md border border-border/70 bg-muted/30 px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                        className="mt-1.5 flex max-w-full items-center gap-1.5 overflow-hidden rounded-md border border-border/70 bg-muted/30 px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
                       >
                         <Clock className="w-3 h-3 shrink-0" />
-                        <span className="whitespace-nowrap font-medium">Last activity</span>
-                        <span className="text-muted-foreground/60">·</span>
-                        <span className="whitespace-nowrap">{c.lastActivity.date}</span>
-                        <span className="text-muted-foreground/60">·</span>
-                        <span className="capitalize">{c.lastActivity.type}</span>
+                        <span className="shrink-0 font-medium">Last activity</span>
+                        <span className="shrink-0 text-muted-foreground/60">·</span>
+                        <span className="shrink-0">{c.lastActivity.date}</span>
+                        <span className="shrink-0 text-muted-foreground/60">·</span>
+                        <span className="truncate capitalize">{c.lastActivity.type}</span>
                       </button>
                     )}
                   </div>
