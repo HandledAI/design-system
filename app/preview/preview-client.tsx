@@ -464,57 +464,53 @@ export default function PreviewClientPage() {
             </button>
           </div>
 
-            <div className="overflow-hidden bg-background mb-8">
-              <div className="relative z-20 bg-background p-4">
-                <div className="flex gap-4">
-                  <div className="w-1 self-stretch rounded-full bg-brand-purple" />
-                  <div className="flex-1 space-y-3">
-                    <div className="text-sm leading-relaxed text-foreground">
-                      <div className="mb-2 flex items-start justify-between gap-3">
-                        <p className="text-sm font-semibold text-foreground">Account brief: {item.company}</p>
-                        <SignalApproval.Actions />
-                      </div>
-                      <ul className="list-disc space-y-2 pl-4 text-muted-foreground marker:text-muted-foreground/60">
-                        <li>
-                          There are <span className="font-medium text-foreground">3 unusual signals</span> including a large balance
-                          outflow and reduced login frequency
-                          <Citation number={1} source={sourceItems[0]} />
-                          <Citation number={2} source={sourceItems[1]} />
-                          <Citation number={3} source={sourceItems[2]} />
-                        </li>
-                        <li>
-                          Scott mentioned in <span className="font-medium text-foreground">#treasury-questions</span> that they are actively
-                          looking for treasury management options
-                          <Citation number={4} source={sourceItems[2]} />
-                        </li>
-                        <li>
-                          You have a recent email thread regarding optimization options that hasn&apos;t been replied to
-                          <Citation number={6} source={sourceItems[3]} />
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+            <div className="mb-8 border border-border rounded-lg bg-card">
+              <div className="p-5">
+                <h3 className="text-sm font-bold text-foreground mb-1">Account brief: {item.company}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                  We detected signals that suggest a potential opportunity with this account.
+                </p>
 
-                <div className="ml-5 mt-4 pl-1">
-                  <button
-                    type="button"
-                    onClick={() => setContextExpanded((previous) => !previous)}
-                    className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70 transition-colors hover:text-foreground"
-                  >
-                    Sources
-                    <ChevronDown
-                      className={`h-3.5 w-3.5 transition-transform duration-200 ${contextExpanded ? "rotate-180" : ""}`}
-                    />
-                  </button>
+                <ul className="list-disc space-y-2 pl-4 text-sm text-muted-foreground marker:text-muted-foreground/60 mb-4">
+                  <li>
+                    There are <span className="font-medium text-foreground">3 unusual signals</span> including a large balance
+                    outflow and reduced login frequency
+                    <Citation number={1} source={sourceItems[0]} />
+                    <Citation number={2} source={sourceItems[1]} />
+                    <Citation number={3} source={sourceItems[2]} />
+                  </li>
+                  <li>
+                    Scott mentioned in <span className="font-medium text-foreground">#treasury-questions</span> that they are actively
+                    looking for treasury management options
+                    <Citation number={4} source={sourceItems[2]} />
+                  </li>
+                  <li>
+                    You have a recent email thread regarding optimization options that hasn&apos;t been replied to
+                    <Citation number={6} source={sourceItems[3]} />
+                  </li>
+                </ul>
+
+                <button
+                  type="button"
+                  onClick={() => setContextExpanded((previous) => !previous)}
+                  className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70 transition-colors hover:text-foreground mb-4"
+                >
+                  Sources
+                  <ChevronDown
+                    className={`h-3.5 w-3.5 transition-transform duration-200 ${contextExpanded ? "rotate-180" : ""}`}
+                  />
+                </button>
+
+                {contextExpanded && (
+                  <div className="mb-4">
+                    <SourceList sources={sourceItems} />
+                  </div>
+                )}
+
+                <div className="border-t border-border pt-4">
+                  <SignalApproval.Actions />
                 </div>
               </div>
-
-              {contextExpanded && (
-                <div className="overflow-hidden bg-background px-6 pb-5 pt-1">
-                  <SourceList sources={sourceItems} />
-                </div>
-              )}
             </div>
 
           <div className="mb-8 overflow-hidden bg-background">

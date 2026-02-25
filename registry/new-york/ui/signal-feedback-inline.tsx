@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, CirclePlus, Lock, XCircle } from "lucide-react"
+import { Check, CirclePlus, Lock, ThumbsDown } from "lucide-react"
 
 const dismissReasons = [
   "Bad timing",
@@ -116,7 +116,7 @@ function Actions() {
   if (approvalState === "dismissed") {
     return (
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <XCircle className="h-3.5 w-3.5" />
+        <ThumbsDown className="h-3.5 w-3.5" />
         <span>Signal Dismissed</span>
       </div>
     )
@@ -124,10 +124,12 @@ function Actions() {
 
   if (approvalState === "confirming") {
     return (
-      <div className="flex flex-col gap-2 rounded-lg border border-border bg-muted/30 p-3">
-        <p className="text-sm text-foreground">
-          This will create an Opportunity in Salesforce for <strong>{companyName}</strong>. Confirm?
-        </p>
+      <div className="space-y-3">
+        <div className="rounded-md border border-border bg-muted/30 p-3">
+          <p className="text-sm text-foreground">
+            This will create an Opportunity in Salesforce for <strong>{companyName}</strong>. Confirm?
+          </p>
+        </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -140,7 +142,7 @@ function Actions() {
           <button
             type="button"
             onClick={handleCancel}
-            className="inline-flex h-7 items-center rounded-md px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="inline-flex h-7 items-center rounded-md border border-border px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             Cancel
           </button>
@@ -151,8 +153,8 @@ function Actions() {
 
   if (approvalState === "dismissing") {
     return (
-      <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/30 p-3">
-        <p className="text-xs font-medium text-muted-foreground">Why are you dismissing this signal?</p>
+      <div className="space-y-3">
+        <p className="text-xs font-medium text-muted-foreground">What&apos;s the issue with this signal?</p>
         <div className="flex flex-wrap gap-1.5">
           {dismissReasons.map((reason) => {
             const selected = selectedReasons.includes(reason)
@@ -181,8 +183,8 @@ function Actions() {
             onKeyDown={(e) => {
               if (e.key === "Enter" && canSubmitDismiss) handleDismissSubmit()
             }}
-            placeholder={otherSelected ? "Please describe (required)" : "Optional details"}
-            className="h-8 w-full rounded-md border border-border bg-background px-2.5 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-ring"
+            placeholder={otherSelected ? "Please describe (required)" : "Provide additional feedback..."}
+            className="h-7 w-full rounded-md border border-border bg-muted/20 px-2.5 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-ring"
           />
         )}
 
@@ -197,12 +199,12 @@ function Actions() {
                 : "cursor-not-allowed bg-muted text-muted-foreground"
             }`}
           >
-            Dismiss Signal
+            Submit
           </button>
           <button
             type="button"
             onClick={handleCancel}
-            className="inline-flex h-7 items-center rounded-md px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="inline-flex h-7 items-center rounded-md border border-border px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             Cancel
           </button>
@@ -216,7 +218,7 @@ function Actions() {
       <button
         type="button"
         onClick={requestApproval}
-        className="inline-flex h-8 items-center gap-1.5 rounded-md bg-foreground px-3 text-xs font-semibold text-background transition-colors hover:bg-foreground/90"
+        className="inline-flex h-7 items-center gap-1.5 rounded-md border border-border bg-foreground px-3 text-xs font-semibold text-background shadow-none transition-colors hover:bg-foreground/90"
       >
         <CirclePlus className="h-3.5 w-3.5" />
         Create Opportunity
@@ -224,10 +226,10 @@ function Actions() {
       <button
         type="button"
         onClick={requestDismiss}
-        className="inline-flex h-8 items-center gap-1.5 rounded-md px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        className="inline-flex h-7 items-center gap-1.5 rounded-md border border-border px-3 text-xs font-medium text-muted-foreground shadow-none transition-colors hover:bg-muted hover:text-foreground"
       >
-        <XCircle className="h-3.5 w-3.5" />
-        Dismiss Signal
+        <ThumbsDown className="h-3.5 w-3.5" />
+        Not Helpful
       </button>
     </div>
   )
