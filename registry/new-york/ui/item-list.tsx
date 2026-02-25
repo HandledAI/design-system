@@ -372,6 +372,19 @@ function getRiskDotColor(risk: QueueRisk) {
   }
 }
 
+const AVATAR_COLORS = [
+  "bg-blue-100 text-blue-700",
+  "bg-emerald-100 text-emerald-700",
+  "bg-purple-100 text-purple-700",
+  "bg-amber-100 text-amber-700",
+  "bg-rose-100 text-rose-700",
+  "bg-cyan-100 text-cyan-700",
+]
+
+function getAvatarColor(name: string) {
+  return AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length]
+}
+
 export function ItemList() {
   const [selectedFilters, setSelectedFilters] = React.useState<
     Record<string, string[]>
@@ -460,7 +473,7 @@ export function ItemList() {
   }, [groupedItems])
 
   const rowPaddingClass =
-    display.density === "compact" ? "px-4 py-2" : "px-4 py-3"
+    display.density === "compact" ? "px-4 py-1.5" : "px-4 py-2.5"
 
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card">
@@ -554,7 +567,7 @@ export function ItemList() {
                           {item.risk === "At Risk" ? (
                             <Badge
                               variant="outline"
-                              className="inline-flex items-center gap-1 rounded-full border-red-200 bg-red-50 px-2 py-0.5 text-[10px] font-medium text-red-700"
+                              className="inline-flex h-5 items-center gap-1 rounded-md border-red-200 bg-red-50 px-1.5 text-[10px] font-semibold text-red-700"
                             >
                               <AlertCircle className="h-3 w-3" />
                               At Risk
@@ -588,7 +601,7 @@ export function ItemList() {
                         <div className="w-[48px] shrink-0 text-center">
                           <span
                             className={cn(
-                              "rounded border px-1.5 py-0.5 text-[11px] font-semibold",
+                              "inline-flex h-5 items-center justify-center rounded border px-1.5 text-[10px] font-semibold",
                               item.attempts >= 4
                                 ? "border-red-200 bg-red-50 text-red-700"
                                 : item.attempts === 3
@@ -601,14 +614,24 @@ export function ItemList() {
                         </div>
 
                         {display.showOwner ? (
-                          <div className="hidden w-[130px] shrink-0 truncate text-[13px] font-medium text-foreground lg:block">
-                            {item.owner}
+                          <div className="hidden w-[130px] shrink-0 items-center gap-2 lg:flex">
+                            <div
+                              className={cn(
+                                "flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[10px] font-semibold",
+                                getAvatarColor(item.owner)
+                              )}
+                            >
+                              {item.owner.charAt(0)}
+                            </div>
+                            <span className="truncate text-xs font-medium text-foreground">
+                              {item.owner}
+                            </span>
                           </div>
                         ) : null}
 
                         {display.showStatus ? (
                           <div className="hidden w-[125px] shrink-0 justify-end md:flex">
-                            <span className="rounded-md border border-border bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                            <span className="inline-flex h-5 items-center rounded-md border border-border bg-muted px-1.5 text-[10px] font-medium text-muted-foreground">
                               {item.stage}
                             </span>
                           </div>

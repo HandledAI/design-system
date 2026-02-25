@@ -29,6 +29,8 @@ import {
   Zap,
   LayoutList,
   Columns2,
+  Square,
+  Tag,
 } from "lucide-react"
 import { BRAND_ICONS } from "@/lib/icons"
 
@@ -78,6 +80,11 @@ import { DataTable } from "@/registry/new-york/ui/data-table"
 import { ItemList } from "@/registry/new-york/ui/item-list"
 import { ViewModeToggle } from "@/registry/new-york/ui/view-mode-toggle"
 import { TimelineActivity } from "@/registry/new-york/ui/timeline-activity"
+import {
+  InboxToolbar,
+  type AssigneeFilter,
+  type InboxFilterCategory,
+} from "@/registry/new-york/ui/inbox-toolbar"
 
 const MOCK_QUEUE = [
   {
@@ -316,7 +323,8 @@ const buildSourceItems = (item: QueueItem): SourceDef[] => [
 
 export default function PreviewClientPage() {
   const [currentView, setCurrentView] = React.useState("inbox")
-  const [inboxViewMode, setInboxViewMode] = React.useState<"inbox" | "list">("inbox")
+  const [inboxViewMode, setInboxViewMode] = React.useState<"inbox" | "list" | "detail">("inbox")
+  const [previousViewMode, setPreviousViewMode] = React.useState<"inbox" | "list">("inbox")
   const [selectedTask, setSelectedTask] = React.useState(MOCK_QUEUE[0])
   const [showAllMetrics, setShowAllMetrics] = React.useState(false)
   const [showCoaching, setShowCoaching] = React.useState(true)
@@ -325,6 +333,68 @@ export default function PreviewClientPage() {
   const [contextExpanded, setContextExpanded] = React.useState(false)
   const [showRecentActivity, setShowRecentActivity] = React.useState(false)
   const [extraActions, setExtraActions] = React.useState<SuggestedAction[]>([])
+  const [inboxAssignee, setInboxAssignee] = React.useState<AssigneeFilter>("me")
+  const [inboxFilters, setInboxFilters] = React.useState<Record<string, string>>({})
+
+  const INBOX_FILTER_CATEGORIES: InboxFilterCategory[] = React.useMemo(
+    () => [
+      {
+        id: "category",
+        label: "Category",
+        icon: <Tag className="h-3.5 w-3.5 text-muted-foreground" />,
+        options: [...new Set(MOCK_QUEUE.map((i) => i.tag1))],
+      },
+      {
+        id: "account",
+        label: "Account",
+        icon: <Building className="h-3.5 w-3.5 text-muted-foreground" />,
+        options: [...new Set(MOCK_QUEUE.map((i) => i.company))],
+      },
+    ],
+    []
+  )
+
+  const handleInboxItemSelect = React.useCallback(
+    (item: (typeof MOCK_QUEUE)[number]) => {
+      setSelectedTask(item)
+      if (inboxViewMode === "list") {
+        setPreviousViewMode("list")
+        setInboxViewMode("detail")
+      }
+    },
+    [inboxViewMode]
+  )
+
+  const handleBackFromDetail = React.useCallback(() => {
+    setInboxViewMode(previousViewMode)
+  }, [previousViewMode])
+
+  const handleViewModeChange = React.useCallback(
+    (id: string) => {
+      const mode = id as "inbox" | "list" | "detail"
+      if (mode !== "detail") {
+        setPreviousViewMode(mode)
+      }
+      setInboxViewMode(mode)
+    },
+    []
+  )
+
+  // Responsive: auto-collapse to detail on narrow viewports
+  React.useEffect(() => {
+    const mql = window.matchMedia("(max-width: 768px)")
+
+    function handleChange(e: MediaQueryListEvent | MediaQueryList) {
+      if (e.matches && inboxViewMode === "inbox") {
+        setPreviousViewMode("inbox")
+        setInboxViewMode("detail")
+      }
+    }
+
+    handleChange(mql)
+    mql.addEventListener("change", handleChange)
+    return () => mql.removeEventListener("change", handleChange)
+  }, [inboxViewMode])
 
   React.useEffect(() => {
     setContextExpanded(false)
@@ -953,6 +1023,16 @@ export default function PreviewClientPage() {
               <div className="flex h-full w-full flex-col">
                 <div className="flex items-center justify-between border-b border-border bg-background px-4 py-3 shrink-0">
                   <div className="flex items-center gap-3">
+                    {inboxViewMode === "detail" ? (
+                      <button
+                        type="button"
+                        onClick={handleBackFromDetail}
+                        className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                        Back
+                      </button>
+                    ) : null}
                     <h2 className="text-lg font-semibold text-foreground">Inbox</h2>
                     <Badge variant="secondary" className="bg-muted text-muted-foreground hover:bg-muted font-medium text-[11px] px-2 py-0.5 rounded-md">
                       {MOCK_QUEUE.length}
@@ -961,11 +1041,12 @@ export default function PreviewClientPage() {
                   <div className="flex items-center gap-3">
                     <ViewModeToggle
                       modes={[
-                        { id: "inbox", icon: <Columns2 className="h-3.5 w-3.5" />, label: "Inbox View" },
+                        { id: "inbox", icon: <Columns2 className="h-3.5 w-3.5" />, label: "Split View" },
                         { id: "list", icon: <LayoutList className="h-3.5 w-3.5" />, label: "List View" },
+                        { id: "detail", icon: <Square className="h-3.5 w-3.5" />, label: "Detail View" },
                       ]}
                       activeMode={inboxViewMode}
-                      onModeChange={(id) => setInboxViewMode(id as "inbox" | "list")}
+                      onModeChange={handleViewModeChange}
                     />
                     <Link href="/">
                       <Button variant="ghost" size="sm" className="h-8 gap-2 text-xs text-muted-foreground hover:text-foreground">
@@ -976,8 +1057,22 @@ export default function PreviewClientPage() {
                   </div>
                 </div>
 
-                {inboxViewMode === "list" ? (
+                {inboxViewMode === "detail" ? (
+                  <div className="flex h-full flex-1 flex-col overflow-hidden bg-background">
+                    <div className="flex-1 overflow-y-auto">{renderDetailView(selectedTask)}</div>
+                  </div>
+                ) : inboxViewMode === "list" ? (
                   <div className="flex-1 overflow-y-auto bg-background">
+                    <InboxToolbar
+                      assignee={inboxAssignee}
+                      onAssigneeChange={setInboxAssignee}
+                      filterCategories={INBOX_FILTER_CATEGORIES}
+                      selectedFilters={inboxFilters}
+                      onFilterChange={(catId, val) =>
+                        setInboxFilters((prev) => ({ ...prev, [catId]: val }))
+                      }
+                      onClearFilters={() => setInboxFilters({})}
+                    />
                     {(() => {
                       const urgent = MOCK_QUEUE.filter(i => i.statusColor === "red")
                       const active = MOCK_QUEUE.filter(i => i.statusColor !== "red")
@@ -996,15 +1091,19 @@ export default function PreviewClientPage() {
                           {group.items.map((item) => (
                             <div
                               key={item.id}
-                              onClick={() => { setSelectedTask(item); setInboxViewMode("inbox") }}
-                              className="flex items-center gap-3 px-4 py-3 border-b border-border/50 text-sm cursor-pointer transition-colors hover:bg-muted/40"
+                              onClick={() => handleInboxItemSelect(item)}
+                              className={`flex items-center gap-3 px-4 py-2.5 border-b border-border/50 text-[13px] cursor-pointer transition-colors border-l-2 ${
+                                selectedTask.id === item.id
+                                  ? "bg-muted/30 border-l-brand-purple"
+                                  : "border-l-transparent hover:bg-muted/40"
+                              }`}
                             >
                               <span className={`h-2 w-2 shrink-0 rounded-full ${item.statusColor === 'red' ? 'bg-[#f43f5e]' : 'bg-[#3b82f6]'}`} />
-                              <span className="w-[80px] shrink-0 text-[11px] font-medium uppercase tracking-wide text-muted-foreground/80">{item.id}</span>
-                              <span className="w-[110px] shrink-0 rounded-md border border-border bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground truncate">{item.tag1}</span>
-                              <span className="min-w-0 flex-1 truncate font-semibold text-foreground">{item.title}</span>
-                              <span className="w-[120px] shrink-0 truncate text-[13px] font-medium text-foreground">{item.company}</span>
-                              <span className="w-[80px] shrink-0 text-right text-[12px] text-muted-foreground">{item.time}</span>
+                              <span className="w-[80px] shrink-0 font-mono text-xs text-muted-foreground/80">{item.id}</span>
+                              <span className="w-[110px] shrink-0 rounded-md border border-border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground truncate">{item.tag1}</span>
+                              <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">{item.title}</span>
+                              <span className="w-[120px] shrink-0 truncate text-xs font-medium text-foreground">{item.company}</span>
+                              <span className="w-[80px] shrink-0 text-right text-xs text-muted-foreground">{item.time}</span>
                             </div>
                           ))}
                         </div>
@@ -1048,19 +1147,24 @@ export default function PreviewClientPage() {
                           <div
                             key={item.id}
                             onClick={() => setSelectedTask(item)}
-                            className={`cursor-pointer border-b border-border p-4 transition-colors group relative ${
+                            className={`cursor-pointer border-b border-border p-4 transition-colors group relative border-l-2 ${
                               selectedTask.id === item.id
-                                ? "bg-muted/30"
-                                : "bg-transparent hover:bg-muted/10"
+                                ? "bg-muted/30 border-l-brand-purple"
+                                : "bg-transparent border-l-transparent hover:bg-muted/10"
                             }`}
                           >
-                            <div className="mb-1.5 flex items-start justify-between">
-                              <span className="truncate pr-2 text-[14px] font-semibold text-foreground leading-tight">{item.title}</span>
-                              <span className="whitespace-nowrap pt-0.5 text-[11px] font-medium text-muted-foreground/80">{item.time}</span>
+                            <div className="mb-1.5 flex items-center gap-2">
+                              <span className="min-w-0 truncate text-[13px] font-semibold text-foreground leading-tight">{item.title}</span>
+                              {selectedTask.id !== item.id && item.tag1 && (
+                                <span className="shrink-0 rounded-full border border-border bg-muted/60 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                                  {item.tag1}
+                                </span>
+                              )}
+                              <span className="ml-auto shrink-0 text-[10px] font-medium text-muted-foreground/80">{item.time}</span>
                             </div>
                             <div className="flex items-start gap-2 mt-2">
                               <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 ${item.statusColor === 'red' ? 'bg-[#f43f5e]' : 'bg-[#3b82f6]'}`} />
-                              <span className="text-[13px] text-muted-foreground leading-tight">{item.details}</span>
+                              <span className="text-xs text-muted-foreground leading-tight">{item.details}</span>
                             </div>
 
                             <div className={`absolute right-4 bottom-4 flex items-center gap-1.5 bg-background shadow-sm rounded-md px-1 py-0.5 border border-border ${
@@ -1069,12 +1173,6 @@ export default function PreviewClientPage() {
                                <Button variant="ghost" size="icon" className="h-6 w-6 rounded text-muted-foreground hover:text-foreground"><CheckSquare className="w-3.5 h-3.5" /></Button>
                                <Button variant="ghost" size="icon" className="h-6 w-6 rounded text-muted-foreground hover:text-foreground"><Clock className="w-3.5 h-3.5" /></Button>
                             </div>
-
-                            {selectedTask.id !== item.id && item.tag1 === "Outbound" && (
-                              <div className="mt-2 text-[11px] font-medium text-[#3b82f6]">
-                                {item.tag1}
-                              </div>
-                            )}
                           </div>
                         ))}
                         <div className="p-4">
