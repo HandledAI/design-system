@@ -30,6 +30,8 @@ import {
   Columns2,
   Square,
   Tag,
+  Phone,
+  TrendingUp,
 } from "lucide-react"
 import { BRAND_ICONS } from "@/lib/icons"
 
@@ -79,6 +81,13 @@ import { DataTable } from "@/registry/new-york/ui/data-table"
 import { ItemList } from "@/registry/new-york/ui/item-list"
 import { ViewModeToggle } from "@/registry/new-york/ui/view-mode-toggle"
 import { TimelineActivity } from "@/registry/new-york/ui/timeline-activity"
+import { VolumeAnalysisChart } from "@/registry/new-york/ui/volume-analysis-chart"
+import { DonutChart } from "@/registry/new-york/ui/donut-chart"
+import { TrendAreaChart } from "@/registry/new-york/ui/trend-area-chart"
+import { BarChartComponent } from "@/registry/new-york/ui/bar-chart-component"
+import { StyledBarList } from "@/registry/new-york/ui/styled-bar-list"
+import { PipelineOverview, type PipelineStage, type PipelineStageMetrics, type PipelineStageTiming } from "@/registry/new-york/ui/pipeline-overview"
+import { ReportCard } from "@/registry/new-york/ui/report-card"
 import {
   InboxToolbar,
   type AssigneeFilter,
@@ -380,6 +389,87 @@ const getSignalScore = (company: string) => {
   }
 }
 
+const ANALYTICS_PIPELINE_STAGES: PipelineStage[] = [
+  { id: "received", label: "Referrals Received", count: 847, trend: "+12%", nextConversion: "85%" },
+  { id: "contacted", label: "Successfully Contacted", count: 720, trend: "+4%", nextConversion: "92%" },
+  { id: "intake_sent", label: "Intake Sent", count: 661, trend: "+6%", nextConversion: "93%" },
+  { id: "intake_done", label: "Intake Completed", count: 613, trend: "+6%", nextConversion: "99%" },
+  { id: "scheduled", label: "Scheduled", count: 612, trend: "+5%", nextConversion: "85%" },
+  { id: "completed", label: "Completed", count: 520, trend: "+4%", nextConversion: null },
+]
+
+const ANALYTICS_STAGE_METRICS: Record<string, PipelineStageMetrics> = {
+  received: { medianTime: "6h", avgTime: "10h", dropOffs: [{ reason: "Lost/Other", count: 56, pct: "7%" }, { reason: "Coverage", count: 40, pct: "5%" }, { reason: "Unqualified", count: 30, pct: "4%" }] },
+  contacted: { medianTime: "1.1d", avgTime: "1.8d", dropOffs: [{ reason: "No Contact", count: 60, pct: "8%" }] },
+  intake_sent: { medianTime: "0.5d", avgTime: "1.2d", dropOffs: [{ reason: "Intake Drop", count: 48, pct: "7%" }] },
+  intake_done: { medianTime: "1.5d", avgTime: "2.1d", dropOffs: [{ reason: "Unqualified", count: 1, pct: "<1%" }] },
+  scheduled: { medianTime: "1.2d", avgTime: "1.6d", dropOffs: [{ reason: "No Show/Cancel", count: 92, pct: "15%" }] },
+  completed: { medianTime: "1h", avgTime: "1.5h", dropOffs: [] },
+}
+
+const ANALYTICS_TIMINGS: (PipelineStageTiming | null)[] = [
+  null, { median: "1.1d", avg: "1.8d" }, { median: "0.5d", avg: "1.2d" },
+  { median: "1.5d", avg: "2.1d" }, { median: "1.2d", avg: "1.6d" }, { median: "1h", avg: "1.5h" },
+]
+
+const ANALYTICS_FILTER_BREAKDOWNS = {
+  Facility: { received: { Gilbert: 280, Tucson: 200, "North Phoenix": 180, Avondale: 110, Glendale: 77 } },
+  Channel: { received: { eFax: 508, Webform: 170, Phone: 169 } },
+  Source: { received: { "Dr. Smith": 220, "Dr. Johnson": 180, "Dr. Williams": 150, "Dr. Martinez": 140, "Other PCPs": 157 } },
+  "Lead Source": { received: { PCP: 400, School: 250, "Social (Instagram)": 100, "Social (Facebook)": 97 } },
+  Payer: { received: { "Blue Cross Blue Shield": 280, Aetna: 180, UnitedHealthcare: 150, Cigna: 120, Medicare: 70, Medicaid: 30, Other: 17 } },
+}
+
+const ANALYTICS_VOLUME_DATES = ["Jan 13", "Jan 14", "Jan 15", "Jan 16", "Jan 17", "Jan 18", "Jan 19"]
+function genAnalyticsVolumeData(keys: string[]) {
+  return ANALYTICS_VOLUME_DATES.map((date) => {
+    const point: Record<string, unknown> = { date }
+    keys.forEach((key) => { point[key] = Math.floor(Math.random() * 30) + 5 })
+    return point
+  })
+}
+const ANALYTICS_VOLUME_DATA = genAnalyticsVolumeData(["Gilbert", "North Phoenix", "Tucson", "Avondale", "Glendale"])
+const ANALYTICS_VOLUME_KEYS = [
+  { key: "Gilbert", color: "#10b981" },
+  { key: "North Phoenix", color: "#3b82f6" },
+  { key: "Tucson", color: "#8b5cf6" },
+  { key: "Avondale", color: "#f59e0b" },
+  { key: "Glendale", color: "#ec4899" },
+]
+
+const ANALYTICS_DONUT_DATA = [
+  { name: "No Contact", value: 6, color: "#0F4C3A" },
+  { name: "Stalled", value: 4, color: "#15803d" },
+  { name: "Needs Attn", value: 8, color: "#3DB4A0" },
+  { name: "Auth Delay", value: 5, color: "#5FCFBC" },
+  { name: "DCS Hold", value: 3, color: "#86EFAC" },
+  { name: "Expired", value: 2, color: "#A7F3D0" },
+]
+
+const ANALYTICS_TREND_DATA = [
+  { name: "3 Weeks Ago", Scheduled: 12, Administered: 10, Canceled: 2 },
+  { name: "2 Weeks Ago", Scheduled: 18, Administered: 14, Canceled: 3 },
+  { name: "Last Week", Scheduled: 15, Administered: 13, Canceled: 1 },
+  { name: "This Week", Scheduled: 22, Administered: 18, Canceled: 4 },
+]
+
+const ANALYTICS_BAR_DATA = [
+  { date: "Jan 13", phone: 120, text: 95, email: 25 },
+  { date: "Jan 14", phone: 145, text: 88, email: 30 },
+  { date: "Jan 15", phone: 132, text: 110, email: 28 },
+  { date: "Jan 16", phone: 160, text: 105, email: 35 },
+  { date: "Jan 17", phone: 148, text: 92, email: 22 },
+  { date: "Jan 18", phone: 155, text: 98, email: 32 },
+  { date: "Jan 19", phone: 138, text: 102, email: 27 },
+]
+
+const ANALYTICS_BAR_LIST_DATA = [
+  { name: "Outreach", value: 42 },
+  { name: "Follow-up", value: 28 },
+  { name: "Scheduling", value: 18 },
+  { name: "Verification", value: 12 },
+]
+
 export default function PreviewClientPage() {
   const [currentView, setCurrentView] = React.useState("inbox")
   const [inboxViewMode, setInboxViewMode] = React.useState<"inbox" | "list" | "detail">("inbox")
@@ -394,6 +484,7 @@ export default function PreviewClientPage() {
   const [inboxAssignee, setInboxAssignee] = React.useState<AssigneeFilter>("me")
   const [inboxFilters, setInboxFilters] = React.useState<Record<string, string>>({})
   const [evidenceExpanded, setEvidenceExpanded] = React.useState(false)
+  const [insightsTab, setInsightsTab] = React.useState<"overview" | "analytics">("overview")
 
   const INBOX_FILTER_CATEGORIES: InboxFilterCategory[] = React.useMemo(
     () => [
@@ -626,22 +717,19 @@ export default function PreviewClientPage() {
                   <button
                     type="button"
                     onClick={() => setShowRecentActivity((prev) => !prev)}
-                    className="flex w-full items-center justify-between gap-2 py-2 rounded-md transition-colors hover:bg-muted/40 -mx-2 px-2"
+                    className="group/timeline flex w-full items-center justify-between gap-2 py-2 rounded-md transition-colors hover:bg-muted/40 -mx-2 px-2 cursor-pointer"
                   >
-                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Activity timeline</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider group-hover/timeline:text-foreground transition-colors">Activity timeline</h3>
+                      {!showRecentActivity && (
+                        <span className="text-[11px] text-muted-foreground/60">&middot; 1d ago</span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] font-medium text-muted-foreground">7 events</span>
+                      <span className="text-[11px] font-medium text-muted-foreground">{showRecentActivity ? "7 events" : "7 events"}</span>
                       <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${showRecentActivity ? "rotate-180" : ""}`} />
                     </div>
                   </button>
-
-                  {!showRecentActivity && (
-                    <div className="flex items-center gap-2 px-2 py-1.5 text-xs text-muted-foreground">
-                      <MessageSquare className="h-3 w-3 shrink-0" />
-                      <span className="truncate">Contact record updated for <span className="font-medium text-foreground">Robert Choi</span></span>
-                      <span className="shrink-0 text-muted-foreground/60">&middot; 1d ago</span>
-                    </div>
-                  )}
 
                   {showRecentActivity ? (
                     <div className="mt-3">
@@ -967,7 +1055,45 @@ export default function PreviewClientPage() {
                     </Link>
                   </div>
                 </div>
+
+                <div className="flex items-center gap-1 border-b border-border">
+                  <button
+                    type="button"
+                    onClick={() => setInsightsTab("overview")}
+                    className={`relative px-4 py-2 text-sm font-medium transition-colors ${
+                      insightsTab === "overview"
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <BarChart2 className="h-3.5 w-3.5" />
+                      Overview
+                    </span>
+                    {insightsTab === "overview" && (
+                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full" />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setInsightsTab("analytics")}
+                    className={`relative px-4 py-2 text-sm font-medium transition-colors ${
+                      insightsTab === "analytics"
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <TrendingUp className="h-3.5 w-3.5" />
+                      Analytics
+                    </span>
+                    {insightsTab === "analytics" && (
+                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full" />
+                    )}
+                  </button>
+                </div>
                 
+                {insightsTab === "overview" && <>
                 {/* Coaching Banner */}
                 {showCoaching && (
                   <div className="border border-border rounded-xl p-6 relative bg-card shadow-sm">
@@ -1125,6 +1251,95 @@ export default function PreviewClientPage() {
                     <CheckInsCard />
                   </div>
                 </div>
+                </>}
+
+                {insightsTab === "analytics" && (
+                  <div className="space-y-6">
+                    {/* Pipeline Overview - Full Report Card */}
+                    <PipelineOverview
+                      stages={ANALYTICS_PIPELINE_STAGES}
+                      stageMetrics={ANALYTICS_STAGE_METRICS}
+                      stageTimings={ANALYTICS_TIMINGS}
+                      filterBreakdowns={ANALYTICS_FILTER_BREAKDOWNS}
+                    />
+
+                    {/* Volume Analysis - Report Card */}
+                    <ReportCard
+                      title="Volume Analysis"
+                      subtitle="Referral volume broken down by facility over time"
+                      filterOptions={[
+                        { label: "Facility", value: "facility" },
+                        { label: "Channel", value: "channel" },
+                        { label: "Source", value: "source" },
+                        { label: "Payer", value: "payer" },
+                      ]}
+                      selectedFilter="facility"
+                    >
+                      <VolumeAnalysisChart
+                        data={ANALYTICS_VOLUME_DATA}
+                        dataKeys={ANALYTICS_VOLUME_KEYS}
+                      />
+                    </ReportCard>
+
+                    {/* Two Column: Risk Breakdown + Trend */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <ReportCard
+                        title="Risk Breakdown"
+                        subtitle="Referrals at risk by category"
+                      >
+                        <div className="flex items-center justify-center">
+                          <DonutChart data={ANALYTICS_DONUT_DATA} centerLabel={28} showLegend />
+                        </div>
+                      </ReportCard>
+
+                      <ReportCard
+                        title="Referrals Over Time"
+                        subtitle="Weekly appointment trends"
+                        toggleOptions={["Scheduled", "Administered", "Canceled"]}
+                        selectedToggle="Scheduled"
+                      >
+                        <TrendAreaChart
+                          data={ANALYTICS_TREND_DATA}
+                          series={[
+                            { dataKey: "Scheduled", color: "#10b981" },
+                            { dataKey: "Administered", color: "#3b82f6" },
+                            { dataKey: "Canceled", color: "#ef4444" },
+                          ]}
+                          xAxisKey="name"
+                          height={220}
+                        />
+                      </ReportCard>
+                    </div>
+
+                    {/* Outreach Activity */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      <ReportCard
+                        title="Outreach Activity"
+                        subtitle="Daily outreach by channel"
+                        className="lg:col-span-2"
+                      >
+                        <BarChartComponent
+                          data={ANALYTICS_BAR_DATA}
+                          bars={[
+                            { dataKey: "phone", color: "#059669", name: "Phone Calls", icon: Phone },
+                            { dataKey: "text", color: "#10b981", name: "Text Messages", icon: MessageSquare },
+                            { dataKey: "email", color: "#34d399", name: "Emails", icon: Mail },
+                          ]}
+                        />
+                      </ReportCard>
+
+                      <ReportCard
+                        title="Top Activity Types"
+                        subtitle="By completion percentage"
+                      >
+                        <StyledBarList
+                          data={ANALYTICS_BAR_LIST_DATA}
+                          valueFormatter={(v) => `${v}%`}
+                        />
+                      </ReportCard>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : currentView === "inbox" ? (
               <div className="flex h-full w-full flex-col">
