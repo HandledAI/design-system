@@ -1,0 +1,20 @@
+---
+description: Checklist when editing design system components
+globs: registry/new-york/ui/*.tsx
+alwaysApply: false
+---
+
+# Component Editing Checklist
+
+When modifying a component in `registry/new-york/ui/`:
+
+- Update `docs/components/{name}.md` when props, variants, behavior, or dependencies change.
+- If adding a new component:
+  - export it from `index.ts`
+  - add `docs/components/{name}.md`
+  - add it to `docs/COMPONENTS.md` under the correct category
+- If renaming or removing exports, treat as a breaking change and require a MAJOR version bump.
+- If adding a new external dependency:
+  - add it to `peerDependencies` in `package.json`
+  - document it in that component's doc file
+- After component changes, run `pnpm typecheck`.
