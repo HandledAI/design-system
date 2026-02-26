@@ -119,6 +119,8 @@ export function PrototypeShell({
     <div className="flex h-screen w-full overflow-hidden bg-background font-sans">
       <QuickActionSidebarNav
         className="z-20 h-screen shrink-0"
+        brandLabel={config.brand?.name}
+        brandSubtitle={undefined}
         navSections={config.sidebar}
         activeItemId={currentView}
         onNavigate={handleNavigate}
