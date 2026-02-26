@@ -1,8 +1,15 @@
 "use client"
 
 import * as React from "react"
+import dynamic from "next/dynamic"
 import { createColumnHelper } from "@tanstack/react-table"
-import { AgentOrb } from "@/registry/new-york/ui/agent-orb"
+import type { AgentOrbProps } from "@/registry/new-york/ui/agent-orb"
+
+const AgentOrb = dynamic<AgentOrbProps>(
+  () => import("@/registry/new-york/ui/agent-orb").then((m) => m.AgentOrb),
+  { ssr: false, loading: () => <div className="w-full h-full bg-muted/20 rounded-full animate-pulse" /> },
+)
+
 import {
   AgentPopover,
   AgentPopoverBranding,
