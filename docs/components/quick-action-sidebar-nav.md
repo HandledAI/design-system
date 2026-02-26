@@ -23,6 +23,7 @@ import {
 | brandSubtitle | string | "Placeholder" | Brand subtitle |
 | navSections | SidebarNavSection[] | DEFAULT_NAV_SECTIONS | Navigation sections |
 | activeItemId | string | "inbox" | Currently active nav item id |
+| activeVariant | "default" \| "gradient" | "default" | Active state style: `"default"` flat background, `"gradient"` gradient from primary. |
 | onNavigate | (itemId: string) => void | — | Navigation handler |
 | user | SidebarUserProfile | DEFAULT_USER | User profile for footer |
 | userMenuItems | UserMenuItem[] | DEFAULT_USER_MENU | User dropdown menu items |
@@ -39,7 +40,10 @@ import {
 
 ## Variants
 
-N/A
+### activeVariant
+
+- `"default"` — Active nav item gets a flat `bg-sidebar-accent` background (existing behavior).
+- `"gradient"` — Active nav item gets `bg-gradient-to-r from-primary/10 to-transparent text-primary`, matching the Recruiting Module sidebar pattern.
 
 ## Basic Usage
 

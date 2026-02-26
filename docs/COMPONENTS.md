@@ -16,7 +16,9 @@ import { ComponentName } from "@handled-ai/design-system"
 - [Textarea](./components/textarea.md) - Multi-line text field with shared design-system styles.
 - [Select](./components/select.md) - Compound select built on Radix Select primitives.
 - [Badge](./components/badge.md) - Lightweight status/label pill with variant styles.
+- [StatusBadge](./components/status-badge.md) - Semantic status pill that auto-maps status strings to success/warning/error/neutral colors.
 - [Avatar](./components/avatar.md) - User avatar primitives with fallback, badge, and group helpers.
+- [Message](./components/message.md) - Chat message primitives with user/assistant layouts, contained/flat variants, and avatar slots.
 - [Separator](./components/separator.md) - Horizontal or vertical visual separator.
 - [Skeleton](./components/skeleton.md) - Loading placeholder block for progressive rendering states.
 - [Progress](./components/progress.md) - Radix-based progress bar for completion/status indicators.
@@ -62,6 +64,7 @@ import { ComponentName } from "@handled-ai/design-system"
 ## Data Table
 
 - [DataTable](./components/data-table.md) - Integrated table experience with sorting, filters, quick views, and score drill-down.
+- [SimpleDataTable](./components/simple-data-table.md) - Lightweight generic table with clean `columns`/`data` props, rounded hover rows, and minimal chrome.
 - [DataTableFilter](./components/data-table-filter.md) - Category-based table filter menu primitives.
 - [DataTableDisplay](./components/data-table-display.md) - Table display controls for sorting and column visibility.
 - [DataTableQuickViews](./components/data-table-quick-views.md) - Preset quick-view controls for fast filtering.
@@ -106,6 +109,12 @@ import { ComponentName } from "@handled-ai/design-system"
 - [PrototypeWorkQueueView](./components/prototype-work-queue-view.md) - Work queue view wrapping ItemList.
 
 See [Prototype Template Guide](./prototype-template.md) for full usage documentation.
+
+## Agent Components
+
+- [AgentOrb](./components/agent-orb.md) - Three.js WebGL shader orb with audio-reactive animation and CSS glow effects.
+- [AgentPopover](./components/agent-popover.md) - Split-panel modal with multi-step flow for agent interactions (form, overview, chat).
+- [AgentWidget](./components/agent-widget.md) - Embeddable voice/chat widget UI shell with message display and input controls.
 
 ## Utilities
 

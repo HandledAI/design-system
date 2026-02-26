@@ -64,11 +64,14 @@ export interface UserMenuItem {
   destructive?: boolean
 }
 
+export type ActiveVariant = "default" | "gradient"
+
 interface QuickActionSidebarNavProps extends React.ComponentProps<"aside"> {
   brandLabel?: string
   brandSubtitle?: string
   navSections?: SidebarNavSection[]
   activeItemId?: string
+  activeVariant?: ActiveVariant
   onNavigate?: (itemId: string) => void
   user?: SidebarUserProfile
   userMenuItems?: UserMenuItem[]
@@ -132,13 +135,23 @@ function NavItemRow({
   item,
   isActive,
   isCollapsed,
+  activeVariant = "default",
   onClick,
 }: {
   item: SidebarNavItem
   isActive: boolean
   isCollapsed: boolean
+  activeVariant?: ActiveVariant
   onClick?: () => void
 }) {
+  const activeClasses =
+    activeVariant === "gradient"
+      ? "bg-gradient-to-r from-primary/10 to-transparent text-primary"
+      : "bg-sidebar-accent text-sidebar-accent-foreground"
+
+  const iconActiveClasses =
+    activeVariant === "gradient" ? "text-primary" : ""
+
   const content = (
     <button
       type="button"
@@ -147,11 +160,11 @@ function NavItemRow({
         "flex w-full items-center gap-3 rounded-lg text-sm font-medium transition-colors",
         isCollapsed ? "justify-center p-2" : "px-3 py-2",
         isActive
-          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+          ? activeClasses
           : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent",
       )}
     >
-      <item.icon className={cn("shrink-0", isCollapsed ? "w-5 h-5" : "w-4 h-4")} />
+      <item.icon className={cn("shrink-0", isCollapsed ? "w-5 h-5" : "w-4 h-4", isActive && iconActiveClasses)} />
       {!isCollapsed && <span className="flex-1 truncate text-left">{item.label}</span>}
     </button>
   )
@@ -172,11 +185,13 @@ function NavSection({
   section,
   activeItemId,
   isCollapsed,
+  activeVariant = "default",
   onNavigate,
 }: {
   section: SidebarNavSection
   activeItemId?: string
   isCollapsed: boolean
+  activeVariant?: ActiveVariant
   onNavigate?: (id: string) => void
 }) {
   const [isExpanded, setIsExpanded] = React.useState(true)
@@ -209,6 +224,7 @@ function NavSection({
               item={item}
               isActive={activeItemId === item.id}
               isCollapsed={isCollapsed}
+              activeVariant={activeVariant}
               onClick={() => onNavigate?.(item.id)}
             />
           ))}
@@ -239,6 +255,7 @@ function NavSection({
                 item={item}
                 isActive={activeItemId === item.id}
                 isCollapsed={isCollapsed}
+                activeVariant={activeVariant}
                 onClick={() => onNavigate?.(item.id)}
               />
             ))}
@@ -254,6 +271,7 @@ export function QuickActionSidebarNav({
   brandSubtitle = "Placeholder",
   navSections = DEFAULT_NAV_SECTIONS,
   activeItemId = "inbox",
+  activeVariant = "default",
   onNavigate,
   user = DEFAULT_USER,
   userMenuItems = DEFAULT_USER_MENU,
@@ -336,6 +354,7 @@ export function QuickActionSidebarNav({
                 section={section}
                 activeItemId={activeItemId}
                 isCollapsed={isCollapsed}
+                activeVariant={activeVariant}
                 onNavigate={onNavigate}
               />
             </React.Fragment>

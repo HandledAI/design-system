@@ -80,3 +80,11 @@ export * from "./registry/new-york/ui/prototype-inbox-view"
 export * from "./registry/new-york/ui/prototype-insights-view"
 export * from "./registry/new-york/ui/prototype-accounts-view"
 export * from "./registry/new-york/ui/prototype-work-queue-view"
+
+// Recruiting patterns
+export * from "./registry/new-york/ui/message"
+export * from "./registry/new-york/ui/status-badge"
+export * from "./registry/new-york/ui/simple-data-table"
+export * from "./registry/new-york/ui/agent-orb"
+export * from "./registry/new-york/ui/agent-popover"
+export * from "./registry/new-york/ui/agent-widget"
