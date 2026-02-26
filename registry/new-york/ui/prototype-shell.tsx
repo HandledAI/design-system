@@ -35,6 +35,12 @@ export interface PrototypeShellProps {
    * Receives `onClose` so children can close the panel.
    */
   entityPanelChildren?: React.ReactNode | ((ctx: { onClose: () => void }) => React.ReactNode)
+  /**
+   * Fired on every sidebar navigation click (both navigable and non-navigable views).
+   * Useful for intercepting clicks on product-specific views like "settings"
+   * that live outside the shell.
+   */
+  onNavigate?: (viewId: string) => void
 }
 
 // ---------------------------------------------------------------------------
@@ -71,6 +77,7 @@ export function PrototypeShell({
   config,
   headerActions,
   entityPanelChildren,
+  onNavigate,
 }: PrototypeShellProps) {
   const [currentView, setCurrentView] = React.useState(config.defaultView)
   const [isEntityPanelOpen, setIsEntityPanelOpen] = React.useState(false)
@@ -90,8 +97,9 @@ export function PrototypeShell({
       if (navigableViews.includes(id)) {
         setCurrentView(id)
       }
+      onNavigate?.(id)
     },
-    [navigableViews],
+    [navigableViews, onNavigate],
   )
 
   const handleOpenEntityPanel = React.useCallback(() => setIsEntityPanelOpen(true), [])
