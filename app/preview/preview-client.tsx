@@ -518,7 +518,7 @@ export default function PreviewClientPage() {
     <>
       <span className={`h-2 w-2 shrink-0 rounded-full ${item.statusColor === "red" ? "bg-[#f43f5e]" : "bg-[#3b82f6]"}`} />
       <span className="w-[80px] shrink-0 font-mono text-xs text-muted-foreground/80">{item.id}</span>
-      <span className="w-[110px] shrink-0 rounded-md border border-border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground truncate">{item.tag1}</span>
+      <span className="shrink-0 rounded-md border border-border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground whitespace-nowrap">{item.tag1}</span>
       <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">{item.title}</span>
       <span className="w-[120px] shrink-0 truncate text-xs font-medium text-foreground">{item.company}</span>
       <span className="w-[80px] shrink-0 text-right text-xs text-muted-foreground">{item.time}</span>
@@ -732,7 +732,7 @@ export default function PreviewClientPage() {
                     <div className="flex items-center gap-2">
                       <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider group-hover/timeline:text-foreground transition-colors">Activity timeline</h3>
                       {!showRecentActivity && (
-                        <span className="text-[11px] text-muted-foreground/60">&middot; 1d ago</span>
+                        <span className="text-[11px] text-muted-foreground/60">&middot; Last activity 1d ago</span>
                       )}
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -1362,7 +1362,7 @@ export default function PreviewClientPage() {
                             <div className="mb-1.5 flex items-center gap-2">
                               <span className="min-w-0 truncate text-[13px] font-semibold text-foreground leading-tight">{item.title}</span>
                               {selectedTask.id !== item.id && item.tag1 && (
-                                <span className="shrink-0 rounded-full border border-border bg-muted/60 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                                <span className="shrink-0 rounded-md border border-border bg-muted/60 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                                   {item.tag1}
                                 </span>
                               )}

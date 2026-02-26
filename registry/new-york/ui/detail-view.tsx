@@ -59,7 +59,7 @@ export function DetailViewSummary({
       {/* Blue left border */}
       <div className="absolute left-0 top-1 bottom-1 w-1 bg-brand-purple rounded-full" />
       
-      <div className="flex items-start justify-between mb-4 gap-3">
+      <div className="flex items-start justify-between mb-4 gap-3 flex-wrap">
         <h2 className="text-base font-semibold text-foreground">{title}</h2>
         {actions}
       </div>

@@ -40,7 +40,7 @@ import { ActivityDetailShowcase } from "@/app/activity-detail-showcase"
 import { ViewModeToggleShowcase } from "@/app/view-mode-toggle-showcase"
 import { SuggestedActionsShowcase } from "@/app/suggested-actions-showcase"
 import { ChartShowcase } from "@/app/chart-showcase"
-import { Clock, Square } from "lucide-react"
+import { ChevronDown, Clock, Square } from "lucide-react"
 import { BRAND_ICONS } from "@/lib/icons"
 
 export default function Home() {
@@ -422,28 +422,62 @@ export default function Home() {
 
                 <div className="border rounded-lg p-5">
                   <SignalApprovalRoot companyName="Cedars">
-                    <DetailViewHeader
-                      title="James Liu"
-                      breadcrumbs="REF-1894"
-                      badges={
-                        <>
-                          <Badge variant="destructive" className="bg-red-50 text-red-700 border-red-100 hover:bg-red-100">
-                            ! Urgent
-                          </Badge>
-                          <Badge variant="secondary">Review Required</Badge>
-                        </>
-                      }
-                    />
-                    <DetailViewSummary
-                      title="Here's what I found for this patient:"
-                      actions={<SignalApprovalActions />}
-                    >
-                      <p className="flex items-center flex-wrap gap-1">
-                        <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full mr-2" />
-                        There are <strong>2 missing documents</strong> including lab results and recent imaging
-                        <Citation number={1} />
+                    <div className="flex flex-col gap-4 mb-6">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span className="text-muted-foreground/50">&middot;</span>
+                        REF-1894
+                      </div>
+                      <h1 className="text-2xl font-bold tracking-tight text-foreground">James Liu</h1>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="destructive" className="bg-red-50 text-red-700 border-red-100 hover:bg-red-100">
+                          ! Urgent
+                        </Badge>
+                        <Badge variant="secondary">Review Required</Badge>
+                      </div>
+                    </div>
+
+                    <div className="mb-8">
+                      <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Signal brief</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-2">
+                        We detected signals that suggest a potential opportunity with Cedars.
                       </p>
-                    </DetailViewSummary>
+                      <p className="text-sm text-foreground/90 leading-relaxed mb-4">
+                        There are 2 missing documents including lab results and recent imaging that require immediate follow-up.
+                      </p>
+
+                      <div className="mb-5 rounded-md border border-border bg-muted/20 p-3">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Signal Score</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-foreground">78/100</span>
+                            <span className="text-[10px] font-bold uppercase text-emerald-600">HIGH</span>
+                          </div>
+                        </div>
+                        <div className="h-1.5 bg-muted rounded-full overflow-hidden mb-2">
+                          <div className="h-full rounded-full bg-emerald-500" style={{ width: "78%" }} />
+                        </div>
+                        <div className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
+                          <ChevronDown className="h-3 w-3" />
+                          View more
+                        </div>
+                      </div>
+
+                      <SignalApprovalActions />
+                    </div>
+
+                    <div className="mb-8">
+                      <div className="flex w-full items-center justify-between gap-2 py-2 rounded-md -mx-2 px-2">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Activity timeline</h3>
+                          <span className="text-[11px] text-muted-foreground/60">&middot; Last activity 1d ago</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[11px] font-medium text-muted-foreground">3 events</span>
+                          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                        </div>
+                      </div>
+                    </div>
+
                     <SignalApprovalGate>
                       <SuggestedActions
                         actions={[

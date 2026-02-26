@@ -188,17 +188,17 @@ function NavSection({
         <button
           type="button"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="flex w-full items-center gap-1.5 mb-1 px-3 group cursor-pointer"
+          className="flex w-full items-center justify-between mb-1 px-3 group cursor-pointer"
         >
+          <span className="text-xs font-bold tracking-widest text-sidebar-foreground/50 uppercase">
+            {section.title}
+          </span>
           <ChevronDown
             className={cn(
               "w-3 h-3 text-sidebar-foreground/40 transition-transform duration-200",
               !isExpanded && "-rotate-90",
             )}
           />
-          <span className="text-[10px] font-bold tracking-widest text-sidebar-foreground/50 uppercase">
-            {section.title}
-          </span>
         </button>
       )}
       {(isExpanded || isCollapsed || !section.title) && (
