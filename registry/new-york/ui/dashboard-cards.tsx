@@ -1,8 +1,8 @@
 import * as React from "react"
-import { Card, CardHeader, CardTitle, CardContent } from "@/registry/new-york/ui/card"
-import { Button } from "@/registry/new-york/ui/button"
-import { Badge } from "@/registry/new-york/ui/badge"
-import { PreviewList, PreviewListItem } from "@/registry/new-york/ui/preview-list"
+import { Card, CardHeader, CardTitle, CardContent } from "./card"
+import { Button } from "./button"
+import { Badge } from "./badge"
+import { PreviewList, PreviewListItem } from "./preview-list"
 import { Square, Clock, Video, CheckCircle2, CheckSquare, Eye } from "lucide-react"
 
 export function TopTasksCard({ onViewAll }: { onViewAll?: () => void }) {

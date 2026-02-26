@@ -1,14 +1,14 @@
 "use client"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../../lib/utils"
 import {
   ItemListDisplay,
   type ItemListDisplayState,
-} from "@/registry/new-york/ui/item-list-display"
+} from "./item-list-display"
 import {
   ItemListFilter,
   type ItemListFilterCategory,
-} from "@/registry/new-york/ui/item-list-filter"
+} from "./item-list-filter"
 
 export interface ItemListQuickView {
   id: string

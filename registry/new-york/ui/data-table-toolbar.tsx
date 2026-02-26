@@ -5,11 +5,11 @@ import type { SortingState } from "@tanstack/react-table"
 import {
   DataTableFilter,
   type DataTableFilterCategory,
-} from "@/registry/new-york/ui/data-table-filter"
+} from "./data-table-filter"
 import {
   DataTableDisplay,
   type DataTableDisplayColumn,
-} from "@/registry/new-york/ui/data-table-display"
+} from "./data-table-display"
 
 interface DataTableToolbarProps {
   categories: DataTableFilterCategory[]

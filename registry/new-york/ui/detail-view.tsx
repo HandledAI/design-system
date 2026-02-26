@@ -3,7 +3,7 @@
 import * as React from "react"
 import { ArrowLeft, ChevronDown, ChevronUp, MessageSquare } from "lucide-react"
 import { HoverCard as HoverCardPrimitive } from "radix-ui"
-import { cn } from "@/lib/utils"
+import { cn } from "../../../lib/utils"
 import { Button } from "./button"
 import { Badge } from "./badge"
 

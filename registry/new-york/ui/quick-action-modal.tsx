@@ -3,7 +3,7 @@
 import * as React from "react"
 import { X } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../../lib/utils"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./dialog"
 
 type TemplateIcon = React.ComponentType<{ className?: string }>
@@ -167,7 +167,7 @@ export function QuickActionModal({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          "max-h-[85vh] gap-0 overflow-hidden rounded-2xl border border-border bg-card p-0 shadow-2xl sm:max-w-2xl",
+          "flex max-h-[85vh] flex-col gap-0 overflow-hidden rounded-2xl border border-border bg-card p-0 shadow-2xl sm:max-w-2xl",
           className,
         )}
       >

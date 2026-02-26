@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "chart-tooltip",
+  "title": "Chart Tooltip",
+  "description": "Chart Tooltip component.",
+  "files": [
+    {
+      "path": "registry/new-york/ui/chart-tooltip.tsx",
+      "content": "\"use client\"\n\nimport * as React from \"react\"\n\nimport { cn } from \"../../../lib/utils\"\n\nexport interface ChartTooltipEntry {\n  name?: string\n  value?: number | string\n  dataKey?: string\n  color?: string\n  stroke?: string\n  fill?: string\n}\n\nexport interface SimpleChartTooltipProps {\n  active?: boolean\n  payload?: ChartTooltipEntry[]\n  label?: string\n  formatter?: (value: number | string, name: string) => [string, string]\n  className?: string\n}\n\nexport function SimpleChartTooltip({\n  active,\n  payload,\n  label,\n  formatter,\n  className,\n}: SimpleChartTooltipProps) {\n  if (!active || !payload || !payload.length) {\n    return null\n  }\n\n  return (\n    <div\n      className={cn(\n        \"rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-md\",\n        className,\n      )}\n      style={{ fontSize: \"12px\" }}\n    >\n      {label ? (\n        <p className=\"mb-1 text-xs font-medium text-slate-600\">{label}</p>\n      ) : null}\n      {payload.map((entry, index) => {\n        const value = entry.value ?? \"\"\n        const name = entry.name || entry.dataKey || \"\"\n        const color = entry.color || entry.stroke || entry.fill\n\n        const [displayValue, displayName] = formatter\n          ? formatter(value as number | string, name)\n          : [String(value), name]\n\n        return (\n          <div key={index} className=\"flex items-center gap-2\">\n            {color ? (\n              <div\n                className=\"h-2 w-2 shrink-0 rounded-full\"\n                style={{ backgroundColor: color }}\n              />\n            ) : null}\n            <span className=\"text-xs font-medium text-slate-900\">\n              {displayName}: {displayValue}\n            </span>\n          </div>\n        )\n      })}\n    </div>\n  )\n}\n\nexport const CHART_TOOLTIP_STYLE: React.CSSProperties = {\n  backgroundColor: \"#fff\",\n  borderRadius: \"8px\",\n  fontSize: \"12px\",\n  padding: \"8px\",\n  border: \"1px solid #e2e8f0\",\n  boxShadow: \"0 4px 6px -1px rgba(0, 0, 0, 0.1)\",\n}\n\nexport const CHART_CURSOR_STYLE = {\n  stroke: \"#94a3b8\",\n  strokeWidth: 1,\n  strokeDasharray: \"4 4\",\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

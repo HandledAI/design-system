@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../../lib/utils"
 import { CHART_TOOLTIP_STYLE } from "./chart-tooltip"
 
 export interface VolumeDataKey {

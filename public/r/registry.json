@@ -311,6 +311,721 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "inbox-row",
+      "type": "registry:ui",
+      "title": "Inbox Row",
+      "description": "A row component for list views.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/inbox-row.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "detail-view",
+      "type": "registry:ui",
+      "title": "Detail View",
+      "description": "A detail view component with AI summaries and threaded content.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/detail-view.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "item-list-filter",
+      "type": "registry:ui",
+      "title": "Item List Filter",
+      "description": "Filter controls tailored for grouped queue list layouts.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "dropdown-menu"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/item-list-filter.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "item-list-display",
+      "type": "registry:ui",
+      "title": "Item List Display",
+      "description": "Grouping and density controls for queue-style list presentations.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "dropdown-menu",
+        "select"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/item-list-display.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "item-list-toolbar",
+      "type": "registry:ui",
+      "title": "Item List Toolbar",
+      "description": "Toolbar composed of quick views, list filtering, and display controls.",
+      "registryDependencies": [
+        "item-list-filter",
+        "item-list-display"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/item-list-toolbar.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "item-list",
+      "type": "registry:ui",
+      "title": "Item List",
+      "description": "Queue-style list with grouped rows and quick view controls.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "badge",
+        "item-list-toolbar"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/item-list.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "data-table-filter",
+      "type": "registry:ui",
+      "title": "Data Table Filter",
+      "description": "A nested category filter control for data tables.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "dropdown-menu"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/data-table-filter.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "data-table-display",
+      "type": "registry:ui",
+      "title": "Data Table Display",
+      "description": "Display and sorting controls for data tables.",
+      "dependencies": [
+        "lucide-react",
+        "@tanstack/react-table"
+      ],
+      "registryDependencies": [
+        "button",
+        "dropdown-menu",
+        "select"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/data-table-display.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "data-table-quick-views",
+      "type": "registry:ui",
+      "title": "Data Table Quick Views",
+      "description": "Quick-view chip controls for data table presets.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "dropdown-menu"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/data-table-quick-views.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "data-table-toolbar",
+      "type": "registry:ui",
+      "title": "Data Table Toolbar",
+      "description": "Toolbar composing table filter and display controls.",
+      "dependencies": [
+        "@tanstack/react-table"
+      ],
+      "registryDependencies": [
+        "data-table-filter",
+        "data-table-display"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/data-table-toolbar.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "data-table",
+      "type": "registry:ui",
+      "title": "Data Table",
+      "description": "A full featured data table with quick views and controls.",
+      "dependencies": [
+        "lucide-react",
+        "@tanstack/react-table"
+      ],
+      "registryDependencies": [
+        "badge",
+        "data-table-filter",
+        "data-table-display",
+        "data-table-quick-views",
+        "data-table-toolbar"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/data-table.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "performance-metrics-table",
+      "type": "registry:ui",
+      "title": "Performance Metrics Table",
+      "description": "A configurable inline metrics table with progress bars and compact controls.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "avatar",
+        "button",
+        "dropdown-menu",
+        "input",
+        "scroll-area",
+        "table"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/performance-metrics-table.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "entity-panel",
+      "type": "registry:ui",
+      "title": "Entity Panel",
+      "description": "Panel components for viewing entity details.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "sheet",
+        "card",
+        "badge",
+        "button",
+        "input"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/entity-panel.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "dashboard-cards",
+      "type": "registry:ui",
+      "title": "Dashboard Cards",
+      "description": "Pre-built card components for a dashboard layout.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "card",
+        "button",
+        "badge",
+        "preview-list"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/dashboard-cards.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "preview-list",
+      "type": "registry:ui",
+      "title": "Preview List",
+      "description": "A list component with bounded item counts and flexible row slots.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/preview-list.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "signal-feedback-inline",
+      "type": "registry:ui",
+      "title": "Signal Feedback Inline",
+      "description": "Inline feedback controls for evaluating signal quality.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/signal-feedback-inline.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "recommended-actions-section",
+      "type": "registry:ui",
+      "title": "Recommended Actions Section",
+      "description": "Action recommendation cards with quick controls and feedback.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "badge",
+        "button",
+        "tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/recommended-actions-section.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "quick-action-chat-area",
+      "type": "registry:ui",
+      "title": "Quick Action Chat Area",
+      "description": "A compact task composer with priority controls and quick submit.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/quick-action-chat-area.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "quick-action-modal",
+      "type": "registry:ui",
+      "title": "Quick Action Modal",
+      "description": "Modal workflow for choosing templates and creating quick tasks.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "dialog",
+        "quick-action-chat-area"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/quick-action-modal.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "quick-action-sidebar-nav",
+      "type": "registry:ui",
+      "title": "Quick Action Sidebar Nav",
+      "description": "Sidebar navigation layout with embedded quick-action trigger and modal.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "quick-action-modal"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/quick-action-sidebar-nav.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "activity-detail",
+      "type": "registry:ui",
+      "title": "Activity Detail",
+      "description": "Activity Detail component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "badge"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/activity-detail.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "bar-chart-component",
+      "type": "registry:ui",
+      "title": "Bar Chart Component",
+      "description": "Bar Chart Component component.",
+      "dependencies": [
+        "recharts"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/bar-chart-component.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "chart-tooltip",
+      "type": "registry:ui",
+      "title": "Chart Tooltip",
+      "description": "Chart Tooltip component.",
+      "files": [
+        {
+          "path": "registry/new-york/ui/chart-tooltip.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "contact-list",
+      "type": "registry:ui",
+      "title": "Contact List",
+      "description": "Contact List component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "badge",
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/contact-list.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "donut-chart",
+      "type": "registry:ui",
+      "title": "Donut Chart",
+      "description": "Donut Chart component.",
+      "dependencies": [
+        "recharts"
+      ],
+      "registryDependencies": [
+        "chart-tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/donut-chart.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "inbox-toolbar",
+      "type": "registry:ui",
+      "title": "Inbox Toolbar",
+      "description": "Inbox Toolbar component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "badge",
+        "dropdown-menu"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/inbox-toolbar.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "pipeline-overview",
+      "type": "registry:ui",
+      "title": "Pipeline Overview",
+      "description": "Pipeline Overview component.",
+      "dependencies": [
+        "lucide-react",
+        "@nivo/sankey"
+      ],
+      "registryDependencies": [
+        "tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/pipeline-overview.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "progress",
+      "type": "registry:ui",
+      "title": "Progress",
+      "description": "Progress component.",
+      "dependencies": [
+        "radix-ui"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/progress.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "report-card",
+      "type": "registry:ui",
+      "title": "Report Card",
+      "description": "Report Card component.",
+      "files": [
+        {
+          "path": "registry/new-york/ui/report-card.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "sankey-chart",
+      "type": "registry:ui",
+      "title": "Sankey Chart",
+      "description": "Sankey Chart component.",
+      "dependencies": [
+        "@nivo/sankey"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/sankey-chart.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "score-analysis-modal",
+      "type": "registry:ui",
+      "title": "Score Analysis Modal",
+      "description": "Score Analysis Modal component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "sheet",
+        "badge",
+        "score-ring",
+        "score-breakdown",
+        "signal-feedback-inline"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/score-analysis-modal.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "score-breakdown",
+      "type": "registry:ui",
+      "title": "Score Breakdown",
+      "description": "Score Breakdown component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/score-breakdown.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "score-feedback",
+      "type": "registry:ui",
+      "title": "Score Feedback",
+      "description": "Score Feedback component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/score-feedback.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "score-ring",
+      "type": "registry:ui",
+      "title": "Score Ring",
+      "description": "Score Ring component.",
+      "files": [
+        {
+          "path": "registry/new-york/ui/score-ring.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "styled-bar-list",
+      "type": "registry:ui",
+      "title": "Styled Bar List",
+      "description": "Styled Bar List component.",
+      "files": [
+        {
+          "path": "registry/new-york/ui/styled-bar-list.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "suggested-actions",
+      "type": "registry:ui",
+      "title": "Suggested Actions",
+      "description": "Suggested Actions component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/suggested-actions.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "timeline-activity",
+      "type": "registry:ui",
+      "title": "Timeline Activity",
+      "description": "Timeline Activity component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/timeline-activity.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "top-line-metrics",
+      "type": "registry:ui",
+      "title": "Top Line Metrics",
+      "description": "Top Line Metrics component.",
+      "dependencies": [
+        "recharts",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/top-line-metrics.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "trend-area-chart",
+      "type": "registry:ui",
+      "title": "Trend Area Chart",
+      "description": "Trend Area Chart component.",
+      "dependencies": [
+        "recharts"
+      ],
+      "registryDependencies": [
+        "chart-tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/trend-area-chart.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "view-mode-toggle",
+      "type": "registry:ui",
+      "title": "View Mode Toggle",
+      "description": "View Mode Toggle component.",
+      "files": [
+        {
+          "path": "registry/new-york/ui/view-mode-toggle.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "volume-analysis-chart",
+      "type": "registry:ui",
+      "title": "Volume Analysis Chart",
+      "description": "Volume Analysis Chart component.",
+      "dependencies": [
+        "recharts"
+      ],
+      "registryDependencies": [
+        "chart-tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/volume-analysis-chart.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }

@@ -1,20 +1,21 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import { MessageCircle, Mail } from "lucide-react"
 import { Button } from "@/registry/new-york/ui/button"
 import { ActivityDetail, type ActivityDetailData } from "@/registry/new-york/ui/activity-detail"
 import { BRAND_ICONS } from "@/lib/icons"
 
 const callActivity: ActivityDetailData = {
-  icon: <img src={BRAND_ICONS.gong} alt="Gong" className="w-4 h-4 object-contain" />,
+  icon: <Image src={BRAND_ICONS.gong} alt="Gong" width={16} height={16} className="w-4 h-4 object-contain" />,
   title: "Call with Sarah Chen — Treasury strategy discussion",
   details: "Strong interest in yield optimization and cash management. Sarah mentioned they're evaluating 3 vendors for treasury management and wants to schedule a deeper technical review next week.",
   content: "Key takeaways:\n\n• Currently managing $12M in operating cash across 4 bank accounts\n• Pain point: manual reconciliation taking 2+ hours daily\n• Decision timeline: Q2 board meeting (6 weeks out)\n• Budget holder: CFO (Marcus Webb) has pre-approved evaluation",
   time: "Yesterday at 2:30 PM",
   source: "Gong",
   type: "call",
-  sourceIcon: <img src={BRAND_ICONS.gong} alt="Gong" className="w-4 h-4 object-contain" />,
+  sourceIcon: <Image src={BRAND_ICONS.gong} alt="Gong" width={16} height={16} className="w-4 h-4 object-contain" />,
   externalUrl: "#",
   tags: ["Treasury", "High Intent", "Technical Review"],
   participants: [
@@ -31,13 +32,13 @@ const callActivity: ActivityDetailData = {
 }
 
 const emailActivity: ActivityDetailData = {
-  icon: <img src={BRAND_ICONS.gmail.icon} alt="Gmail" className="w-4 h-4 object-contain" />,
+  icon: <Image src={BRAND_ICONS.gmail.icon} alt="Gmail" width={16} height={16} className="w-4 h-4 object-contain" />,
   title: "Re: Q2 Treasury Review — Next Steps",
   details: "Email thread discussing follow-up from the treasury strategy call and scheduling a technical deep-dive.",
   time: "Today at 9:15 AM",
   source: "Gmail",
   type: "email",
-  sourceIcon: <img src={BRAND_ICONS.gmail.icon} alt="Gmail" className="w-4 h-4 object-contain" />,
+  sourceIcon: <Image src={BRAND_ICONS.gmail.icon} alt="Gmail" width={16} height={16} className="w-4 h-4 object-contain" />,
   externalUrl: "#",
   tags: ["Follow-up", "Treasury", "Scheduling"],
   thread: [

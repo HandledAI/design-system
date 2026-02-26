@@ -2,13 +2,13 @@
 
 import { ChevronDown, X } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../../lib/utils"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/registry/new-york/ui/dropdown-menu"
+} from "./dropdown-menu"
 
 export type DataTableQuickViewValue = string | null
 

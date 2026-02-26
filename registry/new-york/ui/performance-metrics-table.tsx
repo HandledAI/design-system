@@ -9,17 +9,17 @@ import {
   ChevronRight,
 } from "lucide-react"
 
-import { cn } from "@/lib/utils"
-import { Avatar, AvatarFallback } from "@/registry/new-york/ui/avatar"
-import { Button } from "@/registry/new-york/ui/button"
+import { cn } from "../../../lib/utils"
+import { Avatar, AvatarFallback } from "./avatar"
+import { Button } from "./button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/registry/new-york/ui/dropdown-menu"
-import { Input } from "@/registry/new-york/ui/input"
-import { ScrollArea, ScrollBar } from "@/registry/new-york/ui/scroll-area"
+} from "./dropdown-menu"
+import { Input } from "./input"
+import { ScrollArea, ScrollBar } from "./scroll-area"
 import {
   Table,
   TableBody,
@@ -27,7 +27,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/registry/new-york/ui/table"
+} from "./table"
 
 export interface PerformanceMetricsTableRow {
   id: string

@@ -22,17 +22,17 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table"
 
-import { cn } from "@/lib/utils"
-import { Badge } from "@/registry/new-york/ui/badge"
+import { cn } from "../../../lib/utils"
+import { Badge } from "./badge"
 import {
   DataTableQuickViews,
   type DataTableQuickViewValue,
-} from "@/registry/new-york/ui/data-table-quick-views"
-import { DataTableToolbar } from "@/registry/new-york/ui/data-table-toolbar"
-import { type DataTableFilterCategory } from "@/registry/new-york/ui/data-table-filter"
-import { ScoreAnalysisModal } from "@/registry/new-york/ui/score-analysis-modal"
-import type { ScoreFactor } from "@/registry/new-york/ui/score-breakdown"
-import { Citation, type SourceDef } from "@/registry/new-york/ui/detail-view"
+} from "./data-table-quick-views"
+import { DataTableToolbar } from "./data-table-toolbar"
+import { type DataTableFilterCategory } from "./data-table-filter"
+import { ScoreAnalysisModal } from "./score-analysis-modal"
+import type { ScoreFactor } from "./score-breakdown"
+import { Citation, type SourceDef } from "./detail-view"
 
 type DataRow = {
   id: string

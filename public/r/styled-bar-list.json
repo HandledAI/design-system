@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "styled-bar-list",
+  "title": "Styled Bar List",
+  "description": "Styled Bar List component.",
+  "files": [
+    {
+      "path": "registry/new-york/ui/styled-bar-list.tsx",
+      "content": "\"use client\"\n\nimport * as React from \"react\"\n\nimport { cn } from \"../../../lib/utils\"\n\nexport interface StyledBarItem {\n  name: string\n  value: number\n  href?: string\n  subtitle?: string\n}\n\nexport interface StyledBarListProps {\n  data: StyledBarItem[]\n  valueFormatter?: (value: number) => string\n  className?: string\n  showAnimation?: boolean\n  showSubtitle?: boolean\n  barColor?: string\n}\n\nexport function StyledBarList({\n  data,\n  valueFormatter = (value) => value.toString(),\n  className,\n  showAnimation = true,\n  showSubtitle = false,\n  barColor = \"bg-emerald-500/30\",\n}: StyledBarListProps) {\n  const maxValue = Math.max(...data.map((item) => item.value))\n\n  return (\n    <div className={cn(\"space-y-2\", className)}>\n      {data.map((item, index) => {\n        const percentage = (item.value / maxValue) * 100\n\n        return (\n          <div key={index} className={showSubtitle ? \"space-y-1\" : \"\"}>\n            <div className=\"relative h-9 overflow-hidden rounded-md\">\n              <div\n                className={cn(\n                  \"absolute inset-y-0 left-0 rounded-md\",\n                  barColor,\n                  showAnimation && \"transition-all duration-300\",\n                )}\n                style={{ width: `${percentage}%` }}\n              />\n              <div className=\"relative flex h-full items-center justify-between px-3\">\n                <span className=\"truncate pr-2 text-sm font-medium text-slate-900\">\n                  {item.name}\n                </span>\n                <span className=\"ml-auto shrink-0 text-sm font-semibold text-slate-900\">\n                  {valueFormatter(item.value)}\n                </span>\n              </div>\n            </div>\n            {showSubtitle && item.subtitle ? (\n              <div className=\"pl-3 text-xs text-slate-500\">\n                {item.subtitle}\n              </div>\n            ) : null}\n          </div>\n        )\n      })}\n    </div>\n  )\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

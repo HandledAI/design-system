@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/registry/new-york/ui/sheet"
-import { Badge } from "@/registry/new-york/ui/badge"
-import { Button } from "@/registry/new-york/ui/button"
-import { Input } from "@/registry/new-york/ui/input"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "./sheet"
+import { Badge } from "./badge"
+import { Button } from "./button"
+import { Input } from "./input"
 import {
   ArrowLeft,
   Plus,
@@ -27,8 +27,7 @@ import {
   Clock,
   CalendarDays,
 } from "lucide-react"
-import { BRAND_ICONS } from "@/lib/icons"
-import { TimelineActivity, type TimelineEvent } from "@/registry/new-york/ui/timeline-activity"
+import { TimelineActivity, type TimelineEvent } from "./timeline-activity"
 
 // ---------------------------------------------------------------------------
 // EntityPanel – supports both Sheet (side panel) and fullscreen modes
@@ -300,7 +299,36 @@ export function SystemActivity() {
 // PotentialContacts – unchanged from original
 // ---------------------------------------------------------------------------
 
-export function PotentialContacts() {
+export interface EntityPanelBrandIcons {
+  linkedin?: string
+  gmail?: string
+  slack?: string
+  gdoc?: string
+}
+
+function EntityPanelBrandIcon({
+  src,
+  alt,
+  className,
+  fallback,
+}: {
+  src?: string
+  alt: string
+  className: string
+  fallback: React.ReactNode
+}) {
+  if (!src) {
+    return <>{fallback}</>
+  }
+
+  return <img src={src} alt={alt} className={className} />
+}
+
+export function PotentialContacts({
+  icons,
+}: {
+  icons?: Pick<EntityPanelBrandIcons, "linkedin" | "gmail">
+}) {
   return (
     <div className="space-y-3 mb-8">
       <div className="flex items-center justify-between">
@@ -316,8 +344,22 @@ export function PotentialContacts() {
             <span className="text-muted-foreground text-sm truncate">VP Finance</span>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <button className="h-7 w-7 flex items-center justify-center hover:bg-muted rounded-md transition-colors"><img src={BRAND_ICONS.linkedin} alt="LinkedIn" className="w-3.5 h-3.5 object-contain" /></button>
-            <button className="h-7 w-7 flex items-center justify-center hover:bg-muted rounded-md transition-colors"><img src={BRAND_ICONS.gmail.icon} alt="Gmail" className="w-3.5 h-3.5 object-contain" /></button>
+            <button className="h-7 w-7 flex items-center justify-center hover:bg-muted rounded-md transition-colors">
+              <EntityPanelBrandIcon
+                src={icons?.linkedin}
+                alt="LinkedIn"
+                className="w-3.5 h-3.5 object-contain"
+                fallback={<LinkIcon className="w-3.5 h-3.5 text-muted-foreground" />}
+              />
+            </button>
+            <button className="h-7 w-7 flex items-center justify-center hover:bg-muted rounded-md transition-colors">
+              <EntityPanelBrandIcon
+                src={icons?.gmail}
+                alt="Gmail"
+                className="w-3.5 h-3.5 object-contain"
+                fallback={<Mail className="w-3.5 h-3.5 text-muted-foreground" />}
+              />
+            </button>
             <Button size="sm" className="bg-foreground text-background hover:bg-foreground/90 h-6 text-[11px] font-medium shadow-none ml-1">
               <Plus className="w-3 h-3 mr-1" /> Add to SF
             </Button>
@@ -332,7 +374,14 @@ export function PotentialContacts() {
             <span className="text-muted-foreground text-sm truncate">CEO</span>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <button className="h-7 w-7 flex items-center justify-center hover:bg-muted rounded-md transition-colors"><img src={BRAND_ICONS.linkedin} alt="LinkedIn" className="w-3.5 h-3.5 object-contain" /></button>
+            <button className="h-7 w-7 flex items-center justify-center hover:bg-muted rounded-md transition-colors">
+              <EntityPanelBrandIcon
+                src={icons?.linkedin}
+                alt="LinkedIn"
+                className="w-3.5 h-3.5 object-contain"
+                fallback={<LinkIcon className="w-3.5 h-3.5 text-muted-foreground" />}
+              />
+            </button>
             <Button size="sm" className="bg-foreground text-background hover:bg-foreground/90 h-6 text-[11px] font-medium shadow-none ml-1">
               <Plus className="w-3 h-3 mr-1" /> Add to SF
             </Button>
@@ -347,8 +396,22 @@ export function PotentialContacts() {
             <span className="text-muted-foreground text-sm truncate">Head of Ops</span>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <button className="h-7 w-7 flex items-center justify-center hover:bg-muted rounded-md transition-colors"><img src={BRAND_ICONS.linkedin} alt="LinkedIn" className="w-3.5 h-3.5 object-contain" /></button>
-            <button className="h-7 w-7 flex items-center justify-center hover:bg-muted rounded-md transition-colors"><img src={BRAND_ICONS.gmail.icon} alt="Gmail" className="w-3.5 h-3.5 object-contain" /></button>
+            <button className="h-7 w-7 flex items-center justify-center hover:bg-muted rounded-md transition-colors">
+              <EntityPanelBrandIcon
+                src={icons?.linkedin}
+                alt="LinkedIn"
+                className="w-3.5 h-3.5 object-contain"
+                fallback={<LinkIcon className="w-3.5 h-3.5 text-muted-foreground" />}
+              />
+            </button>
+            <button className="h-7 w-7 flex items-center justify-center hover:bg-muted rounded-md transition-colors">
+              <EntityPanelBrandIcon
+                src={icons?.gmail}
+                alt="Gmail"
+                className="w-3.5 h-3.5 object-contain"
+                fallback={<Mail className="w-3.5 h-3.5 text-muted-foreground" />}
+              />
+            </button>
             <Button size="sm" className="bg-foreground text-background hover:bg-foreground/90 h-6 text-[11px] font-medium shadow-none ml-1">
               <Plus className="w-3 h-3 mr-1" /> Add to SF
             </Button>
@@ -416,7 +479,11 @@ export function RecentActivity({
 // ConnectedApps
 // ---------------------------------------------------------------------------
 
-export function ConnectedApps() {
+export function ConnectedApps({
+  icons,
+}: {
+  icons?: Pick<EntityPanelBrandIcons, "slack" | "gdoc">
+}) {
   return (
     <div className="space-y-3 mb-8">
       <div className="flex items-center justify-between">
@@ -428,7 +495,12 @@ export function ConnectedApps() {
         <div className="flex items-center justify-between gap-3 group py-2.5 border-b border-border/30 hover:bg-muted/20 -mx-2 px-2 rounded-sm transition-colors">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-8 h-8 rounded-md border border-border/60 bg-muted/30 flex items-center justify-center shrink-0">
-              <img src={BRAND_ICONS.slack} alt="Slack" className="w-4 h-4 object-contain" />
+              <EntityPanelBrandIcon
+                src={icons?.slack}
+                alt="Slack"
+                className="w-4 h-4 object-contain"
+                fallback={<MessageCircle className="w-4 h-4 text-muted-foreground" />}
+              />
             </div>
             <div className="min-w-0">
               <p className="font-medium text-sm text-foreground leading-snug truncate">#lunchclub-acmeco</p>
@@ -444,7 +516,12 @@ export function ConnectedApps() {
         <div className="flex items-center justify-between gap-3 group py-2.5 border-b border-border/30 hover:bg-muted/20 -mx-2 px-2 rounded-sm transition-colors">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-8 h-8 rounded-md border border-border/60 bg-muted/30 flex items-center justify-center shrink-0">
-              <img src={BRAND_ICONS.gdoc} alt="Google Docs" className="w-4 h-4 object-contain" />
+              <EntityPanelBrandIcon
+                src={icons?.gdoc}
+                alt="Google Docs"
+                className="w-4 h-4 object-contain"
+                fallback={<FileText className="w-4 h-4 text-muted-foreground" />}
+              />
             </div>
             <div className="min-w-0">
               <p className="font-medium text-sm text-foreground leading-snug truncate">Account Strategy Document</p>

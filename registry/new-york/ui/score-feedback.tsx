@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { ThumbsUp, ThumbsDown, Check } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "../../../lib/utils"
 
 const positivePills = [
   "Right timing",

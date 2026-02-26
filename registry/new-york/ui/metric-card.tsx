@@ -1,6 +1,6 @@
 import * as React from "react"
 import { ArrowUp, ArrowDown, Info, ExternalLink } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "../../../lib/utils"
 
 export interface MetricDataPoint {
   label: string

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { ListFilter, Search } from "lucide-react"
 
-import { Button } from "@/registry/new-york/ui/button"
+import { Button } from "./button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +12,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/registry/new-york/ui/dropdown-menu"
+} from "./dropdown-menu"
 
 export interface DataTableFilterCategory {
   id: string

@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Activity, Scale, Heart, MessageSquare, ArrowRight, ChevronDown } from "lucide-react"
 import { format } from "date-fns"
-import { cn } from "@/lib/utils"
+import { cn } from "../../../lib/utils"
 
 export interface ActivityLogItem {
   id: string

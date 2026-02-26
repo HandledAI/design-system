@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "data-table-quick-views",
+  "title": "Data Table Quick Views",
+  "description": "Quick-view chip controls for data table presets.",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "dropdown-menu"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/ui/data-table-quick-views.tsx",
+      "content": "\"use client\"\n\nimport { ChevronDown, X } from \"lucide-react\"\n\nimport { cn } from \"../../../lib/utils\"\nimport {\n  DropdownMenu,\n  DropdownMenuContent,\n  DropdownMenuItem,\n  DropdownMenuTrigger,\n} from \"./dropdown-menu\"\n\nexport type DataTableQuickViewValue = string | null\n\ninterface DataTableQuickViewsProps {\n  quickViews: string[]\n  moreViews: string[]\n  activeView: DataTableQuickViewValue\n  onViewChange: (next: DataTableQuickViewValue) => void\n  className?: string\n}\n\nexport function DataTableQuickViews({\n  quickViews,\n  moreViews,\n  activeView,\n  onViewChange,\n  className,\n}: DataTableQuickViewsProps) {\n  const isMoreActive = Boolean(activeView && moreViews.includes(activeView))\n\n  return (\n    <div\n      className={cn(\n        \"flex items-center gap-2 overflow-x-auto border-b border-border px-4 pb-3 pt-2\",\n        className\n      )}\n    >\n      <span className=\"mr-1 shrink-0 text-xs font-medium text-muted-foreground/80\">\n        Quick views:\n      </span>\n\n      {quickViews.map((view) => {\n        const isActive = activeView === view\n        return (\n          <button\n            key={view}\n            onClick={() => onViewChange(isActive ? null : view)}\n            className={cn(\n              \"whitespace-nowrap rounded-full border px-3 py-1 text-xs transition-colors\",\n              isActive\n                ? \"border-brand-purple/30 bg-brand-purple/10 font-medium text-brand-purple\"\n                : \"border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground\"\n            )}\n          >\n            {view}\n          </button>\n        )\n      })}\n\n      <DropdownMenu>\n        <DropdownMenuTrigger asChild>\n          <button\n            className={cn(\n              \"flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs transition-colors\",\n              isMoreActive\n                ? \"border-brand-purple/30 bg-brand-purple/10 font-medium text-brand-purple\"\n                : \"border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground\"\n            )}\n          >\n            {isMoreActive ? activeView : \"More...\"}\n            <ChevronDown className=\"h-3 w-3 opacity-60\" />\n          </button>\n        </DropdownMenuTrigger>\n        <DropdownMenuContent align=\"start\" className=\"w-56\">\n          {moreViews.map((view) => (\n            <DropdownMenuItem\n              key={view}\n              className={cn(\n                \"cursor-pointer text-xs\",\n                activeView === view && \"bg-brand-purple/5 font-medium text-brand-purple\"\n              )}\n              onSelect={() => onViewChange(view)}\n            >\n              {view}\n            </DropdownMenuItem>\n          ))}\n        </DropdownMenuContent>\n      </DropdownMenu>\n\n      {activeView ? (\n        <button\n          onClick={() => onViewChange(null)}\n          className=\"ml-auto flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground\"\n        >\n          <X className=\"h-3 w-3\" />\n          Clear\n        </button>\n      ) : null}\n    </div>\n  )\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

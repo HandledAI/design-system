@@ -29,7 +29,6 @@ import {
   PenLine,
 } from "lucide-react"
 import { Button } from "./button"
-import { BRAND_ICONS } from "@/lib/icons"
 
 // ---------------------------------------------------------------------------
 // Brand Icons (image-based from registry)
@@ -46,14 +45,27 @@ function BrandIcon({ src, alt, className }: { src: string; alt: string; classNam
   )
 }
 
-function getActionTypeIcon(type: string, className?: string) {
+export interface SuggestedActionsIconMap {
+  gmail?: string
+  slack?: string
+  zendesk?: string
+  salesforce?: string
+}
+
+function getActionTypeIcon(type: string, className?: string, iconMap?: SuggestedActionsIconMap) {
   switch (type) {
     case "email":
-      return <BrandIcon src={BRAND_ICONS.gmail.icon} alt="Gmail" className={className} />
+      return iconMap?.gmail
+        ? <BrandIcon src={iconMap.gmail} alt="Gmail" className={className} />
+        : <Mail className={className} />
     case "slack":
-      return <BrandIcon src={BRAND_ICONS.slack} alt="Slack" className={className} />
+      return iconMap?.slack
+        ? <BrandIcon src={iconMap.slack} alt="Slack" className={className} />
+        : <MessageSquare className={className} />
     case "ticket":
-      return <BrandIcon src={BRAND_ICONS.zendesk} alt="Zendesk" className={className} />
+      return iconMap?.zendesk
+        ? <BrandIcon src={iconMap.zendesk} alt="Zendesk" className={className} />
+        : <MessageSquare className={className} />
     case "call":
       return <Phone className={className} />
     default:
@@ -679,6 +691,7 @@ function AccountContactsPopover({
   onViewAll,
   onOpenRecentActivity,
   trigger,
+  iconMap,
 }: {
   contacts: SuggestedContact[]
   onSelect: (contact: SuggestedContact) => void
@@ -688,6 +701,7 @@ function AccountContactsPopover({
   onViewAll?: () => void
   onOpenRecentActivity?: () => void
   trigger: React.ReactNode
+  iconMap?: SuggestedActionsIconMap
 }) {
   const [open, setOpen] = React.useState(false)
   const triggerRef = React.useRef<HTMLDivElement>(null)
@@ -802,7 +816,11 @@ function AccountContactsPopover({
                       className="h-7 w-7 inline-flex items-center justify-center rounded-md border border-border bg-background hover:bg-muted/40 transition-colors shrink-0"
                       aria-label={`Open ${c.name} in Salesforce`}
                     >
-                      <img src={BRAND_ICONS.salesforce} alt="Salesforce" className="w-3.5 h-3.5 object-contain" />
+                      {iconMap?.salesforce ? (
+                        <BrandIcon src={iconMap.salesforce} alt="Salesforce" className="w-3.5 h-3.5" />
+                      ) : (
+                        <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -849,6 +867,7 @@ function EmailHeader({
   onBccRemove,
   onOpenAccountDetails,
   onOpenRecentActivity,
+  iconMap,
   showSubject = false,
 }: {
   fromName: string
@@ -868,6 +887,7 @@ function EmailHeader({
   onBccRemove?: (index: number) => void
   onOpenAccountDetails?: () => void
   onOpenRecentActivity?: () => void
+  iconMap?: SuggestedActionsIconMap
   showSubject?: boolean
 }) {
   const hasUnconfirmedTo = toContacts.some((c) => !c.confirmed)
@@ -980,7 +1000,11 @@ function EmailHeader({
                   className="h-7 w-7 inline-flex items-center justify-center rounded-md border border-border bg-background hover:bg-muted/40 transition-colors shrink-0"
                   aria-label="Open in Salesforce"
                 >
-                  <img src={BRAND_ICONS.salesforce} alt="Salesforce" className="w-3.5 h-3.5 object-contain" />
+                  {iconMap?.salesforce ? (
+                    <BrandIcon src={iconMap.salesforce} alt="Salesforce" className="w-3.5 h-3.5" />
+                  ) : (
+                    <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
+                  )}
                 </button>
               </div>
               {toContacts[expandedToIndex].role && (
@@ -1025,7 +1049,8 @@ function EmailHeader({
               onSelectCc={(c) => onCcAdd?.({ ...c, confirmed: true })}
               onSelectBcc={(c) => onBccAdd?.({ ...c, confirmed: true })}
               onViewAll={onOpenAccountDetails}
-                onOpenRecentActivity={onOpenRecentActivity}
+              onOpenRecentActivity={onOpenRecentActivity}
+              iconMap={iconMap}
               trigger={
                 <button className="h-7 rounded-md border border-border bg-background px-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors">
                   Contacts
@@ -1079,6 +1104,7 @@ function EmailHeader({
                     onSelect={(c) => onCcAdd?.(c)}
                     onViewAll={onOpenAccountDetails}
                     onOpenRecentActivity={onOpenRecentActivity}
+                    iconMap={iconMap}
                     trigger={
                       <button className="text-xs text-muted-foreground hover:text-foreground transition-colors">
                         <Users className="w-3 h-3" />
@@ -1120,6 +1146,7 @@ function EmailHeader({
                     onSelect={(c) => onBccAdd?.(c)}
                     onViewAll={onOpenAccountDetails}
                     onOpenRecentActivity={onOpenRecentActivity}
+                    iconMap={iconMap}
                     trigger={
                       <button className="text-xs text-muted-foreground hover:text-foreground transition-colors">
                         <Users className="w-3 h-3" />
@@ -1207,6 +1234,7 @@ function SuggestedActionCard({
   onOpenRecentActivity,
   onMarkComplete,
   onDispatchAgent,
+  iconMap,
 }: {
   action: SuggestedAction
   onDismiss?: (id: number | string) => void
@@ -1219,6 +1247,7 @@ function SuggestedActionCard({
   onOpenRecentActivity?: () => void
   onMarkComplete?: (id: number | string) => void
   onDispatchAgent?: (id: number | string) => void
+  iconMap?: SuggestedActionsIconMap
 }) {
   const isCall = action.type === "call"
   const [expanded, setExpanded] = React.useState(action.type === "email" || isCall)
@@ -1283,7 +1312,7 @@ function SuggestedActionCard({
       >
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-7 h-7 shrink-0">
-            {getActionTypeIcon(action.type, "w-5 h-5")}
+            {getActionTypeIcon(action.type, "w-5 h-5", iconMap)}
           </div>
           <div>
             <div className="text-sm font-medium text-foreground">{action.label}</div>
@@ -1306,7 +1335,7 @@ function SuggestedActionCard({
       <div className="px-4 py-3 flex items-center justify-between bg-background border-b border-border/40">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-7 h-7 shrink-0">
-            {getActionTypeIcon(action.type, "w-5 h-5")}
+            {getActionTypeIcon(action.type, "w-5 h-5", iconMap)}
           </div>
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-foreground">{action.label}</span>
@@ -1495,6 +1524,7 @@ function SuggestedActionCard({
             onBccRemove={(i) => setBccContacts((prev) => prev.filter((_, idx) => idx !== i))}
             onOpenAccountDetails={onOpenAccountDetails}
             onOpenRecentActivity={onOpenRecentActivity}
+            iconMap={iconMap}
             showSubject={isNewEmail}
           />
         </div>
@@ -1523,6 +1553,7 @@ function SuggestedActionCard({
                     onSelect={(c) => setCallContact({ ...c, confirmed: true })}
                     onViewAll={onOpenAccountDetails}
                     onOpenRecentActivity={onOpenRecentActivity}
+                    iconMap={iconMap}
                     trigger={
                       <button className="h-7 rounded-md border border-border bg-background px-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors">
                         Contacts
@@ -1761,6 +1792,7 @@ export interface SuggestedActionsProps {
   onOpenRecentActivity?: () => void
   onMarkComplete?: (id: number | string) => void
   onDispatchAgent?: (id: number | string) => void
+  iconMap?: SuggestedActionsIconMap
 }
 
 export function SuggestedActions({
@@ -1776,6 +1808,7 @@ export function SuggestedActions({
   onOpenRecentActivity,
   onMarkComplete,
   onDispatchAgent,
+  iconMap,
 }: SuggestedActionsProps) {
   const [dismissedIds, setDismissedIds] = React.useState<Set<number | string>>(new Set())
 
@@ -1814,6 +1847,7 @@ export function SuggestedActions({
               onOpenRecentActivity={onOpenRecentActivity}
               onMarkComplete={onMarkComplete}
               onDispatchAgent={onDispatchAgent}
+              iconMap={iconMap}
             />
           </div>
         ))}

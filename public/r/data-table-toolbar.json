@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "data-table-toolbar",
+  "title": "Data Table Toolbar",
+  "description": "Toolbar composing table filter and display controls.",
+  "dependencies": [
+    "@tanstack/react-table"
+  ],
+  "registryDependencies": [
+    "data-table-filter",
+    "data-table-display"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/ui/data-table-toolbar.tsx",
+      "content": "\"use client\"\n\nimport type { SortingState } from \"@tanstack/react-table\"\n\nimport {\n  DataTableFilter,\n  type DataTableFilterCategory,\n} from \"./data-table-filter\"\nimport {\n  DataTableDisplay,\n  type DataTableDisplayColumn,\n} from \"./data-table-display\"\n\ninterface DataTableToolbarProps {\n  categories: DataTableFilterCategory[]\n  selectedFilters: Record<string, string[]>\n  onToggleFilter: (categoryId: string, option: string) => void\n  sorting: SortingState\n  onSortingChange: (next: SortingState) => void\n  displayColumns: DataTableDisplayColumn[]\n  onToggleColumn: (columnId: string) => void\n  onResetDisplay: () => void\n}\n\nexport function DataTableToolbar({\n  categories,\n  selectedFilters,\n  onToggleFilter,\n  sorting,\n  onSortingChange,\n  displayColumns,\n  onToggleColumn,\n  onResetDisplay,\n}: DataTableToolbarProps) {\n  return (\n    <div className=\"flex items-center justify-between gap-2 border-b border-border px-4 py-2\">\n      <div className=\"flex items-center gap-2\">\n        <DataTableFilter\n          categories={categories}\n          selectedFilters={selectedFilters}\n          onToggleFilter={onToggleFilter}\n        />\n      </div>\n      <div className=\"flex items-center gap-2\">\n        <DataTableDisplay\n          sorting={sorting}\n          onSortingChange={onSortingChange}\n          columns={displayColumns}\n          onToggleColumn={onToggleColumn}\n          onReset={onResetDisplay}\n        />\n      </div>\n    </div>\n  )\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

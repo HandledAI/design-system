@@ -4,13 +4,13 @@ import * as React from "react"
 import { TrendingUp, Info, ArrowRight } from "lucide-react"
 import { ResponsiveSankey } from "@nivo/sankey"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../../lib/utils"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/registry/new-york/ui/tooltip"
+} from "./tooltip"
 
 export interface PipelineStage {
   id: string

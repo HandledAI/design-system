@@ -21,8 +21,8 @@ import {
   Users,
 } from "lucide-react"
 
-import { cn } from "@/lib/utils"
-import { Avatar, AvatarFallback } from "@/registry/new-york/ui/avatar"
+import { cn } from "../../../lib/utils"
+import { Avatar, AvatarFallback } from "./avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,13 +30,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/registry/new-york/ui/dropdown-menu"
+} from "./dropdown-menu"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/registry/new-york/ui/tooltip"
+} from "./tooltip"
 import { QuickActionModal, type QuickActionTaskDraft } from "./quick-action-modal"
 
 export interface SidebarNavItem {

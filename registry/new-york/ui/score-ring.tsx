@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "../../../lib/utils"
 
 function getScoreColor(score: number, denominator: number) {
   const pct = (score / denominator) * 100

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../../lib/utils"
 
 export interface ChartTooltipEntry {
   name?: string
@@ -38,7 +38,7 @@ export function SimpleChartTooltip({
         "rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-md",
         className,
       )}
-      style={{ fontSize: "12px", fontFamily: "inherit" }}
+      style={{ fontSize: "12px" }}
     >
       {label ? (
         <p className="mb-1 text-xs font-medium text-slate-600">{label}</p>

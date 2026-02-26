@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "donut-chart",
+  "title": "Donut Chart",
+  "description": "Donut Chart component.",
+  "dependencies": [
+    "recharts"
+  ],
+  "registryDependencies": [
+    "chart-tooltip"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/ui/donut-chart.tsx",
+      "content": "\"use client\"\n\nimport * as React from \"react\"\nimport {\n  PieChart,\n  Pie,\n  Cell,\n  Label,\n  Tooltip,\n  ResponsiveContainer,\n} from \"recharts\"\n\nimport { cn } from \"../../../lib/utils\"\nimport { CHART_TOOLTIP_STYLE } from \"./chart-tooltip\"\n\nexport interface DonutSegment {\n  name: string\n  value: number\n  color: string\n}\n\nexport interface DonutChartProps {\n  data: DonutSegment[]\n  centerLabel?: string | number\n  size?: number\n  innerRadius?: number\n  outerRadius?: number\n  paddingAngle?: number\n  showTooltip?: boolean\n  showLegend?: boolean\n  className?: string\n}\n\nexport function DonutChart({\n  data,\n  centerLabel,\n  size = 80,\n  innerRadius,\n  outerRadius,\n  paddingAngle = 2,\n  showTooltip = true,\n  showLegend = false,\n  className,\n}: DonutChartProps) {\n  const computedInner = innerRadius ?? Math.round(size * 0.325)\n  const computedOuter = outerRadius ?? Math.round(size * 0.45)\n\n  return (\n    <div className={cn(\"flex items-center gap-3\", className)}>\n      <div className=\"shrink-0\" style={{ height: size, width: size }}>\n        <ResponsiveContainer width=\"100%\" height=\"100%\">\n          <PieChart>\n            {showTooltip ? (\n              <Tooltip\n                contentStyle={CHART_TOOLTIP_STYLE}\n                itemStyle={{ color: \"#0f172a\", fontWeight: 600 }}\n                formatter={(value: unknown, name: unknown) => [\n                  `${value}`,\n                  String(name),\n                ]}\n              />\n            ) : null}\n            <Pie\n              data={data}\n              innerRadius={computedInner}\n              outerRadius={computedOuter}\n              paddingAngle={paddingAngle}\n              dataKey=\"value\"\n              stroke=\"none\"\n            >\n              {data.map((entry, index) => (\n                <Cell key={`cell-${index}`} fill={entry.color} />\n              ))}\n              {centerLabel != null ? (\n                <Label\n                  value={String(centerLabel)}\n                  position=\"center\"\n                  className=\"fill-slate-900 text-lg font-bold\"\n                />\n              ) : null}\n            </Pie>\n          </PieChart>\n        </ResponsiveContainer>\n      </div>\n\n      {showLegend ? (\n        <div className=\"flex min-w-0 flex-1 flex-col gap-1.5 pl-1\">\n          {data.map((d) => (\n            <div\n              key={d.name}\n              className=\"flex items-center justify-between text-[10px]\"\n            >\n              <div className=\"flex min-w-0 items-center gap-1.5\">\n                <div\n                  className=\"h-1.5 w-1.5 shrink-0 rounded-full\"\n                  style={{ backgroundColor: d.color }}\n                />\n                <span\n                  className=\"truncate font-medium text-slate-600\"\n                  title={d.name}\n                >\n                  {d.name}\n                </span>\n              </div>\n              <span className=\"ml-1.5 font-bold text-slate-900\">{d.value}</span>\n            </div>\n          ))}\n        </div>\n      ) : null}\n    </div>\n  )\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}
