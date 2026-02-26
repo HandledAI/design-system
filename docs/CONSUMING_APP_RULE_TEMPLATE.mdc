@@ -18,6 +18,34 @@ alwaysApply: true
   - `@handled-ai/design-system: "<PINNED_VERSION>"`
 - Pin exact versions only (never `^` or `~`).
 
+# CSS Setup (Critical)
+
+- This app MUST have Tailwind CSS v4 processing at build time.
+- The main CSS file (e.g. `src/index.css`) MUST start with:
+  ```css
+  @import "tailwindcss";
+  @import "tw-animate-css";
+  ```
+- The file MUST contain `:root` CSS variables, `@theme inline` block, and `@layer base` styles.
+- Do NOT use pre-compiled Tailwind output as your CSS source file.
+- See `CONSUMER_SETUP.md` in the design-system repo for the complete template CSS.
+- Vite projects: `@tailwindcss/vite` plugin must be in `vite.config.ts`.
+- Non-Vite: `@tailwindcss/postcss` must be in `postcss.config.mjs`.
+
+# Required Peer Dependencies
+
+The design system externalizes these packages -- they MUST be installed in the consuming app:
+
+- `@tanstack/react-table` (DataTable / accounts view)
+- `class-variance-authority` (component variants)
+- `clsx` + `tailwind-merge` (cn() utility)
+- `date-fns` (date formatting)
+- `zod` (validation)
+- `lucide-react` (icons)
+- `radix-ui`, `@radix-ui/react-slot`, `@radix-ui/react-label`
+
+Optional (only if using charts/3D): `recharts`, `@nivo/sankey`, `@nivo/core`, `three`, `@react-three/fiber`, `@react-three/drei`
+
 # Theming Contract
 
 - Do not hard-code colors when a semantic token exists.
@@ -26,6 +54,17 @@ alwaysApply: true
   - `text-muted-foreground`
   - `border-border`
 - Token values are defined by this app's theme variables (`globals.css` or equivalent).
+
+# PrototypeShell Setup
+
+- When building a new app from the prototype, provide ALL inbox callbacks referenced by `detailSections`:
+  - `buildSuggestedActions` -- email/action cards
+  - `buildSourceItems` -- source context for the detail view
+  - `getSignalScore` -- signal score breakdown
+  - `getTimelineEvents` -- activity timeline
+  - `accountContacts` -- email To/Cc/Bcc suggestions
+  - `emailSignature` -- default signature
+- The resulting app should look identical to the design system preview at `design.withhandled.app/preview`.
 
 # How to Change Components
 
