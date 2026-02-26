@@ -1,0 +1,47 @@
+# Consuming App Cursor Rule Template
+
+Copy the template below into your consuming app as:
+`.cursor/rules/design-system.mdc`
+
+```md
+---
+description: Design system usage and update contract for this app
+alwaysApply: true
+---
+
+# Design System Contract
+
+- This app consumes `@handled-ai/design-system` via npm.
+- Import components from:
+  - `@handled-ai/design-system`
+- Current pinned version (update this line in your app):
+  - `@handled-ai/design-system: "<PINNED_VERSION>"`
+- Pin exact versions only (never `^` or `~`).
+
+# Theming Contract
+
+- Do not hard-code colors when a semantic token exists.
+- Use semantic tokens such as:
+  - `bg-primary`
+  - `text-muted-foreground`
+  - `border-border`
+- Token values are defined by this app's theme variables (`globals.css` or equivalent).
+
+# How to Change Components
+
+- Do not edit package-installed component code in `node_modules`.
+- To change shared component behavior:
+  1. make the change in the `@handled-ai/design-system` repo
+  2. publish a new package version
+  3. update this app's pinned dependency version
+- Use design-system docs as the API source of truth:
+  - `docs/COMPONENTS.md`
+
+# Eject Pattern (Exception Only)
+
+- If this app needs deep one-off customization for a single component:
+  - `npx shadcn@latest add @handled/{name}`
+- This creates a local copy that diverges from the shared package.
+- Once ejected, this app owns ongoing maintenance for that local copy.
+- Use this path rarely; prefer upstream changes in the design-system package.
+```

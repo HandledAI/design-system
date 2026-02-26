@@ -1,0 +1,25 @@
+---
+description: Design system project architecture and conventions
+alwaysApply: true
+---
+
+# Design System Architecture
+
+- This repository is `@handled-ai/design-system`, a shared component library used by multiple apps.
+- Primary distribution channel is npm (`@handled-ai/design-system`) built with `npm run build:lib` (tsup).
+- The shadcn registry/Vercel site is secondary and used for showcase/discovery, not production installation.
+- Component source files live in `registry/new-york/ui/*.tsx`.
+- The npm package entry point is root `index.ts`.
+- Documentation lives in:
+  - `docs/COMPONENTS.md` (table of contents)
+  - `docs/components/{name}.md` (per-component docs)
+- Publishing is manual: bump version in `package.json` then run `npm publish`.
+- Key scripts: `build:lib`, `registry:build`, `typecheck`, `lint`, `dev`.
+- Theming uses semantic CSS variable tokens; consuming apps own token values.
+
+# Component Conventions
+
+- Use functional components.
+- Use `cn` from `@/lib/utils` for class merging.
+- Accept and forward `className`.
+- Use `data-slot` attributes where appropriate for composability/testability.
