@@ -5,40 +5,306 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/registry/new-yor
 import { Badge } from "@/registry/new-york/ui/badge"
 import { Button } from "@/registry/new-york/ui/button"
 import { Input } from "@/registry/new-york/ui/input"
-import { 
-  ArrowLeft, Plus, ExternalLink, Mail, FileText, 
-  MessageCircle, Briefcase, Building2, Users, Newspaper,
-  X, Phone, CheckCircle2, ChevronDown, ChevronUp
+import {
+  ArrowLeft,
+  Plus,
+  ExternalLink,
+  Mail,
+  FileText,
+  MessageCircle,
+  Briefcase,
+  Building2,
+  Users,
+  Newspaper,
+  X,
+  Phone,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Link as LinkIcon,
+  Maximize2,
+  Minimize2,
+  Clock,
+  CalendarDays,
 } from "lucide-react"
 import { BRAND_ICONS } from "@/lib/icons"
 import { TimelineActivity, type TimelineEvent } from "@/registry/new-york/ui/timeline-activity"
 
-export function EntityPanel({ 
-  isOpen, 
-  onClose, 
-  children 
-}: { 
+// ---------------------------------------------------------------------------
+// EntityPanel – supports both Sheet (side panel) and fullscreen modes
+// ---------------------------------------------------------------------------
+
+export function EntityPanel({
+  isOpen,
+  onClose,
+  children,
+}: {
   isOpen: boolean
   onClose: (open: boolean) => void
-  children?: React.ReactNode 
+  children?: React.ReactNode
 }) {
+  const [isFullscreen, setIsFullscreen] = React.useState(false)
+
+  React.useEffect(() => {
+    if (!isOpen) setIsFullscreen(false)
+  }, [isOpen])
+
+  const handleClose = React.useCallback(() => {
+    setIsFullscreen(false)
+    onClose(false)
+  }, [onClose])
+
+  const panelContent = (
+    <EntityPanelContext.Provider value={{ isFullscreen, setIsFullscreen, onClose: handleClose }}>
+      {children}
+    </EntityPanelContext.Provider>
+  )
+
+  if (isFullscreen && isOpen) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-background">
+        <div className="flex-1 overflow-y-auto px-6 py-6">{panelContent}</div>
+      </div>
+    )
+  }
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-full sm:w-[420px] sm:max-w-[420px] overflow-y-auto px-5 py-6 bg-background border-l border-border" showCloseButton={false}>
+      <SheetContent
+        side="right"
+        className="w-full sm:w-[500px] sm:max-w-[600px] overflow-hidden p-0 bg-background border-l border-border flex flex-col"
+        showCloseButton={false}
+      >
         <SheetHeader className="sr-only p-0">
           <SheetTitle>Entity panel</SheetTitle>
         </SheetHeader>
-        {children}
+        <div className="flex-1 overflow-y-auto px-6 py-6">{panelContent}</div>
       </SheetContent>
     </Sheet>
   )
 }
 
+const EntityPanelContext = React.createContext<{
+  isFullscreen: boolean
+  setIsFullscreen: (v: boolean) => void
+  onClose: () => void
+}>({
+  isFullscreen: false,
+  setIsFullscreen: () => {},
+  onClose: () => {},
+})
+
+function useEntityPanel() {
+  return React.useContext(EntityPanelContext)
+}
+
+// ---------------------------------------------------------------------------
+// EntityPanelHeader – MeetingDetail-inspired header bar
+// ---------------------------------------------------------------------------
+
+export function EntityPanelHeader({
+  icon,
+  title,
+  badgeLabel,
+  subtitle,
+}: {
+  icon?: React.ReactNode
+  title: string
+  badgeLabel?: string
+  subtitle?: string
+}) {
+  const { isFullscreen, setIsFullscreen, onClose } = useEntityPanel()
+
+  return (
+    <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center gap-2 min-w-0">
+        {icon ?? <CalendarDays className="w-5 h-5 text-muted-foreground shrink-0" />}
+        <h2 className="text-lg font-semibold text-foreground truncate">{title}</h2>
+        {badgeLabel && (
+          <Badge
+            variant="outline"
+            className="text-blue-600 border-blue-300 dark:border-blue-700 dark:text-blue-400 shadow-none px-2 py-0.5 text-[11px] font-medium shrink-0"
+          >
+            {badgeLabel}
+          </Badge>
+        )}
+      </div>
+      <div className="flex items-center gap-1 shrink-0 ml-4 text-muted-foreground">
+        <button
+          type="button"
+          className="p-1.5 rounded-md hover:bg-secondary transition-colors"
+          title="Copy Link"
+        >
+          <LinkIcon className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => setIsFullscreen(!isFullscreen)}
+          className="p-1.5 rounded-md hover:bg-secondary transition-colors"
+          title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+        >
+          {isFullscreen ? (
+            <Minimize2 className="w-4 h-4" />
+          ) : (
+            <Maximize2 className="w-4 h-4" />
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="p-1.5 rounded-md hover:bg-secondary transition-colors"
+          title="Close"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// EntityPanelTabs – Overview/Details tab bar
+// ---------------------------------------------------------------------------
+
+export function EntityPanelTabs({
+  tabs,
+  activeTab,
+  onTabChange,
+}: {
+  tabs: { id: string; label: string }[]
+  activeTab: string
+  onTabChange: (id: string) => void
+}) {
+  return (
+    <div className="flex items-center gap-6 border-b border-border mb-6">
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          type="button"
+          onClick={() => onTabChange(tab.id)}
+          className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === tab.id
+              ? "border-primary text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// EntityMetadataGrid – key/value metadata rows with icons
+// ---------------------------------------------------------------------------
+
+export interface EntityMetadataField {
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+  value: React.ReactNode
+}
+
+export function EntityMetadataGrid({ fields }: { fields: EntityMetadataField[] }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-[160px_1fr] gap-y-4 gap-x-6 mb-8 text-sm">
+      {fields.map((field, idx) => (
+        <React.Fragment key={idx}>
+          <div className="flex items-center gap-2 text-muted-foreground font-medium">
+            <field.icon className="w-4 h-4" />
+            <span>{field.label}</span>
+          </div>
+          <div className="text-foreground">{field.value}</div>
+        </React.Fragment>
+      ))}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// EntitySection – clean section with title (MeetingDetail-style)
+// ---------------------------------------------------------------------------
+
+export function EntitySection({
+  title,
+  children,
+  action,
+}: {
+  title: string
+  children: React.ReactNode
+  action?: React.ReactNode
+}) {
+  return (
+    <section className="mb-8">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        {action}
+      </div>
+      {children}
+    </section>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// EntityActivityItem – clean activity row (MeetingDetail-style)
+// ---------------------------------------------------------------------------
+
+export function EntityActivityItem({
+  icon,
+  title,
+  description,
+  date,
+}: {
+  icon?: React.ReactNode
+  title: React.ReactNode
+  description?: React.ReactNode
+  date?: string
+}) {
+  return (
+    <div className="flex gap-3 text-[13px]">
+      <div className="mt-0.5 text-muted-foreground shrink-0">
+        {icon ?? <CalendarDays className="w-4 h-4" />}
+      </div>
+      <div>
+        <p className="text-foreground leading-relaxed">{title}</p>
+        {description && <p className="text-[11px] text-muted-foreground/70 mt-0.5">{description}</p>}
+        {date && <p className="text-[11px] text-muted-foreground/70 mt-0.5">{date}</p>}
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// SystemActivity – standalone section for bottom of entity panel
+// ---------------------------------------------------------------------------
+
+export function SystemActivity() {
+  return (
+    <EntitySection title="System Activity">
+      <div className="space-y-4">
+        <EntityActivityItem
+          title={<><span className="font-medium">System</span> enriched the lead</>}
+          date="Today at 10:15 AM"
+        />
+        <EntityActivityItem
+          icon={<Mail className="w-4 h-4" />}
+          title={<><span className="font-medium">Jackie Lee</span> submitted website form</>}
+          date="Yesterday at 3:22 PM"
+        />
+      </div>
+    </EntitySection>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// PotentialContacts – unchanged from original
+// ---------------------------------------------------------------------------
+
 export function PotentialContacts() {
   return (
-    <div className="space-y-3 mt-8">
+    <div className="space-y-3 mb-8">
       <div className="flex items-center justify-between">
-        <h3 className="text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wider">Potential Contacts</h3>
+        <h3 className="text-sm font-semibold text-foreground">Potential Contacts</h3>
         <span className="text-xs text-muted-foreground">3 identified</span>
       </div>
       <div className="space-y-0 pt-1">
@@ -93,30 +359,39 @@ export function PotentialContacts() {
   )
 }
 
+// ---------------------------------------------------------------------------
+// RecentActivity
+// ---------------------------------------------------------------------------
+
 export type ActivityItem = TimelineEvent
 
-export function RecentActivity({ 
-  title = "RECENT ACTIVITY", 
-  count = "10 total events", 
-  filters = [], 
-  items = [] 
-}: { 
+export function RecentActivity({
+  title = "Recent Activity",
+  count = "10 total events",
+  filters = [],
+  items = [],
+}: {
   title?: string
   count?: string
   filters?: string[]
-  items?: TimelineEvent[] 
+  items?: TimelineEvent[]
 }) {
   return (
-    <div id="entity-recent-activity" className="space-y-4 mt-8 scroll-m-20">
+    <div id="entity-recent-activity" className="space-y-4 mb-8 scroll-m-20">
       <div className="flex items-center justify-between">
-        <h3 className="text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wider">{title}</h3>
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
         {count && <span className="text-xs text-muted-foreground">{count}</span>}
       </div>
 
       {filters.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5">
-          {filters.map(filter => (
-            <Button key={filter} variant="outline" size="sm" className="h-7 text-xs rounded-md shadow-none font-medium border-border text-muted-foreground hover:text-foreground">
+          {filters.map((filter) => (
+            <Button
+              key={filter}
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs rounded-md shadow-none font-medium border-border text-muted-foreground hover:text-foreground"
+            >
               {filter}
             </Button>
           ))}
@@ -124,7 +399,10 @@ export function RecentActivity({
       )}
 
       <div className="relative">
-        <Input placeholder="Search activity..." className="h-9 text-sm bg-background border-border shadow-none" />
+        <Input
+          placeholder="Search activity..."
+          className="h-9 text-sm bg-background border-border shadow-none"
+        />
       </div>
 
       <div>
@@ -134,12 +412,15 @@ export function RecentActivity({
   )
 }
 
+// ---------------------------------------------------------------------------
+// ConnectedApps
+// ---------------------------------------------------------------------------
 
 export function ConnectedApps() {
   return (
-    <div className="space-y-3 mt-8">
+    <div className="space-y-3 mb-8">
       <div className="flex items-center justify-between">
-        <h3 className="text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wider">Connected Apps</h3>
+        <h3 className="text-sm font-semibold text-foreground">Connected Apps</h3>
         <span className="text-xs text-muted-foreground">3 connected</span>
       </div>
 
@@ -196,168 +477,177 @@ export function ConnectedApps() {
   )
 }
 
+// ---------------------------------------------------------------------------
+// EntityDetails – updated with MeetingDetail-inspired metadata grid + tabs
+// ---------------------------------------------------------------------------
+
 export function EntityDetails({ onClose }: { onClose?: () => void }) {
+  const [activeTab, setActiveTab] = React.useState<"overview" | "details">("overview")
   const [showMore, setShowMore] = React.useState(false)
 
-  const leadFields = [
-    { icon: Users, label: "Lead Name", value: "Jackie Lee" },
-    { icon: Briefcase, label: "Title", value: "VP Finance" },
-    { icon: Building2, label: "Company", value: "CloudKitchen" },
-    { icon: Mail, label: "Lead Source", value: "Inbound — Website form" },
-    { icon: "status" as const, label: "Lead Status", value: "New — Not Contacted", badge: "amber" as const },
-    { icon: Users, label: "Lead Owner", value: "Sarah Johnson (SDR)" },
-    { icon: Building2, label: "Industry", value: "Food Tech / Logistics", badge: "blue" as const },
-    { icon: Users, label: "Company Size", value: "200-500 employees" },
+  const leadFields: EntityMetadataField[] = [
+    { icon: Users, label: "Lead Name", value: <span className="font-medium">Jackie Lee</span> },
+    { icon: Briefcase, label: "Title", value: <span className="font-medium">VP Finance</span> },
+    { icon: Building2, label: "Company", value: <span className="font-medium">CloudKitchen</span> },
+    { icon: Mail, label: "Lead Source", value: <span className="font-medium">Inbound — Website form</span> },
+    {
+      icon: ({ className }) => (
+        <div className={className}>
+          <div className="w-3 h-3 rounded-full border-[2px] border-amber-500" />
+        </div>
+      ),
+      label: "Lead Status",
+      value: (
+        <Badge variant="outline" className="text-amber-700 border-amber-200 bg-amber-50 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800 shadow-none font-medium px-2 py-0 text-[11px]">
+          New — Not Contacted
+        </Badge>
+      ),
+    },
+    { icon: Users, label: "Lead Owner", value: <span className="font-medium">Sarah Johnson (SDR)</span> },
+    {
+      icon: Building2,
+      label: "Industry",
+      value: (
+        <Badge variant="outline" className="text-blue-700 border-blue-200 bg-blue-50 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800 shadow-none font-medium px-2 py-0 text-[11px]">
+          Food Tech / Logistics
+        </Badge>
+      ),
+    },
+    { icon: Users, label: "Company Size", value: <span className="font-medium">200-500 employees</span> },
   ]
 
-  const visibleFields = showMore ? leadFields : leadFields.slice(0, 8)
+  const visibleFields = showMore ? leadFields : leadFields.slice(0, 6)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-0">
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-sm font-medium text-muted-foreground">CK</div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-xl font-medium tracking-tight">CloudKitchen</h2>
-              <Badge variant="outline" className="text-blue-600 border-blue-300 dark:border-blue-700 dark:text-blue-400 shadow-none px-2 py-0.5 text-[11px] font-medium">Lead</Badge>
-            </div>
-            <p className="text-xs text-muted-foreground mt-0.5">Last enriched: Today at 10:15 AM</p>
+      <EntityPanelHeader
+        icon={
+          <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-sm font-medium text-muted-foreground shrink-0">
+            CK
           </div>
-        </div>
-        <div className="flex items-center gap-1 -mt-1 -mr-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:bg-blue-50 hover:text-blue-600"><MessageCircle className="w-4 h-4" /></Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-muted"><ExternalLink className="w-4 h-4" /></Button>
-          {onClose && (
-            <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-muted-foreground hover:bg-muted"><X className="w-4 h-4" /></Button>
-          )}
-        </div>
-      </div>
+        }
+        title="CloudKitchen"
+        badgeLabel="Lead"
+        subtitle="Last enriched: Today at 10:15 AM"
+      />
 
-      {/* Lead Fields */}
-      <div className="space-y-0">
-        {visibleFields.map((field, idx) => {
-          const isStatusIcon = field.icon === "status"
-          const Icon = isStatusIcon ? null : field.icon
-          return (
-            <div key={idx} className="flex items-start gap-3 py-2.5 border-b border-border/30 last:border-b-0">
-              {isStatusIcon ? (
-                <div className="w-4 h-4 flex items-center justify-center mt-0.5 shrink-0">
-                  <div className="w-3 h-3 rounded-full border-[2px] border-amber-500" />
-                </div>
-              ) : (
-                Icon && <Icon className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-              )}
-              <span className="text-sm text-muted-foreground min-w-[100px] shrink-0">{field.label}</span>
-              <div className="flex-1 text-sm">
-                {field.badge === "amber" ? (
-                  <Badge variant="outline" className="text-amber-700 border-amber-200 bg-amber-50 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800 shadow-none font-medium px-2 py-0 text-[11px]">{field.value}</Badge>
-                ) : field.badge === "blue" ? (
-                  <Badge variant="outline" className="text-blue-700 border-blue-200 bg-blue-50 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800 shadow-none font-medium px-2 py-0 text-[11px]">{field.value}</Badge>
-                ) : (
-                  <span className="text-foreground font-medium">{field.value}</span>
-                )}
+      {/* Tabs */}
+      <EntityPanelTabs
+        tabs={[
+          { id: "overview", label: "Overview" },
+          { id: "details", label: "Details" },
+        ]}
+        activeTab={activeTab}
+        onTabChange={(id) => setActiveTab(id as "overview" | "details")}
+      />
+
+      {activeTab === "overview" ? (
+        <div className="space-y-0">
+          {/* Metadata Grid */}
+          <EntityMetadataGrid fields={visibleFields} />
+
+          {leadFields.length > 6 && (
+            <button
+              onClick={() => setShowMore(!showMore)}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mb-8"
+            >
+              {showMore ? "See less" : "See more"}
+              {showMore ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            </button>
+          )}
+
+          {/* Enrichment as sections */}
+          <EntitySection title="Company Signals">
+            <ul className="space-y-2">
+              <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
+                <span>
+                  Recent funding: $45M Series B, 3 months ago
+                  <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">1</span>
+                </span>
+              </li>
+              <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
+                <span>
+                  Hiring: 3 finance/treasury roles in last 30 days
+                  <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">2</span>
+                </span>
+              </li>
+              <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
+                <span>
+                  Market expansion: 8 &rarr; 15 US markets planned
+                  <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">3</span>
+                </span>
+              </li>
+            </ul>
+          </EntitySection>
+
+          <EntitySection title="Contact Signals (Jackie Lee)">
+            <ul className="space-y-2">
+              <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
+                <span>
+                  Started role: 12 days ago
+                  <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">4</span>
+                </span>
+              </li>
+              <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
+                <span>
+                  Previous: Deel — operations/finance
+                  <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">4</span>
+                </span>
+              </li>
+              <li className="flex items-start gap-2 text-sm text-muted-foreground">
+                <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
+                <span>
+                  LinkedIn connections to existing customers: 2 detected
+                  <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">4</span>
+                </span>
+              </li>
+            </ul>
+          </EntitySection>
+
+          <SourcesToggle />
+        </div>
+      ) : (
+        <div className="space-y-0">
+          <EntitySection title="Estimated Tech Stack">
+            <div className="space-y-2">
+              <div className="flex items-start gap-2 text-sm">
+                <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
+                <span className="text-muted-foreground min-w-[100px] shrink-0">Banking:</span>
+                <span className="text-muted-foreground/50 italic">Unknown</span>
+              </div>
+              <div className="flex items-start gap-2 text-sm">
+                <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
+                <span className="text-muted-foreground min-w-[100px] shrink-0">Corporate Cards:</span>
+                <span className="text-foreground font-medium">
+                  Brex <span className="text-muted-foreground font-normal">(from job posting requirements)</span>
+                  <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">2</span>
+                </span>
+              </div>
+              <div className="flex items-start gap-2 text-sm">
+                <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
+                <span className="text-muted-foreground min-w-[100px] shrink-0">Payroll:</span>
+                <span className="text-foreground font-medium">
+                  Gusto <span className="text-muted-foreground font-normal">(from LinkedIn integrations)</span>
+                  <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">5</span>
+                </span>
               </div>
             </div>
-          )
-        })}
-
-        <button
-          onClick={() => setShowMore(!showMore)}
-          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors pt-2"
-        >
-          {showMore ? "See less" : "See more"}
-          {showMore ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-        </button>
-      </div>
-
-      {/* Enrichment Data */}
-      <div className="pt-6 border-t border-border space-y-5">
-        <div className="flex items-center justify-between">
-          <h3 className="text-[11px] font-bold text-muted-foreground/70 uppercase tracking-wider">Enrichment Data</h3>
-          <span className="text-[11px] text-muted-foreground">Last updated: 2h ago</span>
+          </EntitySection>
         </div>
-
-        <div className="space-y-2">
-          <h4 className="text-xs font-medium text-foreground">Company Signals</h4>
-          <ul className="space-y-2">
-            <li className="flex items-start gap-2 text-sm text-muted-foreground">
-              <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
-              <span>Recent funding: $45M Series B, 3 months ago
-                <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">1</span>
-              </span>
-            </li>
-            <li className="flex items-start gap-2 text-sm text-muted-foreground">
-              <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
-              <span>Hiring: 3 finance/treasury roles in last 30 days
-                <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">2</span>
-              </span>
-            </li>
-            <li className="flex items-start gap-2 text-sm text-muted-foreground">
-              <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
-              <span>Market expansion: 8 &rarr; 15 US markets planned
-                <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">3</span>
-              </span>
-            </li>
-          </ul>
-        </div>
-
-        <div className="space-y-2">
-          <h4 className="text-xs font-medium text-foreground">Contact Signals (Jackie Lee)</h4>
-          <ul className="space-y-2">
-            <li className="flex items-start gap-2 text-sm text-muted-foreground">
-              <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
-              <span>Started role: 12 days ago
-                <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">4</span>
-              </span>
-            </li>
-            <li className="flex items-start gap-2 text-sm text-muted-foreground">
-              <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
-              <span>Previous: Deel — operations/finance
-                <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">4</span>
-              </span>
-            </li>
-            <li className="flex items-start gap-2 text-sm text-muted-foreground">
-              <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
-              <span>LinkedIn connections to existing customers: 2 detected
-                <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">4</span>
-              </span>
-            </li>
-          </ul>
-        </div>
-
-        <div className="space-y-2">
-          <h4 className="text-xs font-medium text-foreground">Estimated Tech Stack</h4>
-          <div className="space-y-2">
-            <div className="flex items-start gap-2 text-sm">
-              <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
-              <span className="text-muted-foreground min-w-[100px] shrink-0">Banking:</span>
-              <span className="text-muted-foreground/50 italic">Unknown</span>
-            </div>
-            <div className="flex items-start gap-2 text-sm">
-              <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
-              <span className="text-muted-foreground min-w-[100px] shrink-0">Corporate Cards:</span>
-              <span className="text-foreground font-medium">Brex <span className="text-muted-foreground font-normal">(from job posting requirements)</span>
-                <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">2</span>
-              </span>
-            </div>
-            <div className="flex items-start gap-2 text-sm">
-              <span className="text-muted-foreground/50 mt-1 shrink-0">&bull;</span>
-              <span className="text-muted-foreground min-w-[100px] shrink-0">Payroll:</span>
-              <span className="text-foreground font-medium">Gusto <span className="text-muted-foreground font-normal">(from LinkedIn integrations)</span>
-                <span className="inline-flex items-center justify-center w-4 h-4 ml-1.5 align-text-top text-[9px] font-medium text-muted-foreground bg-muted/30 border border-border/50 rounded-full">5</span>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Sources toggle */}
-        <SourcesToggle />
-      </div>
+      )}
     </div>
   )
 }
+
+// ---------------------------------------------------------------------------
+// SourcesToggle – collapsible sources list
+// ---------------------------------------------------------------------------
 
 function SourcesToggle() {
   const [expanded, setExpanded] = React.useState(false)
@@ -371,10 +661,10 @@ function SourcesToggle() {
   ]
 
   return (
-    <div>
+    <div className="mb-8">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground/70 hover:text-foreground transition-colors uppercase tracking-wider"
+        className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
       >
         Sources
         <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />

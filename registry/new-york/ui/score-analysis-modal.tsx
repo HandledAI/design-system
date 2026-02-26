@@ -1,17 +1,12 @@
 "use client"
 
 import * as React from "react"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/registry/new-york/ui/dialog"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/registry/new-york/ui/sheet"
 import { Badge } from "@/registry/new-york/ui/badge"
-import { Progress } from "@/registry/new-york/ui/progress"
 import { ScoreRing } from "@/registry/new-york/ui/score-ring"
 import { ScoreBreakdown, type ScoreFactor } from "@/registry/new-york/ui/score-breakdown"
+import { SignalApproval } from "@/registry/new-york/ui/signal-feedback-inline"
+import { X } from "lucide-react"
 
 interface ScoreAnalysisModalProps {
   open: boolean
@@ -22,10 +17,13 @@ interface ScoreAnalysisModalProps {
   denominator?: number
   whyNow: string
   evidence: React.ReactNode[]
-  confidence: number
-  confidenceDescription?: string
   factors?: ScoreFactor[]
   onFactorFeedback?: (factorKey: string, type: "up" | "down" | null, detail?: string) => void
+  companyName?: string
+  opportunityUrl?: string
+  onApprove?: () => void
+  onApproveFeedback?: (reasons: string[], detail: string) => void
+  onDismiss?: (reasons: string[], detail: string) => void
 }
 
 function getScoreLabel(score: number, denominator: number) {
@@ -44,80 +42,92 @@ function ScoreAnalysisModal({
   denominator = 100,
   whyNow,
   evidence,
-  confidence,
-  confidenceDescription,
   factors,
   onFactorFeedback,
+  companyName = "Account",
+  opportunityUrl,
+  onApprove,
+  onApproveFeedback,
+  onDismiss,
 }: ScoreAnalysisModalProps) {
   const label = getScoreLabel(score, denominator)
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] gap-0 p-0 overflow-hidden flex flex-col [display:flex]">
-        <div className="overflow-y-auto min-h-0 flex-1 px-6 pt-6 pb-6">
-          <DialogHeader className="mb-4">
-            <DialogTitle className="text-xl font-semibold">{title}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
-          </DialogHeader>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="right"
+        className="w-full sm:w-[500px] sm:max-w-[600px] overflow-hidden p-0 bg-background border-l border-border flex flex-col"
+        showCloseButton={false}
+      >
+        <SheetHeader className="sr-only p-0">
+          <SheetTitle>{title}</SheetTitle>
+        </SheetHeader>
 
-          <div className="space-y-6">
-            {/* Score Display -- donut ring */}
-            <div className="flex flex-col items-center gap-3">
-              <ScoreRing score={score} denominator={denominator} size={120} strokeWidth={10} />
-              <Badge variant="outline">
-                {Math.round((score / denominator) * 100)}% Score
-                {" \u2014 "}
-                <span className={label.className}>{label.text}</span>
-              </Badge>
-            </div>
+        <SignalApproval.Root
+          companyName={companyName}
+          opportunityUrl={opportunityUrl}
+          onApprove={onApprove}
+          onApproveFeedback={onApproveFeedback}
+          onDismiss={onDismiss}
+        >
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
+            <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="p-1.5 rounded-md text-muted-foreground hover:bg-secondary transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
 
-            {/* Why Now */}
-            <div>
-              <h3 className="font-semibold mb-2 text-sm">Why Now</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{whyNow}</p>
-            </div>
+          <div className="flex-1 overflow-y-auto px-6 py-6">
+            <p className="text-sm text-muted-foreground mb-6">{description}</p>
 
-            {/* Evidence */}
-            <div>
-              <h3 className="font-semibold mb-2 text-sm">Supporting Evidence</h3>
-              <ul className="space-y-2">
-                {evidence.map((item, index) => (
-                  <li key={index} className="flex items-start gap-2 text-sm">
-                    <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
-                    <span className="text-muted-foreground leading-relaxed">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <div className="space-y-6">
+              <div className="flex flex-col items-center gap-3">
+                <ScoreRing score={score} denominator={denominator} size={120} strokeWidth={10} />
+                <Badge variant="outline">
+                  {Math.round((score / denominator) * 100)}% Score
+                  {" \u2014 "}
+                  <span className={label.className}>{label.text}</span>
+                </Badge>
+              </div>
 
-            {/* Score Breakdown */}
-            {factors && factors.length > 0 && (
               <div>
-                <h3 className="font-semibold mb-2 text-sm">Score Breakdown</h3>
-                <ScoreBreakdown factors={factors} onFactorFeedback={onFactorFeedback} />
+                <h3 className="font-semibold mb-2 text-sm">Why Now</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{whyNow}</p>
               </div>
-            )}
 
-            {/* Confidence */}
-            <div>
-              <h3 className="font-semibold mb-2 text-sm">Analysis Confidence</h3>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Model Confidence</span>
-                  <span className="font-medium">{confidence}%</span>
-                </div>
-                <Progress value={confidence} className="h-2" />
-                {confidenceDescription && (
-                  <p className="text-xs text-muted-foreground">{confidenceDescription}</p>
-                )}
+              <div>
+                <h3 className="font-semibold mb-2 text-sm">Supporting Evidence</h3>
+                <ul className="space-y-2">
+                  {evidence.map((item, index) => (
+                    <li key={index} className="flex items-start gap-2 text-sm">
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
+                      <span className="text-muted-foreground leading-relaxed">{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
+
+              {factors && factors.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-2 text-sm">Score Breakdown</h3>
+                  <ScoreBreakdown factors={factors} onFactorFeedback={onFactorFeedback} />
+                </div>
+              )}
+
+              <SignalApproval.Actions />
             </div>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </SignalApproval.Root>
+      </SheetContent>
+    </Sheet>
   )
 }
 
-export { ScoreAnalysisModal }
+const ScoreAnalysisPanel = ScoreAnalysisModal
+
+export { ScoreAnalysisModal, ScoreAnalysisPanel }
 export type { ScoreAnalysisModalProps }

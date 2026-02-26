@@ -8,6 +8,7 @@ import type { QuickActionTaskDraft } from "@/registry/new-york/ui/quick-action-m
 export function QuickActionSidebarShowcase() {
   const [lastCreatedTask, setLastCreatedTask] =
     React.useState<QuickActionTaskDraft | null>(null)
+  const [activeItem, setActiveItem] = React.useState("inbox")
 
   return (
     <div
@@ -17,13 +18,17 @@ export function QuickActionSidebarShowcase() {
       <h3 className="text-lg font-semibold">Quick Action Sidebar + Modal</h3>
       <p className="max-w-2xl text-sm text-muted-foreground">
         The sidebar nav and quick action trigger are showcased together. Use the
-        bottom quick action button to open the modal.
+        bottom quick action button to open the modal. Includes collapsible
+        sections, user profile with dropdown menu, and Barb-style nav items.
       </p>
 
-      <div className="rounded-lg border bg-[#eef2f8] p-4">
+      <div className="rounded-lg border bg-muted/30 p-4 flex justify-center">
         <QuickActionSidebarNav
-          className="mx-auto"
+          className="h-[700px] rounded-lg border shadow-sm"
+          activeItemId={activeItem}
+          onNavigate={(id) => setActiveItem(id)}
           onCreateTask={(draft) => setLastCreatedTask(draft)}
+          onUserMenuAction={(id) => console.log("User menu:", id)}
         />
       </div>
 

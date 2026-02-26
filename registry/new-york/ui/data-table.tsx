@@ -32,6 +32,7 @@ import { DataTableToolbar } from "@/registry/new-york/ui/data-table-toolbar"
 import { type DataTableFilterCategory } from "@/registry/new-york/ui/data-table-filter"
 import { ScoreAnalysisModal } from "@/registry/new-york/ui/score-analysis-modal"
 import type { ScoreFactor } from "@/registry/new-york/ui/score-breakdown"
+import { Citation, type SourceDef } from "@/registry/new-york/ui/detail-view"
 
 type DataRow = {
   id: string
@@ -315,11 +316,21 @@ type ScoreAnalysisData = {
   title: string
   description: string
   whyNow: string
-  evidence: string[]
-  confidence: number
-  confidenceDescription: string
+  evidence: React.ReactNode[]
   factors: ScoreFactor[]
 }
+
+const RISK_SOURCES: SourceDef[] = [
+  { id: 1, summary: "Weekly active users declined 12% over the past 30 days with no recovery trend.", meta: "Product telemetry \u00b7 2h ago" },
+  { id: 2, summary: "Critical support ticket #4821 has been unresolved for over 48 hours.", meta: "Zendesk \u00b7 6h ago" },
+  { id: 3, summary: "Competitor mentions detected in recent Slack conversations from the finance team.", meta: "Slack signal \u00b7 1d ago" },
+]
+
+const EXPANSION_SOURCES: SourceDef[] = [
+  { id: 1, summary: "Treasury feature utilization is above the 85th percentile compared to peer accounts.", meta: "Product telemetry \u00b7 3h ago" },
+  { id: 2, summary: "Multiple feature requests submitted for advanced reporting and API access.", meta: "Zendesk \u00b7 1d ago" },
+  { id: 3, summary: "Finance department headcount grew from 8 to 14 in the last quarter.", meta: "LinkedIn signal \u00b7 2d ago" },
+]
 
 const SCORE_ANALYSIS: Record<string, (row: DataRow) => ScoreAnalysisData> = {
   Risk: (row) => ({
@@ -331,13 +342,10 @@ const SCORE_ANALYSIS: Record<string, (row: DataRow) => ScoreAnalysisData> = {
         ? "Critical risk factors detected requiring immediate intervention to prevent churn."
         : "Account health is stable, but monitoring recent support interactions is recommended.",
     evidence: [
-      "Recent decline in weekly active users (-12%)",
-      "Unresolved critical support ticket (>48h)",
-      "Competitor presence detected in recent conversations",
+      <>Recent decline in <span className="font-medium text-foreground">weekly active users (-12%)</span> with no recovery trend<Citation number={1} source={RISK_SOURCES[0]} /></>,
+      <>Unresolved <span className="font-medium text-foreground">critical support ticket</span> open for over 48 hours<Citation number={2} source={RISK_SOURCES[1]} /></>,
+      <>Competitor presence detected in recent conversations from finance team<Citation number={3} source={RISK_SOURCES[2]} /></>,
     ],
-    confidence: 89,
-    confidenceDescription:
-      "Based on risk scoring model trained on historical customer data and outcomes.",
     factors: [
       { key: "engagement", label: "Engagement drop", score: Math.min(row.riskScore + 10, 100), why: "Weekly active users declined 12% over past 30 days" },
       { key: "support", label: "Support load", score: Math.min(row.riskScore + 5, 100), why: "Unresolved critical ticket open for >48h" },
@@ -354,13 +362,10 @@ const SCORE_ANALYSIS: Record<string, (row: DataRow) => ScoreAnalysisData> = {
         ? "Usage patterns and growth signals indicate readiness for additional product adoption."
         : "Moderate expansion potential; consider targeted engagement to increase adoption.",
     evidence: [
-      "Treasury utilization above 85th percentile vs peers",
-      "Frequent feature requests for advanced functionality",
-      "Recent team expansion in finance department",
+      <>Treasury utilization above <span className="font-medium text-foreground">85th percentile</span> vs peer accounts<Citation number={1} source={EXPANSION_SOURCES[0]} /></>,
+      <>Frequent <span className="font-medium text-foreground">feature requests</span> for advanced reporting and API access<Citation number={2} source={EXPANSION_SOURCES[1]} /></>,
+      <>Recent <span className="font-medium text-foreground">team expansion</span> in finance department (8 &rarr; 14)<Citation number={3} source={EXPANSION_SOURCES[2]} /></>,
     ],
-    confidence: 81,
-    confidenceDescription:
-      "Based on expansion model trained on historical upsell outcomes and usage patterns.",
     factors: [
       { key: "usage-depth", label: "Usage depth", score: Math.min(row.expansionScore + 8, 100), why: "Active usage across 4+ core product features" },
       { key: "growth", label: "Growth signals", score: row.expansionScore, why: row.growthIndicators.length > 0 ? row.growthIndicators.join(", ") + " detected" : "No active growth signals" },
@@ -483,7 +488,7 @@ function isRowMatchingCategoryFilter(
   }
 }
 
-export function DataTable() {
+export function DataTable({ onRowClick }: { onRowClick?: (row: DataRow) => void } = {}) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(
     DEFAULT_COLUMN_VISIBILITY
@@ -791,7 +796,11 @@ export function DataTable() {
                 {table.getRowModel().rows.map((row) => (
                   <tr
                     key={row.id}
-                    className="group border-b border-border/50 transition-colors hover:bg-muted/30"
+                    onClick={() => onRowClick?.(row.original)}
+                    className={cn(
+                      "group border-b border-border/50 transition-colors hover:bg-muted/30",
+                      onRowClick && "cursor-pointer",
+                    )}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td
@@ -838,12 +847,15 @@ export function DataTable() {
             score={scoreModal.type === "Risk" ? scoreModal.row.riskScore : scoreModal.row.expansionScore}
             whyNow={data.whyNow}
             evidence={data.evidence}
-            confidence={data.confidence}
-            confidenceDescription={data.confidenceDescription}
             factors={data.factors}
             onFactorFeedback={(key, type, detail) =>
               console.log("Factor feedback:", { account: scoreModal.row.name, factor: key, type, detail })
             }
+            companyName={scoreModal.row.name}
+            opportunityUrl={`https://acme.lightning.force.com/lightning/r/Opportunity/006${scoreModal.row.id}/view`}
+            onApprove={() => console.log("Approved signal — creating opportunity:", { account: scoreModal.row.name, type: scoreModal.type })}
+            onApproveFeedback={(reasons, detail) => console.log("Approval feedback:", { account: scoreModal.row.name, reasons, detail })}
+            onDismiss={(reasons, detail) => console.log("Dismissed signal:", { account: scoreModal.row.name, reasons, detail })}
           />
         )
       })()}
