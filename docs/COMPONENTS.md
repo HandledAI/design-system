@@ -97,6 +97,16 @@ import { ComponentName } from "@handled-ai/design-system"
 - [QuickActionChatArea](./components/quick-action-chat-area.md) - Prompt-style composer for generating or submitting quick tasks.
 - [QuickActionModal](./components/quick-action-modal.md) - Task creation modal with templates and priority selection.
 
+## Prototype Template System
+
+- [PrototypeShell](./components/prototype-shell.md) - Config-driven shell that renders a full prototype app with sidebar, views, and entity panel.
+- [PrototypeInboxView](./components/prototype-inbox-view.md) - Inbox view with split/list/detail modes, filters, signal brief, suggested actions, and timeline.
+- [PrototypeInsightsView](./components/prototype-insights-view.md) - Insights dashboard with overview/analytics tabs, metrics, charts, and coaching.
+- [PrototypeAccountsView](./components/prototype-accounts-view.md) - Accounts view with filter tabs and data table.
+- [PrototypeWorkQueueView](./components/prototype-work-queue-view.md) - Work queue view wrapping ItemList.
+
+See [Prototype Template Guide](./prototype-template.md) for full usage documentation.
+
 ## Utilities
 
 - `cn` - Tailwind/class merge helper that composes `clsx` + `tailwind-merge` for safe className merging.

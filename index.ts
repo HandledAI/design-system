@@ -72,3 +72,11 @@ export * from "./registry/new-york/ui/top-line-metrics"
 export * from "./registry/new-york/ui/trend-area-chart"
 export * from "./registry/new-york/ui/view-mode-toggle"
 export * from "./registry/new-york/ui/volume-analysis-chart"
+
+// Prototype template system
+export * from "./registry/new-york/ui/prototype-config"
+export * from "./registry/new-york/ui/prototype-shell"
+export * from "./registry/new-york/ui/prototype-inbox-view"
+export * from "./registry/new-york/ui/prototype-insights-view"
+export * from "./registry/new-york/ui/prototype-accounts-view"
+export * from "./registry/new-york/ui/prototype-work-queue-view"
