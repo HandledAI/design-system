@@ -5,6 +5,6 @@
     "incremental": false,
     "tsBuildInfoFile": "./dist/.tsbuildinfo"
   },
-  "include": ["index.ts", "lib/**/*.ts", "hooks/**/*.ts", "registry/**/*.ts", "registry/**/*.tsx"],
+  "include": ["index.ts", "lib/**/*.ts", "hooks/**/*.ts", "registry/**/*.ts", "registry/**/*.tsx", "types/**/*.ts", "types/**/*.d.ts"],
   "exclude": ["node_modules", ".next", "app", "components"]
 }

@@ -29,5 +29,8 @@ export default defineConfig({
     "@tanstack/react-table",
     "@nivo/sankey",
     "@nivo/core",
+    "three",
+    "@react-three/fiber",
+    "@react-three/drei",
   ],
 })
