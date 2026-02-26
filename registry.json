@@ -1026,6 +1026,105 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "message",
+      "type": "registry:ui",
+      "title": "Message",
+      "description": "Chat message primitives with user/assistant layouts, contained/flat variants, and avatar slots.",
+      "dependencies": [
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "avatar"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/message.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "status-badge",
+      "type": "registry:ui",
+      "title": "Status Badge",
+      "description": "Semantic status pill that auto-maps status strings to success/warning/error/neutral colors.",
+      "files": [
+        {
+          "path": "registry/new-york/ui/status-badge.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "simple-data-table",
+      "type": "registry:ui",
+      "title": "Simple Data Table",
+      "description": "Lightweight generic data table with clean columns/data props, rounded hover rows, and minimal chrome.",
+      "dependencies": [
+        "@tanstack/react-table",
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/simple-data-table.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "agent-orb",
+      "type": "registry:ui",
+      "title": "Agent Orb",
+      "description": "Three.js WebGL shader orb with audio-reactive animation, CSS glow effects, and semantic token theming.",
+      "dependencies": [
+        "three",
+        "@react-three/fiber",
+        "@react-three/drei"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/agent-orb.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "agent-popover",
+      "type": "registry:ui",
+      "title": "Agent Popover",
+      "description": "Split-panel modal with multi-step flow for agent interactions including form, overview, and chat steps.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "agent-widget"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/agent-popover.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "agent-widget",
+      "type": "registry:ui",
+      "title": "Agent Widget",
+      "description": "Embeddable voice/chat widget UI shell with message display, voice state indicators, and input controls.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "message"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/agent-widget.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }

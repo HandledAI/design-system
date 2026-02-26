@@ -41,6 +41,14 @@ import { ViewModeToggleShowcase } from "@/app/view-mode-toggle-showcase"
 import { SuggestedActionsShowcase } from "@/app/suggested-actions-showcase"
 import { ChartShowcase } from "@/app/chart-showcase"
 import { ScoringFeedbackShowcase } from "@/app/scoring-feedback-showcase"
+import {
+  AgentOrbShowcase,
+  AgentPopoverShowcase,
+  AgentWidgetShowcase,
+  MessageShowcase,
+  StatusBadgeShowcase,
+  SimpleDataTableShowcase,
+} from "@/app/agent-components-showcase"
 import { ChevronDown, Clock, Square } from "lucide-react"
 import { BRAND_ICONS } from "@/lib/icons"
 
@@ -161,7 +169,16 @@ export default function Home() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-muted-foreground mb-2">Assets</h3>
+              <h3 className="font-semibold text-muted-foreground mb-2">Agent Components</h3>
+              <ul className="space-y-1.5 list-disc list-inside pl-4 text-foreground/80">
+                <li><a href="#agent-orb" className="hover:text-brand-purple hover:underline">Agent Orb</a></li>
+                <li><a href="#agent-popover" className="hover:text-brand-purple hover:underline">Agent Popover</a></li>
+                <li><a href="#agent-widget" className="hover:text-brand-purple hover:underline">Agent Widget</a></li>
+                <li><a href="#agent-message" className="hover:text-brand-purple hover:underline">Message Primitives</a></li>
+                <li><a href="#agent-status-badge" className="hover:text-brand-purple hover:underline">Status Badge</a></li>
+                <li><a href="#agent-simple-data-table" className="hover:text-brand-purple hover:underline">Simple Data Table</a></li>
+              </ul>
+              <h3 className="font-semibold text-muted-foreground mb-2 mt-4">Assets</h3>
               <ul className="space-y-1.5 list-disc list-inside pl-4 text-foreground/80">
                 <li><a href="#assets-icons" className="hover:text-brand-purple hover:underline">Icon Assets + URLs</a></li>
                 <li><a href="#assets-graphics" className="hover:text-brand-purple hover:underline">Graphic Assets + URLs</a></li>
@@ -817,6 +834,49 @@ export default function Home() {
           <h2 className="text-2xl font-bold border-b border-border pb-2">Chart Components</h2>
           <div className="grid grid-cols-1 gap-8">
             <ChartShowcase />
+          </div>
+        </section>
+
+        <section className="space-y-6">
+          <h2 className="text-2xl font-bold border-b border-border pb-2">Agent Components</h2>
+          <div className="grid grid-cols-1 gap-8">
+
+            <div id="agent-orb" className="border rounded-xl p-6 space-y-4 scroll-m-20">
+              <h3 className="font-semibold text-lg">Agent Orb</h3>
+              <p className="text-sm text-muted-foreground">Three.js WebGL shader orb with audio-reactive animation and CSS glow effects. Toggle between states to see the animation and glow changes. Colors auto-adapt to the theme&apos;s <code className="rounded bg-muted px-1 py-0.5 text-xs">--primary</code> token.</p>
+              <AgentOrbShowcase />
+            </div>
+
+            <div id="agent-popover" className="border rounded-xl p-6 space-y-4 scroll-m-20">
+              <h3 className="font-semibold text-lg">Agent Popover</h3>
+              <p className="text-sm text-muted-foreground">Split-panel modal with multi-step flow. Left panel shows branding and the AgentOrb visual. Right panel steps through a form, overview, and live chat. This is the UI shell — consuming apps wire up their own AI backend.</p>
+              <AgentPopoverShowcase />
+            </div>
+
+            <div id="agent-widget" className="border rounded-xl p-6 space-y-4 scroll-m-20">
+              <h3 className="font-semibold text-lg">Agent Widget</h3>
+              <p className="text-sm text-muted-foreground">Standalone embeddable voice/chat widget. Can be used independently or composed inside AgentPopover. No AI SDK dependency — pass messages, send callbacks, and session controls.</p>
+              <AgentWidgetShowcase />
+            </div>
+
+            <div id="agent-message" className="border rounded-xl p-6 space-y-4 scroll-m-20">
+              <h3 className="font-semibold text-lg">Message Primitives</h3>
+              <p className="text-sm text-muted-foreground">Chat message building blocks: <code className="rounded bg-muted px-1 py-0.5 text-xs">Message</code>, <code className="rounded bg-muted px-1 py-0.5 text-xs">MessageContent</code>, and <code className="rounded bg-muted px-1 py-0.5 text-xs">MessageAvatar</code>. User messages align right with primary-colored bubbles. Assistant messages align left with muted bubbles.</p>
+              <MessageShowcase />
+            </div>
+
+            <div id="agent-status-badge" className="border rounded-xl p-6 space-y-4 scroll-m-20">
+              <h3 className="font-semibold text-lg">Status Badge</h3>
+              <p className="text-sm text-muted-foreground">Semantic status pills that auto-detect colors from status keywords. Pass any string and it maps to success (green), warning (yellow), error (red), or neutral (gray).</p>
+              <StatusBadgeShowcase />
+            </div>
+
+            <div id="agent-simple-data-table" className="border rounded-xl p-6 space-y-4 scroll-m-20">
+              <h3 className="font-semibold text-lg">Simple Data Table</h3>
+              <p className="text-sm text-muted-foreground">Lightweight generic table with clean <code className="rounded bg-muted px-1 py-0.5 text-xs">columns</code>/<code className="rounded bg-muted px-1 py-0.5 text-xs">data</code> props. Rounded hover rows, thin header separators, compact padding, sortable columns. No toolbar chrome.</p>
+              <SimpleDataTableShowcase />
+            </div>
+
           </div>
         </section>
 
