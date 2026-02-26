@@ -3,20 +3,20 @@
 import { ArrowDown, ArrowUp, ArrowUpDown, LayoutGrid } from "lucide-react"
 import type { SortingState } from "@tanstack/react-table"
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/registry/new-york/ui/button"
+import { cn } from "../../../lib/utils"
+import { Button } from "./button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/registry/new-york/ui/dropdown-menu"
+} from "./dropdown-menu"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/registry/new-york/ui/select"
+} from "./select"
 
 export interface DataTableDisplayColumn {
   id: string

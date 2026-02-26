@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "volume-analysis-chart",
+  "title": "Volume Analysis Chart",
+  "description": "Volume Analysis Chart component.",
+  "dependencies": [
+    "recharts"
+  ],
+  "registryDependencies": [
+    "chart-tooltip"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/ui/volume-analysis-chart.tsx",
+      "content": "\"use client\"\n\nimport * as React from \"react\"\nimport {\n  AreaChart,\n  Area,\n  XAxis,\n  YAxis,\n  CartesianGrid,\n  Tooltip,\n  ResponsiveContainer,\n} from \"recharts\"\n\nimport { cn } from \"../../../lib/utils\"\nimport { CHART_TOOLTIP_STYLE } from \"./chart-tooltip\"\n\nexport interface VolumeDataKey {\n  key: string\n  color: string\n}\n\nexport interface VolumeAnalysisChartProps {\n  data: Record<string, unknown>[]\n  dataKeys: VolumeDataKey[]\n  height?: number\n  xAxisKey?: string\n  stacked?: boolean\n  title?: string\n  subtitle?: string\n  className?: string\n}\n\nexport function VolumeAnalysisChart({\n  data,\n  dataKeys,\n  height = 250,\n  xAxisKey = \"date\",\n  stacked = true,\n  title,\n  subtitle,\n  className,\n}: VolumeAnalysisChartProps) {\n  const chartId = React.useId().replace(/:/g, \"\")\n\n  return (\n    <div className={cn(\"w-full\", className)}>\n      {(title || subtitle) ? (\n        <div className=\"mb-4\">\n          {title ? (\n            <h3 className=\"text-base font-semibold text-slate-900\">{title}</h3>\n          ) : null}\n          {subtitle ? (\n            <p className=\"mt-0.5 text-sm text-slate-500\">{subtitle}</p>\n          ) : null}\n        </div>\n      ) : null}\n\n      <div className=\"w-full\" style={{ height }}>\n        <ResponsiveContainer width=\"100%\" height=\"100%\">\n          <AreaChart\n            data={data}\n            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}\n          >\n            <defs>\n              {dataKeys.map((item, i) => (\n                <linearGradient\n                  key={item.key}\n                  id={`vol-${chartId}-${i}`}\n                  x1=\"0\"\n                  y1=\"0\"\n                  x2=\"0\"\n                  y2=\"1\"\n                >\n                  <stop\n                    offset=\"5%\"\n                    stopColor={item.color}\n                    stopOpacity={0.8}\n                  />\n                  <stop\n                    offset=\"95%\"\n                    stopColor={item.color}\n                    stopOpacity={0.1}\n                  />\n                </linearGradient>\n              ))}\n            </defs>\n            <CartesianGrid\n              strokeDasharray=\"3 3\"\n              vertical={false}\n              stroke=\"#f1f5f9\"\n            />\n            <XAxis\n              dataKey={xAxisKey}\n              axisLine={false}\n              tickLine={false}\n              tick={{ fill: \"#64748B\", fontSize: 12 }}\n              dy={10}\n            />\n            <YAxis\n              axisLine={false}\n              tickLine={false}\n              tick={{ fill: \"#64748B\", fontSize: 12 }}\n            />\n            <Tooltip\n              contentStyle={CHART_TOOLTIP_STYLE}\n              itemStyle={{ fontSize: \"12px\", fontWeight: 600 }}\n            />\n            {dataKeys.map((item, i) => (\n              <Area\n                key={item.key}\n                type=\"linear\"\n                dataKey={item.key}\n                stackId={stacked ? \"1\" : undefined}\n                stroke={item.color}\n                fill={`url(#vol-${chartId}-${i})`}\n                strokeWidth={2}\n              />\n            ))}\n          </AreaChart>\n        </ResponsiveContainer>\n      </div>\n    </div>\n  )\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

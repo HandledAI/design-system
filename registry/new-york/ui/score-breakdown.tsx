@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { ThumbsUp, ThumbsDown } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "../../../lib/utils"
 
 export interface ScoreFactor {
   key: string

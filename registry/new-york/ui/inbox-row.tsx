@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Phone, Mail, MessageSquare, AlertCircle, ChevronDown } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "../../../lib/utils"
 
 export interface InboxRowProps extends React.HTMLAttributes<HTMLDivElement> {
   itemId: string

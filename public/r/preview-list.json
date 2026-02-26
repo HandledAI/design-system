@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "preview-list",
+  "title": "Preview List",
+  "description": "A list component with bounded item counts and flexible row slots.",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/ui/preview-list.tsx",
+      "content": "import * as React from \"react\"\nimport { cn } from \"../../../lib/utils\"\n\nexport function PreviewList({\n  children,\n  className,\n  ...props\n}: React.HTMLAttributes<HTMLDivElement>) {\n  const items = React.Children.toArray(children)\n  const visibleItems = items.slice(0, 8)\n\n  return (\n    <div className={cn(\"flex flex-col\", className)} {...props}>\n      {visibleItems}\n    </div>\n  )\n}\n\nexport interface PreviewListItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {\n  icon?: React.ReactNode\n  title: React.ReactNode\n  subtitle?: React.ReactNode\n  meta?: React.ReactNode // e.g. time, badges on the right\n  action?: React.ReactNode // hover action like a \"Join\" button\n  isHoverable?: boolean\n}\n\nexport const PreviewListItem = React.forwardRef<HTMLDivElement, PreviewListItemProps>(\n  ({ className, icon, title, subtitle, meta, action, isHoverable = true, ...props }, ref) => {\n    return (\n      <div\n        ref={ref}\n        className={cn(\n          \"flex items-center justify-between group relative bg-background transition-colors\",\n          \"px-6 h-16 border-b border-border last:border-0\",\n          isHoverable && \"hover:bg-muted/30 cursor-pointer\",\n          className\n        )}\n        {...props}\n      >\n        <div className=\"flex items-center gap-3 overflow-hidden min-w-0 h-full py-2\">\n          {icon && <div className=\"shrink-0 flex items-center justify-center\">{icon}</div>}\n          <div className=\"min-w-0 flex flex-col justify-center gap-1\">\n            <div className=\"text-sm font-semibold text-foreground truncate leading-snug\">{title}</div>\n            {subtitle && <div className=\"text-xs text-muted-foreground truncate leading-snug\">{subtitle}</div>}\n          </div>\n        </div>\n\n        <div className=\"flex items-center gap-4 shrink-0 pl-4\">\n          {meta && <div className={cn(\"flex items-center gap-2\", action && \"group-hover:opacity-0 transition-opacity\")}>{meta}</div>}\n          \n          {action && (\n            <div className=\"absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center bg-background/95 backdrop-blur-sm pl-2\">\n              {action}\n            </div>\n          )}\n        </div>\n      </div>\n    )\n  }\n)\nPreviewListItem.displayName = \"PreviewListItem\"\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

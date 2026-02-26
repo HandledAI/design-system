@@ -6,6 +6,7 @@ import {
   type SuggestedAction,
   type SuggestedContact,
 } from "@/registry/new-york/ui/suggested-actions"
+import { BRAND_ICONS } from "@/lib/icons"
 
 const SHOWCASE_CONTACTS: SuggestedContact[] = [
   {
@@ -194,6 +195,12 @@ export function SuggestedActionsShowcase() {
           actions={actions}
           accountContacts={SHOWCASE_CONTACTS}
           signature={SHOWCASE_SIGNATURE}
+          iconMap={{
+            gmail: BRAND_ICONS.gmail.icon,
+            slack: BRAND_ICONS.slack,
+            zendesk: BRAND_ICONS.zendesk,
+            salesforce: BRAND_ICONS.salesforce,
+          }}
           onDismiss={(id) => console.log("Dismiss:", id)}
           onSend={(id) => console.log("Send:", id)}
           onSaveDraft={(id) => console.log("Draft:", id)}

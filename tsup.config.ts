@@ -1,4 +1,3 @@
-import path from "node:path"
 import { defineConfig } from "tsup"
 
 export default defineConfig({
@@ -13,14 +12,6 @@ export default defineConfig({
   minify: false,
   splitting: false,
   bundle: true,
-  esbuildOptions(options) {
-    const root = path.resolve(__dirname)
-    options.alias = {
-      "@/lib/utils": path.join(root, "lib/utils.ts"),
-      "@/hooks/use-mobile": path.join(root, "hooks/use-mobile.ts"),
-      "@/registry/new-york/ui/button": path.join(root, "registry/new-york/ui/button.tsx"),
-    }
-  },
   external: [
     "react",
     "react-dom",
@@ -35,5 +26,8 @@ export default defineConfig({
     "recharts",
     "zod",
     "radix-ui",
+    "@tanstack/react-table",
+    "@nivo/sankey",
+    "@nivo/core",
   ],
 })

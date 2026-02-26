@@ -11,16 +11,16 @@ import {
 } from "lucide-react"
 import { Popover as PopoverPrimitive } from "radix-ui"
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/registry/new-york/ui/button"
+import { cn } from "../../../lib/utils"
+import { Button } from "./button"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/registry/new-york/ui/select"
-import { Separator } from "@/registry/new-york/ui/separator"
+} from "./select"
+import { Separator } from "./separator"
 
 export type ItemListGrouping = "stage" | "owner" | "risk"
 export type ItemListViewMode = "list" | "board"

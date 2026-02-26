@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "view-mode-toggle",
+  "title": "View Mode Toggle",
+  "description": "View Mode Toggle component.",
+  "files": [
+    {
+      "path": "registry/new-york/ui/view-mode-toggle.tsx",
+      "content": "\"use client\"\n\nimport * as React from \"react\"\nimport { cn } from \"../../../lib/utils\"\n\nexport interface ViewMode {\n  id: string\n  icon: React.ReactNode\n  label: string\n}\n\nexport interface ViewModeToggleProps {\n  modes: ViewMode[]\n  activeMode: string\n  onModeChange: (modeId: string) => void\n  className?: string\n}\n\nexport function ViewModeToggle({ modes, activeMode, onModeChange, className }: ViewModeToggleProps) {\n  return (\n    <div className={cn(\"flex items-center rounded-lg bg-muted p-0.5 gap-0.5\", className)}>\n      {modes.map((mode) => (\n        <button\n          key={mode.id}\n          onClick={() => onModeChange(mode.id)}\n          title={mode.label}\n          className={cn(\n            \"h-7 w-8 flex items-center justify-center rounded-md transition-all\",\n            activeMode === mode.id\n              ? \"bg-background shadow-sm text-foreground\"\n              : \"text-muted-foreground hover:text-foreground hover:bg-muted/80\"\n          )}\n        >\n          {mode.icon}\n        </button>\n      ))}\n    </div>\n  )\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

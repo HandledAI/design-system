@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "score-ring",
+  "title": "Score Ring",
+  "description": "Score Ring component.",
+  "files": [
+    {
+      "path": "registry/new-york/ui/score-ring.tsx",
+      "content": "import * as React from \"react\"\nimport { cn } from \"../../../lib/utils\"\n\nfunction getScoreColor(score: number, denominator: number) {\n  const pct = (score / denominator) * 100\n  if (pct >= 70) return \"text-emerald-500\"\n  if (pct >= 40) return \"text-amber-500\"\n  return \"text-red-500\"\n}\n\nfunction getScoreTrackColor(score: number, denominator: number) {\n  const pct = (score / denominator) * 100\n  if (pct >= 70) return \"text-emerald-500/15\"\n  if (pct >= 40) return \"text-amber-500/15\"\n  return \"text-red-500/15\"\n}\n\ninterface ScoreRingProps {\n  score: number\n  denominator?: number\n  size?: number\n  strokeWidth?: number\n  className?: string\n  showLabel?: boolean\n}\n\nfunction ScoreRing({\n  score,\n  denominator = 100,\n  size = 120,\n  strokeWidth = 10,\n  className,\n  showLabel = true,\n}: ScoreRingProps) {\n  const radius = (size - strokeWidth) / 2\n  const circumference = 2 * Math.PI * radius\n  const pct = Math.min(score / denominator, 1)\n  const offset = circumference * (1 - pct)\n\n  return (\n    <div className={cn(\"relative inline-flex items-center justify-center\", className)}>\n      <svg\n        width={size}\n        height={size}\n        viewBox={`0 0 ${size} ${size}`}\n        className=\"-rotate-90\"\n      >\n        {/* Track */}\n        <circle\n          cx={size / 2}\n          cy={size / 2}\n          r={radius}\n          fill=\"none\"\n          stroke=\"currentColor\"\n          strokeWidth={strokeWidth}\n          className={getScoreTrackColor(score, denominator)}\n        />\n        {/* Fill */}\n        <circle\n          cx={size / 2}\n          cy={size / 2}\n          r={radius}\n          fill=\"none\"\n          stroke=\"currentColor\"\n          strokeWidth={strokeWidth}\n          strokeLinecap=\"round\"\n          strokeDasharray={circumference}\n          strokeDashoffset={offset}\n          className={cn(\"transition-all duration-500\", getScoreColor(score, denominator))}\n        />\n      </svg>\n      {showLabel && (\n        <div className=\"absolute inset-0 flex flex-col items-center justify-center\">\n          <span className=\"text-2xl font-bold text-foreground leading-none\">\n            {score}\n          </span>\n          <span className=\"text-xs text-muted-foreground mt-0.5\">\n            /{denominator}\n          </span>\n        </div>\n      )}\n    </div>\n  )\n}\n\nexport { ScoreRing, getScoreColor }\nexport type { ScoreRingProps }\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

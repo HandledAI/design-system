@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import {
   Inbox,
   ArrowLeft,
@@ -799,7 +800,7 @@ export default function PreviewClientPage() {
                           },
                           {
                             id: "e6",
-                            icon: <img src={BRAND_ICONS.gong} alt="Gong" className="h-3 w-3 object-contain" />,
+                            icon: <Image src={BRAND_ICONS.gong} alt="Gong" width={12} height={12} className="h-3 w-3 object-contain" />,
                             title: <>Meeting recorded: <span className="font-medium text-foreground">Discovery Call</span></>,
                             preview: "Duration: 45m · 3 participants",
                             time: "2d ago",
@@ -833,7 +834,7 @@ export default function PreviewClientPage() {
                           },
                           {
                             id: "e7",
-                            icon: <img src={BRAND_ICONS.zendesk} alt="Zendesk" className="h-3 w-3 object-contain" />,
+                            icon: <Image src={BRAND_ICONS.zendesk} alt="Zendesk" width={12} height={12} className="h-3 w-3 object-contain" />,
                             title: <>Ticket updated: <span className="font-medium text-foreground">#1024 - API Rate Limiting</span></>,
                             preview: "Status: Open · Priority: High",
                             time: "3d ago",
@@ -871,6 +872,12 @@ export default function PreviewClientPage() {
             actions={suggestedActions}
             accountContacts={ACCOUNT_CONTACTS}
             signature={EMAIL_SIGNATURE}
+            iconMap={{
+              gmail: BRAND_ICONS.gmail.icon,
+              slack: BRAND_ICONS.slack,
+              zendesk: BRAND_ICONS.zendesk,
+              salesforce: BRAND_ICONS.salesforce,
+            }}
             onDismiss={(id) => console.log("Dismiss action:", id)}
             onSend={(id) => console.log("Send action:", id)}
             onSaveDraft={(id) => console.log("Save draft:", id)}
@@ -1441,12 +1448,17 @@ export default function PreviewClientPage() {
 
       <EntityPanel isOpen={isEntityPanelOpen} onClose={setIsEntityPanelOpen}>
         <EntityDetails onClose={() => setIsEntityPanelOpen(false)} />
-        <PotentialContacts />
+        <PotentialContacts
+          icons={{
+            linkedin: BRAND_ICONS.linkedin,
+            gmail: BRAND_ICONS.gmail.icon,
+          }}
+        />
                 <RecentActivity 
                   items={[
                       {
                         id: "1",
-                        icon: <img src={BRAND_ICONS.gong} alt="Gong" className="w-4 h-4 object-contain" />,
+                        icon: <Image src={BRAND_ICONS.gong} alt="Gong" width={16} height={16} className="w-4 h-4 object-contain" />,
                         title: <>Call summary logged for <span className="font-medium text-foreground">Sarah Chen</span></>,
                         time: "335d ago",
                         preview: "Treasury strategy discussion and technical review planning.",
@@ -1472,7 +1484,7 @@ export default function PreviewClientPage() {
                       },
                       {
                         id: "3",
-                        icon: <img src={BRAND_ICONS.gmail.icon} alt="Gmail" className="w-4 h-4 object-contain" />,
+                        icon: <Image src={BRAND_ICONS.gmail.icon} alt="Gmail" width={16} height={16} className="w-4 h-4 object-contain" />,
                         title: <>Email thread: <span className="font-medium text-foreground">Q2 Treasury Review - Next Steps</span></>,
                         time: "Today",
                         preview: "Latest reply confirms Tuesday at 2 PM with CFO included.",
@@ -1499,7 +1511,7 @@ export default function PreviewClientPage() {
                       },
                       {
                         id: "4",
-                        icon: <img src={BRAND_ICONS.zendesk} alt="Zendesk" className="w-4 h-4 object-contain" />,
+                        icon: <Image src={BRAND_ICONS.zendesk} alt="Zendesk" width={16} height={16} className="w-4 h-4 object-contain" />,
                         title: <>Ticket updated: <span className="font-medium text-foreground">#1024 - API Rate Limiting</span></>,
                         time: "343d ago",
                         preview: "Status: Open · Priority: High",
@@ -1527,7 +1539,12 @@ export default function PreviewClientPage() {
                       }
                     ]}
                   />
-        <ConnectedApps />
+        <ConnectedApps
+          icons={{
+            slack: BRAND_ICONS.slack,
+            gdoc: BRAND_ICONS.gdoc,
+          }}
+        />
         <SystemActivity />
       </EntityPanel>
 

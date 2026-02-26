@@ -1,5 +1,6 @@
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 
 import { Button } from "@/registry/new-york/ui/button"
 import { Badge } from "@/registry/new-york/ui/badge"
@@ -11,7 +12,6 @@ import { InboxRow, InboxGroupHeader } from "@/registry/new-york/ui/inbox-row"
 import { ActivityRow } from "@/registry/new-york/ui/activity-log"
 import {
   DetailViewSummary,
-  DetailViewHeader,
   Citation,
   SourceList,
 } from "@/registry/new-york/ui/detail-view"
@@ -40,6 +40,7 @@ import { ActivityDetailShowcase } from "@/app/activity-detail-showcase"
 import { ViewModeToggleShowcase } from "@/app/view-mode-toggle-showcase"
 import { SuggestedActionsShowcase } from "@/app/suggested-actions-showcase"
 import { ChartShowcase } from "@/app/chart-showcase"
+import { ScoringFeedbackShowcase } from "@/app/scoring-feedback-showcase"
 import { ChevronDown, Clock, Square } from "lucide-react"
 import { BRAND_ICONS } from "@/lib/icons"
 
@@ -142,6 +143,7 @@ export default function Home() {
                 <li><a href="#custom-contact-list" className="hover:text-brand-purple hover:underline">Contact List</a></li>
                 <li><a href="#custom-view-mode-toggle" className="hover:text-brand-purple hover:underline">View Mode Toggle</a></li>
                 <li><a href="#custom-suggested-actions" className="hover:text-brand-purple hover:underline">Suggested Actions</a></li>
+                <li><a href="#custom-scoring-feedback" className="hover:text-brand-purple hover:underline">Scoring & Feedback Components</a></li>
                 <li><a href="#custom-entity-panel" className="hover:text-brand-purple hover:underline">Entity Panel Sections</a></li>
               </ul>
             </div>
@@ -523,6 +525,12 @@ export default function Home() {
                             content: "Hey team - I am following up with LabCorp directly for the missing results on REF-1894. Should have an update by end of day.",
                           },
                         ] satisfies SuggestedAction[]}
+                        iconMap={{
+                          gmail: BRAND_ICONS.gmail.icon,
+                          slack: BRAND_ICONS.slack,
+                          zendesk: BRAND_ICONS.zendesk,
+                          salesforce: BRAND_ICONS.salesforce,
+                        }}
                       />
                     </SignalApprovalGate>
                   </SignalApprovalRoot>
@@ -537,6 +545,14 @@ export default function Home() {
                 Action cards for email thread replies, new email drafts, call talk tracks, and Zendesk tickets. Includes recipient confirmation, Cc/Bcc management, email signatures, duplicate actions, and account contact pickers.
               </p>
               <SuggestedActionsShowcase />
+            </div>
+
+            <div id="custom-scoring-feedback" className="border rounded-xl p-6 space-y-6 scroll-m-20">
+              <h3 className="font-semibold text-lg">Scoring & Feedback Components</h3>
+              <p className="text-sm text-muted-foreground">
+                Dedicated demos for score primitives and feedback controls, including progress, score ring, score breakdown, score feedback, score analysis modal, and recommended actions section.
+              </p>
+              <ScoringFeedbackShowcase />
             </div>
 
             <QuickActionComponentsShowcase />
@@ -586,8 +602,8 @@ export default function Home() {
                         role: "VP Finance",
                         badge: { label: "Engaged", color: "green" },
                         channels: [
-                          { type: "linkedin", icon: <img src={BRAND_ICONS.linkedin} alt="LinkedIn" className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
-                          { type: "gmail", icon: <img src={BRAND_ICONS.gmail.icon} alt="Gmail" className="w-3.5 h-3.5 object-contain" />, label: "Email" },
+                          { type: "linkedin", icon: <Image src={BRAND_ICONS.linkedin} alt="LinkedIn" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
+                          { type: "gmail", icon: <Image src={BRAND_ICONS.gmail.icon} alt="Gmail" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "Email" },
                         ],
                       },
                       {
@@ -596,9 +612,9 @@ export default function Home() {
                         role: "CEO",
                         badge: { label: "Take Action", color: "amber" },
                         channels: [
-                          { type: "linkedin", icon: <img src={BRAND_ICONS.linkedin} alt="LinkedIn" className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
-                          { type: "salesforce", icon: <img src={BRAND_ICONS.salesforce} alt="Salesforce" className="w-3.5 h-3.5 object-contain" />, label: "Salesforce" },
-                          { type: "gmail", icon: <img src={BRAND_ICONS.gmail.icon} alt="Gmail" className="w-3.5 h-3.5 object-contain" />, label: "Email" },
+                          { type: "linkedin", icon: <Image src={BRAND_ICONS.linkedin} alt="LinkedIn" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
+                          { type: "salesforce", icon: <Image src={BRAND_ICONS.salesforce} alt="Salesforce" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "Salesforce" },
+                          { type: "gmail", icon: <Image src={BRAND_ICONS.gmail.icon} alt="Gmail" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "Email" },
                         ],
                       },
                       {
@@ -607,7 +623,7 @@ export default function Home() {
                         role: "Head of Ops",
                         badge: { label: "Not Engaged", color: "muted" },
                         channels: [
-                          { type: "linkedin", icon: <img src={BRAND_ICONS.linkedin} alt="LinkedIn" className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
+                          { type: "linkedin", icon: <Image src={BRAND_ICONS.linkedin} alt="LinkedIn" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
                         ],
                       },
                     ] satisfies ContactItem[]}
@@ -624,8 +640,8 @@ export default function Home() {
                         role: "CFO",
                         badge: { label: "Primary", color: "indigo" },
                         channels: [
-                          { type: "linkedin", icon: <img src={BRAND_ICONS.linkedin} alt="LinkedIn" className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
-                          { type: "gmail", icon: <img src={BRAND_ICONS.gmail.icon} alt="Gmail" className="w-3.5 h-3.5 object-contain" />, label: "Email" },
+                          { type: "linkedin", icon: <Image src={BRAND_ICONS.linkedin} alt="LinkedIn" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
+                          { type: "gmail", icon: <Image src={BRAND_ICONS.gmail.icon} alt="Gmail" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "Email" },
                         ],
                         action: { label: "Add to SF" },
                       },
@@ -635,7 +651,7 @@ export default function Home() {
                         role: "VP Engineering",
                         badge: { label: "82%", color: "green" },
                         channels: [
-                          { type: "linkedin", icon: <img src={BRAND_ICONS.linkedin} alt="LinkedIn" className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
+                          { type: "linkedin", icon: <Image src={BRAND_ICONS.linkedin} alt="LinkedIn" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
                         ],
                         action: { label: "Add" },
                       },
@@ -645,8 +661,8 @@ export default function Home() {
                         role: "Director of Sales",
                         badge: { label: "67%", color: "amber" },
                         channels: [
-                          { type: "linkedin", icon: <img src={BRAND_ICONS.linkedin} alt="LinkedIn" className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
-                          { type: "gmail", icon: <img src={BRAND_ICONS.gmail.icon} alt="Gmail" className="w-3.5 h-3.5 object-contain" />, label: "Email" },
+                          { type: "linkedin", icon: <Image src={BRAND_ICONS.linkedin} alt="LinkedIn" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
+                          { type: "gmail", icon: <Image src={BRAND_ICONS.gmail.icon} alt="Gmail" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "Email" },
                         ],
                         action: { label: "Add" },
                       },
@@ -683,8 +699,8 @@ export default function Home() {
                         role: "VP Finance",
                         badge: { label: "Engaged", color: "green" },
                         channels: [
-                          { type: "linkedin", icon: <img src={BRAND_ICONS.linkedin} alt="LinkedIn" className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
-                          { type: "gmail", icon: <img src={BRAND_ICONS.gmail.icon} alt="Gmail" className="w-3.5 h-3.5 object-contain" />, label: "Email" },
+                          { type: "linkedin", icon: <Image src={BRAND_ICONS.linkedin} alt="LinkedIn" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
+                          { type: "gmail", icon: <Image src={BRAND_ICONS.gmail.icon} alt="Gmail" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "Email" },
                         ],
                       },
                       {
@@ -693,9 +709,9 @@ export default function Home() {
                         role: "CEO",
                         badge: { label: "Take Action", color: "amber" },
                         channels: [
-                          { type: "linkedin", icon: <img src={BRAND_ICONS.linkedin} alt="LinkedIn" className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
-                          { type: "salesforce", icon: <img src={BRAND_ICONS.salesforce} alt="Salesforce" className="w-3.5 h-3.5 object-contain" />, label: "Salesforce" },
-                          { type: "gmail", icon: <img src={BRAND_ICONS.gmail.icon} alt="Gmail" className="w-3.5 h-3.5 object-contain" />, label: "Email" },
+                          { type: "linkedin", icon: <Image src={BRAND_ICONS.linkedin} alt="LinkedIn" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
+                          { type: "salesforce", icon: <Image src={BRAND_ICONS.salesforce} alt="Salesforce" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "Salesforce" },
+                          { type: "gmail", icon: <Image src={BRAND_ICONS.gmail.icon} alt="Gmail" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "Email" },
                         ],
                       },
                       {
@@ -704,17 +720,22 @@ export default function Home() {
                         role: "Head of Ops",
                         badge: { label: "Not Engaged", color: "muted" },
                         channels: [
-                          { type: "linkedin", icon: <img src={BRAND_ICONS.linkedin} alt="LinkedIn" className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
+                          { type: "linkedin", icon: <Image src={BRAND_ICONS.linkedin} alt="LinkedIn" width={14} height={14} className="w-3.5 h-3.5 object-contain" />, label: "LinkedIn" },
                         ],
                       },
                     ] satisfies ContactItem[]}
                   />
-                  <PotentialContacts />
+                  <PotentialContacts
+                    icons={{
+                      linkedin: BRAND_ICONS.linkedin,
+                      gmail: BRAND_ICONS.gmail.icon,
+                    }}
+                  />
                   <RecentActivity 
                     items={[
                       {
                         id: "1",
-                        icon: <img src={BRAND_ICONS.gong} alt="Gong" className="w-4 h-4 object-contain" />,
+                        icon: <Image src={BRAND_ICONS.gong} alt="Gong" width={16} height={16} className="w-4 h-4 object-contain" />,
                         title: <span>Call summary logged for <span className="font-medium text-foreground">Sarah Chen</span></span>,
                         time: "335d ago",
                         preview: "Treasury strategy discussion and technical review planning.",
@@ -733,7 +754,7 @@ export default function Home() {
                       },
                       {
                         id: "2",
-                        icon: <img src={BRAND_ICONS.gmail.icon} alt="Gmail" className="w-4 h-4 object-contain" />,
+                        icon: <Image src={BRAND_ICONS.gmail.icon} alt="Gmail" width={16} height={16} className="w-4 h-4 object-contain" />,
                         title: <span>Email thread: <span className="font-medium text-foreground">Treasury deep-dive follow-up</span></span>,
                         time: "Today",
                         preview: "Latest reply confirms next Tuesday deep-dive and API doc request.",
@@ -751,7 +772,7 @@ export default function Home() {
                       },
                       {
                         id: "3",
-                        icon: <img src={BRAND_ICONS.zendesk} alt="Zendesk" className="w-4 h-4 object-contain" />,
+                        icon: <Image src={BRAND_ICONS.zendesk} alt="Zendesk" width={16} height={16} className="w-4 h-4 object-contain" />,
                         title: <span>Ticket updated: <span className="font-medium text-foreground">#1024 - API Rate Limiting</span></span>,
                         time: "343d ago",
                         preview: "Status: Open · Priority: High",
@@ -779,7 +800,12 @@ export default function Home() {
                       }
                     ]}
                   />
-                  <ConnectedApps />
+                  <ConnectedApps
+                    icons={{
+                      slack: BRAND_ICONS.slack,
+                      gdoc: BRAND_ICONS.gdoc,
+                    }}
+                  />
                 </div>
               </div>
             </div>
@@ -818,7 +844,7 @@ export default function Home() {
                     <tr key={asset.key} className="border-t border-border/40 align-middle">
                       <td className="px-3 py-2">
                         <div className="w-8 h-8 rounded-md border border-border/60 bg-muted/20 flex items-center justify-center">
-                          <img src={asset.url} alt={asset.label} className="w-4 h-4 object-contain" />
+                          <Image src={asset.url} alt={asset.label} width={16} height={16} className="w-4 h-4 object-contain" />
                         </div>
                       </td>
                       <td className="px-3 py-2 font-medium text-foreground whitespace-nowrap">{asset.label}</td>
@@ -860,7 +886,7 @@ export default function Home() {
                     <tr key={asset.key} className="border-t border-border/40 align-middle">
                       <td className="px-3 py-2">
                         <div className="w-48 h-28 rounded-md border border-border/60 bg-muted/20 p-3 flex items-center justify-center">
-                          <img src={asset.url} alt={asset.label} className="max-w-full max-h-full object-contain" />
+                          <Image src={asset.url} alt={asset.label} width={192} height={112} className="max-w-full max-h-full object-contain" />
                         </div>
                       </td>
                       <td className="px-3 py-2 font-medium text-foreground whitespace-nowrap">{asset.label}</td>

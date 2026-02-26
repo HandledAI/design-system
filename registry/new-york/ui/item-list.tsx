@@ -10,14 +10,14 @@ import {
   SearchX,
 } from "lucide-react"
 
-import { cn } from "@/lib/utils"
-import { Badge } from "@/registry/new-york/ui/badge"
+import { cn } from "../../../lib/utils"
+import { Badge } from "./badge"
 import {
   ItemListToolbar,
   type ItemListQuickView,
-} from "@/registry/new-york/ui/item-list-toolbar"
-import { type ItemListDisplayState } from "@/registry/new-york/ui/item-list-display"
-import { type ItemListFilterCategory } from "@/registry/new-york/ui/item-list-filter"
+} from "./item-list-toolbar"
+import { type ItemListDisplayState } from "./item-list-display"
+import { type ItemListFilterCategory } from "./item-list-filter"
 
 type QueueStage =
   | "Referrals"

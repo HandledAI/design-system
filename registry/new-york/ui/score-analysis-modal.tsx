@@ -1,11 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/registry/new-york/ui/sheet"
-import { Badge } from "@/registry/new-york/ui/badge"
-import { ScoreRing } from "@/registry/new-york/ui/score-ring"
-import { ScoreBreakdown, type ScoreFactor } from "@/registry/new-york/ui/score-breakdown"
-import { SignalApproval } from "@/registry/new-york/ui/signal-feedback-inline"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "./sheet"
+import { Badge } from "./badge"
+import { ScoreRing } from "./score-ring"
+import { ScoreBreakdown, type ScoreFactor } from "./score-breakdown"
+import { SignalApproval } from "./signal-feedback-inline"
 import { X } from "lucide-react"
 
 interface ScoreAnalysisModalProps {

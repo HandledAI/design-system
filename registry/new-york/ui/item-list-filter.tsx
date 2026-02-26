@@ -2,15 +2,15 @@
 
 import { Filter, X } from "lucide-react"
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/registry/new-york/ui/button"
+import { cn } from "../../../lib/utils"
+import { Button } from "./button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/registry/new-york/ui/dropdown-menu"
+} from "./dropdown-menu"
 
 export interface ItemListFilterCategory {
   id: string

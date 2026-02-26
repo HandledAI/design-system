@@ -686,6 +686,346 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "activity-detail",
+      "type": "registry:ui",
+      "title": "Activity Detail",
+      "description": "Activity Detail component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "badge"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/activity-detail.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "bar-chart-component",
+      "type": "registry:ui",
+      "title": "Bar Chart Component",
+      "description": "Bar Chart Component component.",
+      "dependencies": [
+        "recharts"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/bar-chart-component.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "chart-tooltip",
+      "type": "registry:ui",
+      "title": "Chart Tooltip",
+      "description": "Chart Tooltip component.",
+      "files": [
+        {
+          "path": "registry/new-york/ui/chart-tooltip.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "contact-list",
+      "type": "registry:ui",
+      "title": "Contact List",
+      "description": "Contact List component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "badge",
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/contact-list.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "donut-chart",
+      "type": "registry:ui",
+      "title": "Donut Chart",
+      "description": "Donut Chart component.",
+      "dependencies": [
+        "recharts"
+      ],
+      "registryDependencies": [
+        "chart-tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/donut-chart.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "inbox-toolbar",
+      "type": "registry:ui",
+      "title": "Inbox Toolbar",
+      "description": "Inbox Toolbar component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button",
+        "badge",
+        "dropdown-menu"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/inbox-toolbar.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "pipeline-overview",
+      "type": "registry:ui",
+      "title": "Pipeline Overview",
+      "description": "Pipeline Overview component.",
+      "dependencies": [
+        "lucide-react",
+        "@nivo/sankey"
+      ],
+      "registryDependencies": [
+        "tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/pipeline-overview.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "progress",
+      "type": "registry:ui",
+      "title": "Progress",
+      "description": "Progress component.",
+      "dependencies": [
+        "radix-ui"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/progress.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "report-card",
+      "type": "registry:ui",
+      "title": "Report Card",
+      "description": "Report Card component.",
+      "files": [
+        {
+          "path": "registry/new-york/ui/report-card.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "sankey-chart",
+      "type": "registry:ui",
+      "title": "Sankey Chart",
+      "description": "Sankey Chart component.",
+      "dependencies": [
+        "@nivo/sankey"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/sankey-chart.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "score-analysis-modal",
+      "type": "registry:ui",
+      "title": "Score Analysis Modal",
+      "description": "Score Analysis Modal component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "sheet",
+        "badge",
+        "score-ring",
+        "score-breakdown",
+        "signal-feedback-inline"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/score-analysis-modal.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "score-breakdown",
+      "type": "registry:ui",
+      "title": "Score Breakdown",
+      "description": "Score Breakdown component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/score-breakdown.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "score-feedback",
+      "type": "registry:ui",
+      "title": "Score Feedback",
+      "description": "Score Feedback component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/score-feedback.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "score-ring",
+      "type": "registry:ui",
+      "title": "Score Ring",
+      "description": "Score Ring component.",
+      "files": [
+        {
+          "path": "registry/new-york/ui/score-ring.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "styled-bar-list",
+      "type": "registry:ui",
+      "title": "Styled Bar List",
+      "description": "Styled Bar List component.",
+      "files": [
+        {
+          "path": "registry/new-york/ui/styled-bar-list.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "suggested-actions",
+      "type": "registry:ui",
+      "title": "Suggested Actions",
+      "description": "Suggested Actions component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/suggested-actions.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "timeline-activity",
+      "type": "registry:ui",
+      "title": "Timeline Activity",
+      "description": "Timeline Activity component.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/timeline-activity.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "top-line-metrics",
+      "type": "registry:ui",
+      "title": "Top Line Metrics",
+      "description": "Top Line Metrics component.",
+      "dependencies": [
+        "recharts",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/top-line-metrics.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "trend-area-chart",
+      "type": "registry:ui",
+      "title": "Trend Area Chart",
+      "description": "Trend Area Chart component.",
+      "dependencies": [
+        "recharts"
+      ],
+      "registryDependencies": [
+        "chart-tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/trend-area-chart.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "view-mode-toggle",
+      "type": "registry:ui",
+      "title": "View Mode Toggle",
+      "description": "View Mode Toggle component.",
+      "files": [
+        {
+          "path": "registry/new-york/ui/view-mode-toggle.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "volume-analysis-chart",
+      "type": "registry:ui",
+      "title": "Volume Analysis Chart",
+      "description": "Volume Analysis Chart component.",
+      "dependencies": [
+        "recharts"
+      ],
+      "registryDependencies": [
+        "chart-tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/volume-analysis-chart.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }

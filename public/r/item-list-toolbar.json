@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "item-list-toolbar",
+  "title": "Item List Toolbar",
+  "description": "Toolbar composed of quick views, list filtering, and display controls.",
+  "registryDependencies": [
+    "item-list-filter",
+    "item-list-display"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/ui/item-list-toolbar.tsx",
+      "content": "\"use client\"\n\nimport { cn } from \"../../../lib/utils\"\nimport {\n  ItemListDisplay,\n  type ItemListDisplayState,\n} from \"./item-list-display\"\nimport {\n  ItemListFilter,\n  type ItemListFilterCategory,\n} from \"./item-list-filter\"\n\nexport interface ItemListQuickView {\n  id: string\n  label: string\n  count: number\n}\n\ninterface ItemListToolbarProps {\n  quickViews: ItemListQuickView[]\n  activeQuickView: string | null\n  onQuickViewChange: (viewId: string | null) => void\n  filterCategories: ItemListFilterCategory[]\n  selectedFilters: Record<string, string[]>\n  onToggleFilter: (categoryId: string, option: string) => void\n  onClearFilters: () => void\n  display: ItemListDisplayState\n  onDisplayChange: (next: ItemListDisplayState) => void\n  onResetDisplay: () => void\n}\n\nexport function ItemListToolbar({\n  quickViews,\n  activeQuickView,\n  onQuickViewChange,\n  filterCategories,\n  selectedFilters,\n  onToggleFilter,\n  onClearFilters,\n  display,\n  onDisplayChange,\n  onResetDisplay,\n}: ItemListToolbarProps) {\n  return (\n    <div className=\"flex flex-wrap items-center justify-between gap-3 border-b border-border bg-muted/20 px-4 py-3\">\n      <div className=\"flex min-w-0 flex-1 items-center gap-2 overflow-x-auto\">\n        {quickViews.map((quickView) => {\n          const isActive = quickView.id === activeQuickView\n          return (\n            <button\n              key={quickView.id}\n              type=\"button\"\n              onClick={() => onQuickViewChange(isActive ? null : quickView.id)}\n              className={cn(\n                \"flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-colors\",\n                isActive\n                  ? \"border-emerald-700 bg-emerald-600 text-white\"\n                  : \"border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground\"\n              )}\n            >\n              {quickView.label}\n              <span\n                className={cn(\n                  \"rounded px-1.5 py-0 text-[10px] font-semibold\",\n                  isActive\n                    ? \"bg-emerald-700/80 text-white\"\n                    : \"bg-muted text-muted-foreground\"\n                )}\n              >\n                {quickView.count}\n              </span>\n            </button>\n          )\n        })}\n      </div>\n\n      <div className=\"flex shrink-0 items-center gap-2\">\n        <ItemListFilter\n          categories={filterCategories}\n          selectedFilters={selectedFilters}\n          onToggleFilter={onToggleFilter}\n          onClearFilters={onClearFilters}\n        />\n        <ItemListDisplay\n          value={display}\n          onChange={onDisplayChange}\n          onReset={onResetDisplay}\n        />\n      </div>\n    </div>\n  )\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

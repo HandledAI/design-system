@@ -3,7 +3,7 @@
 import * as React from "react"
 import { ResponsiveSankey } from "@nivo/sankey"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../../lib/utils"
 
 export interface SankeyNode {
   id: string

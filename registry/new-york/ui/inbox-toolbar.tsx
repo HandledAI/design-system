@@ -11,9 +11,9 @@ import {
   Tag,
   Building,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/registry/new-york/ui/button"
-import { Badge } from "@/registry/new-york/ui/badge"
+import { cn } from "../../../lib/utils"
+import { Button } from "./button"
+import { Badge } from "./badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +25,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/registry/new-york/ui/dropdown-menu"
+} from "./dropdown-menu"
 
 export type AssigneeFilter = "me" | "team" | "all"
 
