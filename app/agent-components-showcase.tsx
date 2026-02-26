@@ -140,14 +140,14 @@ export function MessageShowcase() {
     <div className="space-y-2 max-w-lg p-4 bg-muted/20 rounded-xl">
       <Message from="assistant">
         <MessageAvatar name="AI" />
-        <MessageContent>Hello! I'm your AI assistant. How can I help you today?</MessageContent>
+        <MessageContent>Hello! I&apos;m your AI assistant. How can I help you today?</MessageContent>
       </Message>
       <Message from="user">
         <MessageContent>I have a question about the nursing position.</MessageContent>
       </Message>
       <Message from="assistant">
         <MessageAvatar name="AI" />
-        <MessageContent>Of course! I'd be happy to tell you about the ICU Registered Nurse role. What would you like to know?</MessageContent>
+        <MessageContent>Of course! I&apos;d be happy to tell you about the ICU Registered Nurse role. What would you like to know?</MessageContent>
       </Message>
       <Message from="user">
         <MessageContent>What are the shift requirements?</MessageContent>
