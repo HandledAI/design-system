@@ -106,8 +106,8 @@ const DEFAULT_NAV_SECTIONS: SidebarNavSection[] = [
   {
     title: "Your Teams",
     items: [
-      { id: "account-dev", label: "Account Development", icon: Users },
-      { id: "rel-mgmt", label: "Relationship Management", icon: Users },
+      { id: "team-a", label: "Team A", icon: Users },
+      { id: "team-b", label: "Team B", icon: Users },
     ],
     moreItems: [
       { id: "more-teams", label: "More", icon: MoreHorizontal },
@@ -251,7 +251,7 @@ function NavSection({
 export function QuickActionSidebarNav({
   className,
   brandLabel = "ACME CO",
-  brandSubtitle = "Relationship Intelligence",
+  brandSubtitle = "Placeholder",
   navSections = DEFAULT_NAV_SECTIONS,
   activeItemId = "inbox",
   onNavigate,
