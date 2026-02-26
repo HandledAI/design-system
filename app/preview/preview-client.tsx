@@ -25,7 +25,6 @@ import {
   ThumbsUp,
   ThumbsDown,
   X,
-  Zap,
   LayoutList,
   Columns2,
   Square,
@@ -36,17 +35,9 @@ import {
 import { BRAND_ICONS } from "@/lib/icons"
 
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarProvider,
-  SidebarHeader,
-} from "@/registry/new-york/ui/sidebar"
+  QuickActionSidebarNav,
+  type SidebarNavSection,
+} from "@/registry/new-york/ui/quick-action-sidebar-nav"
 
 import { MetricCard } from "@/registry/new-york/ui/metric-card"
 import {
@@ -68,6 +59,7 @@ import {
   PotentialContacts,
   RecentActivity,
   ConnectedApps,
+  SystemActivity,
 } from "@/registry/new-york/ui/entity-panel"
 import { SignalApproval } from "@/registry/new-york/ui/signal-feedback-inline"
 import { ScoreBreakdown, type ScoreFactor } from "@/registry/new-york/ui/score-breakdown"
@@ -76,9 +68,8 @@ import {
   type SuggestedAction,
   type SuggestedContact,
 } from "@/registry/new-york/ui/suggested-actions"
-import { QuickActionModal } from "@/registry/new-york/ui/quick-action-modal"
 import { DataTable } from "@/registry/new-york/ui/data-table"
-import { ItemList } from "@/registry/new-york/ui/item-list"
+import { ItemList, GroupedListView, type GroupedListGroup } from "@/registry/new-york/ui/item-list"
 import { ViewModeToggle } from "@/registry/new-york/ui/view-mode-toggle"
 import { TimelineActivity } from "@/registry/new-york/ui/timeline-activity"
 import { VolumeAnalysisChart } from "@/registry/new-york/ui/volume-analysis-chart"
@@ -478,7 +469,6 @@ export default function PreviewClientPage() {
   const [showAllMetrics, setShowAllMetrics] = React.useState(false)
   const [showCoaching, setShowCoaching] = React.useState(true)
   const [isEntityPanelOpen, setIsEntityPanelOpen] = React.useState(false)
-  const [isQuickActionOpen, setIsQuickActionOpen] = React.useState(false)
   const [showRecentActivity, setShowRecentActivity] = React.useState(false)
   const [extraActions, setExtraActions] = React.useState<SuggestedAction[]>([])
   const [inboxAssignee, setInboxAssignee] = React.useState<AssigneeFilter>("me")
@@ -514,6 +504,26 @@ export default function PreviewClientPage() {
     },
     [inboxViewMode]
   )
+
+  const inboxGroups = React.useMemo<GroupedListGroup<QueueItem>[]>(() => {
+    const urgent = MOCK_QUEUE.filter((i) => i.statusColor === "red")
+    const active = MOCK_QUEUE.filter((i) => i.statusColor !== "red")
+    return [
+      { key: "urgent", label: "Urgent", items: urgent },
+      { key: "active", label: "Active", items: active },
+    ].filter((g) => g.items.length > 0)
+  }, [])
+
+  const renderInboxRow = React.useCallback((item: QueueItem) => (
+    <>
+      <span className={`h-2 w-2 shrink-0 rounded-full ${item.statusColor === "red" ? "bg-[#f43f5e]" : "bg-[#3b82f6]"}`} />
+      <span className="w-[80px] shrink-0 font-mono text-xs text-muted-foreground/80">{item.id}</span>
+      <span className="w-[110px] shrink-0 rounded-md border border-border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground truncate">{item.tag1}</span>
+      <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">{item.title}</span>
+      <span className="w-[120px] shrink-0 truncate text-xs font-medium text-foreground">{item.company}</span>
+      <span className="w-[80px] shrink-0 text-right text-xs text-muted-foreground">{item.time}</span>
+    </>
+  ), [])
 
   const handleBackFromDetail = React.useCallback(() => {
     setInboxViewMode(previousViewMode)
@@ -881,157 +891,59 @@ export default function PreviewClientPage() {
     )
   }
 
+  const previewNavSections: SidebarNavSection[] = React.useMemo(
+    () => [
+      {
+        items: [
+          { id: "search", label: "Search", icon: Search },
+          { id: "inbox", label: "Unibox", icon: Inbox },
+          { id: "drafts", label: "Drafts", icon: FileText },
+        ],
+      },
+      {
+        title: "Book",
+        items: [
+          { id: "accounts", label: "My Accounts", icon: Building },
+          { id: "activity", label: "Activity", icon: Activity },
+          { id: "dashboard", label: "Insights", icon: BarChart2 },
+        ],
+      },
+      {
+        title: "Acme Co Assistant",
+        items: [
+          { id: "new-chat", label: "New chat", icon: Plus },
+          { id: "chats", label: "Chats", icon: MessageSquare },
+        ],
+      },
+      {
+        title: "Your Teams",
+        items: [
+          { id: "account-dev", label: "Account Development", icon: Users },
+          { id: "rel-mgmt", label: "Relationship Management", icon: Users },
+        ],
+        moreItems: [
+          { id: "more-teams", label: "More", icon: MoreHorizontal },
+        ],
+      },
+    ],
+    [],
+  )
+
   return (
-    <SidebarProvider>
-      <div className="flex h-screen w-full overflow-hidden bg-background font-sans">
-        <Sidebar variant="sidebar" className="z-20 border-r border-border bg-background">
-          <SidebarHeader className="p-4 border-b-0">
-            <div className="flex items-center gap-2 text-lg font-bold tracking-tight text-foreground px-2">
-              <div className="flex h-5 w-5 items-center justify-center rounded-full border border-border bg-foreground text-[10px] text-background">
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3"><circle cx="12" cy="12" r="10"/></svg>
-              </div>
-              ACME CO
-            </div>
-            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide px-2 mt-1 block">Relationship Intelligence</span>
-          </SidebarHeader>
-
-          <SidebarContent className="bg-background mt-4">
-            <SidebarGroup>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9">
-                      <Search className="h-4 w-4" />
-                      <span className="font-medium text-sm">Search</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      isActive={currentView === "inbox"}
-                      onClick={() => setCurrentView("inbox")}
-                      className="gap-3 bg-brand-purple/10 text-brand-purple hover:bg-brand-purple/15 hover:text-brand-purple font-medium rounded-md h-9"
-                    >
-                      <Inbox className="h-4 w-4" />
-                      <span className="font-semibold text-sm">Unibox</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9">
-                      <FileText className="h-4 w-4" />
-                      <span className="font-medium text-sm">Drafts</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-
-            <SidebarGroup className="mt-4">
-              <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Book</div>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton 
-                      isActive={currentView === "accounts"}
-                      onClick={() => setCurrentView("accounts")}
-                      className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9"
-                    >
-                      <Building className="h-4 w-4" />
-                      <span className="font-medium text-sm">My Accounts</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton 
-                      isActive={currentView === "activity"}
-                      onClick={() => setCurrentView("activity")}
-                      className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9"
-                    >
-                      <Activity className="h-4 w-4" />
-                      <span className="font-medium text-sm">Activity</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      isActive={currentView === "dashboard"}
-                      onClick={() => setCurrentView("dashboard")}
-                      className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9"
-                    >
-                      <BarChart2 className="h-4 w-4" />
-                      <span className="font-medium text-sm">Insights</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-
-            <SidebarGroup className="mt-4">
-              <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Acme Co Assistant</div>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9">
-                      <Plus className="h-4 w-4" />
-                      <span className="font-medium text-sm">New chat</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9">
-                      <MessageSquare className="h-4 w-4" />
-                      <span className="font-medium text-sm">Chats</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-
-            <SidebarGroup className="mt-4">
-              <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Your Teams</div>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9">
-                      <Users className="h-4 w-4" />
-                      <span className="font-medium text-sm">Account Development</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9">
-                      <Users className="h-4 w-4" />
-                      <span className="font-medium text-sm">Relationship Management</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton className="gap-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md h-9 mt-1">
-                      <MoreHorizontal className="h-4 w-4" />
-                      <span className="font-medium text-sm">... More</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-
-            <SidebarFooter className="mt-auto border-t border-border bg-background p-3">
-              <Button
-                type="button"
-                onClick={() => setIsQuickActionOpen(true)}
-                className="h-11 w-full justify-between rounded-md bg-[#1B4332] px-3 text-white hover:bg-[#245240]"
-              >
-                <span className="flex items-center gap-2 text-sm font-semibold">
-                  <Zap className="h-4 w-4" />
-                  Quick Action
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="rounded-md border border-white/20 bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold">
-                    CMD
-                  </span>
-                  <span className="rounded-md border border-white/20 bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold">
-                    K
-                  </span>
-                </span>
-              </Button>
-            </SidebarFooter>
-
-          </SidebarContent>
-        </Sidebar>
+    <div className="flex h-screen w-full overflow-hidden bg-background font-sans">
+      <QuickActionSidebarNav
+        className="z-20 h-screen shrink-0"
+        navSections={previewNavSections}
+        activeItemId={currentView}
+        onNavigate={(id) => {
+          if (["inbox", "accounts", "activity", "dashboard"].includes(id)) {
+            setCurrentView(id)
+          }
+        }}
+        onCreateTask={(draft) => {
+          console.log("Quick action created:", draft)
+        }}
+      />
 
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-background">
           <div className="relative h-full flex-1 overflow-auto">
@@ -1395,42 +1307,14 @@ export default function PreviewClientPage() {
                       }
                       onClearFilters={() => setInboxFilters({})}
                     />
-                    {(() => {
-                      const urgent = MOCK_QUEUE.filter(i => i.statusColor === "red")
-                      const active = MOCK_QUEUE.filter(i => i.statusColor !== "red")
-                      const groups = [
-                        { label: "Urgent", items: urgent },
-                        { label: "Active", items: active },
-                      ].filter(g => g.items.length > 0)
-
-                      return groups.map((group) => (
-                        <div key={group.label}>
-                          <div className="flex items-center gap-2 py-2 px-4 bg-muted/30 border-b border-border">
-                            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{group.label}</span>
-                            <span className="rounded border border-border bg-background px-1.5 py-0 text-[10px] font-medium text-muted-foreground">{group.items.length}</span>
-                          </div>
-                          {group.items.map((item) => (
-                            <div
-                              key={item.id}
-                              onClick={() => handleInboxItemSelect(item)}
-                              className={`flex items-center gap-3 px-4 py-2.5 border-b border-border/50 text-[13px] cursor-pointer transition-colors border-l-2 ${
-                                selectedTask.id === item.id
-                                  ? "bg-muted/30 border-l-brand-purple"
-                                  : "border-l-transparent hover:bg-muted/40"
-                              }`}
-                            >
-                              <span className={`h-2 w-2 shrink-0 rounded-full ${item.statusColor === 'red' ? 'bg-[#f43f5e]' : 'bg-[#3b82f6]'}`} />
-                              <span className="w-[80px] shrink-0 font-mono text-xs text-muted-foreground/80">{item.id}</span>
-                              <span className="w-[110px] shrink-0 rounded-md border border-border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground truncate">{item.tag1}</span>
-                              <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">{item.title}</span>
-                              <span className="w-[120px] shrink-0 truncate text-xs font-medium text-foreground">{item.company}</span>
-                              <span className="w-[80px] shrink-0 text-right text-xs text-muted-foreground">{item.time}</span>
-                            </div>
-                          ))}
-                        </div>
-                      ))
-                    })()}
+                    <GroupedListView<QueueItem>
+                      groups={inboxGroups}
+                      renderRow={renderInboxRow}
+                      getItemKey={(item) => item.id}
+                      selectedKey={selectedTask.id}
+                      onItemClick={handleInboxItemSelect}
+                      emptyMessage="No inbox items"
+                    />
                   </div>
                 ) : (
                   <div className="flex h-full min-h-0 w-full flex-1">
@@ -1533,7 +1417,7 @@ export default function PreviewClientPage() {
                 </div>
 
                 <div className="flex-1 overflow-auto">
-                  <DataTable />
+                  <DataTable onRowClick={() => setIsEntityPanelOpen(true)} />
                 </div>
               </div>
             ) : currentView === "activity" ? (
@@ -1547,7 +1431,7 @@ export default function PreviewClientPage() {
                   </Link>
                 </div>
 
-                <div className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
+                <div className="flex-1 overflow-auto">
                   <ItemList />
                 </div>
               </div>
@@ -1555,11 +1439,11 @@ export default function PreviewClientPage() {
           </div>
         </main>
 
-        <EntityPanel isOpen={isEntityPanelOpen} onClose={setIsEntityPanelOpen}>
-          <EntityDetails onClose={() => setIsEntityPanelOpen(false)} />
-          <PotentialContacts />
-                  <RecentActivity 
-                    items={[
+      <EntityPanel isOpen={isEntityPanelOpen} onClose={setIsEntityPanelOpen}>
+        <EntityDetails onClose={() => setIsEntityPanelOpen(false)} />
+        <PotentialContacts />
+                <RecentActivity 
+                  items={[
                       {
                         id: "1",
                         icon: <img src={BRAND_ICONS.gong} alt="Gong" className="w-4 h-4 object-contain" />,
@@ -1643,17 +1527,10 @@ export default function PreviewClientPage() {
                       }
                     ]}
                   />
-          <ConnectedApps />
-        </EntityPanel>
-        <QuickActionModal
-          open={isQuickActionOpen}
-          onOpenChange={setIsQuickActionOpen}
-          onCreateTask={(draft) => {
-            console.log("Quick action created:", draft)
-          }}
-        />
+        <ConnectedApps />
+        <SystemActivity />
+      </EntityPanel>
 
-      </div>
-    </SidebarProvider>
+    </div>
   )
 }

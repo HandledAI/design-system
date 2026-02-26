@@ -541,8 +541,8 @@ export function ItemList() {
   }, [groupedItems])
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card">
-      <div className="border-b border-border bg-muted/20 px-4 py-3">
+    <div className="overflow-hidden bg-background">
+      <div className="border-b border-border px-6 py-4">
         <h3 className="text-xl font-semibold tracking-tight text-foreground">
           Patient Inventory
         </h3>
@@ -565,7 +565,7 @@ export function ItemList() {
         onResetDisplay={() => setDisplay(DEFAULT_DISPLAY_STATE)}
       />
 
-      <div className="max-h-[620px] overflow-auto">
+      <div className="flex-1 overflow-auto">
         {groupedItems.length > 0 ? (
           display.viewMode === "board" ? (
             /* Board View */
@@ -576,10 +576,10 @@ export function ItemList() {
                   className="flex w-[280px] shrink-0 flex-col"
                 >
                   <div className="mb-3 flex items-center justify-between px-1">
-                    <h4 className="truncate text-sm font-semibold uppercase text-stone-700">
+                    <h4 className="truncate text-sm font-semibold uppercase text-muted-foreground">
                       {group.label}
                     </h4>
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                       {group.items.length}
                     </span>
                   </div>
@@ -592,8 +592,8 @@ export function ItemList() {
                       />
                     ))}
                     {group.items.length === 0 ? (
-                      <div className="flex h-24 items-center justify-center rounded-lg border-2 border-dashed border-slate-100 bg-slate-50/50">
-                        <span className="text-xs text-slate-300">
+                      <div className="flex h-24 items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/30">
+                        <span className="text-xs text-muted-foreground/50">
                           No items
                         </span>
                       </div>
@@ -620,18 +620,18 @@ export function ItemList() {
                         [group.key]: !previous[group.key],
                       }))
                     }
-                    className="flex w-full cursor-pointer select-none items-center gap-2 border-y border-stone-200 bg-stone-50 px-6 py-2.5 text-left transition-colors hover:bg-stone-100"
+                    className="flex w-full cursor-pointer select-none items-center gap-2 border-b border-border bg-muted/30 px-4 py-2 text-left transition-colors hover:bg-muted/50"
                   >
                     <ChevronDown
                       className={cn(
-                        "h-3.5 w-3.5 text-stone-400 transition-transform",
+                        "h-3.5 w-3.5 text-muted-foreground transition-transform",
                         !isExpanded && "-rotate-90",
                       )}
                     />
-                    <span className="text-xs font-bold uppercase tracking-wide text-stone-700">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                       {group.label}
                     </span>
-                    <span className="rounded border border-stone-200 bg-white px-1.5 py-0.5 text-[10px] font-medium text-stone-500">
+                    <span className="rounded border border-border bg-background px-1.5 py-0 text-[10px] font-medium text-muted-foreground">
                       {group.items.length}
                     </span>
                   </button>
@@ -641,24 +641,24 @@ export function ItemList() {
                       {group.items.map((item) => (
                         <div
                           key={item.id}
-                          className="group flex cursor-pointer items-center gap-4 border-b border-slate-100 px-6 py-3 text-sm transition-colors hover:bg-slate-50"
+                          className="group flex cursor-pointer items-center gap-3 border-b border-border/50 px-4 py-2.5 text-sm transition-colors hover:bg-muted/40"
                         >
-                          <span className="w-[110px] shrink-0 font-mono text-xs text-slate-400">
+                          <span className="w-[80px] shrink-0 font-mono text-xs text-muted-foreground/80">
                             {item.id}
                           </span>
 
                           <div className="shrink-0">
                             <div
                               className={cn(
-                                "h-2.5 w-2.5 rounded-full",
+                                "h-2 w-2 rounded-full",
                                 getRiskDotColor(item.risk),
                               )}
                             />
                           </div>
 
-                          <div className="min-w-0 flex-1 truncate font-medium text-sm text-slate-900">
+                          <div className="min-w-0 flex-1 truncate font-semibold text-sm text-foreground">
                             {item.patient}{" "}
-                            <span className="font-normal text-slate-400">
+                            <span className="font-normal text-muted-foreground">
                               via {item.source} &rarr; {item.specialty}
                             </span>
                           </div>
@@ -676,10 +676,10 @@ export function ItemList() {
                           </div>
 
                           {display.showContactSignals ? (
-                            <div className="hidden items-center gap-3 text-slate-300 md:flex">
-                              <Phone className="h-3.5 w-3.5 cursor-pointer transition-colors hover:text-slate-600" />
-                              <Mail className="h-3.5 w-3.5 cursor-pointer transition-colors hover:text-slate-600" />
-                              <MessageSquare className="h-3.5 w-3.5 cursor-pointer transition-colors hover:text-slate-600" />
+                            <div className="hidden items-center gap-3 text-muted-foreground/40 md:flex">
+                              <Phone className="h-3.5 w-3.5 cursor-pointer transition-colors hover:text-foreground" />
+                              <Mail className="h-3.5 w-3.5 cursor-pointer transition-colors hover:text-foreground" />
+                              <MessageSquare className="h-3.5 w-3.5 cursor-pointer transition-colors hover:text-foreground" />
                             </div>
                           ) : null}
 
@@ -691,7 +691,7 @@ export function ItemList() {
                                   ? "border-red-300 bg-red-100 text-red-700"
                                   : item.attempts === 3
                                     ? "border-amber-300 bg-amber-100 text-amber-700"
-                                    : "border-slate-300 bg-slate-100 text-slate-600",
+                                    : "border-border bg-muted text-muted-foreground",
                               )}
                             >
                               {item.attempts >= 4 ? "4+" : item.attempts}
@@ -700,7 +700,7 @@ export function ItemList() {
 
                           {display.showOwner ? (
                             <div className="hidden w-[120px] shrink-0 items-center gap-2 lg:flex">
-                              <span className="truncate text-xs font-medium text-slate-600">
+                              <span className="truncate text-xs font-medium text-foreground">
                                 {item.owner}
                               </span>
                             </div>
@@ -708,13 +708,13 @@ export function ItemList() {
 
                           {display.showStatus ? (
                             <div className="hidden w-[140px] shrink-0 items-center justify-end gap-2 sm:flex">
-                              <span className="truncate rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-500">
+                              <span className="truncate rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                                 {item.stage}
                               </span>
                             </div>
                           ) : null}
 
-                          <div className="w-[100px] shrink-0 text-right text-xs text-slate-400">
+                          <div className="w-[80px] shrink-0 text-right text-xs text-muted-foreground">
                             {item.aging}
                           </div>
                         </div>
@@ -735,6 +735,109 @@ export function ItemList() {
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// GroupedListView -- shared grouped row list used by ItemList and Inbox
+// ---------------------------------------------------------------------------
+
+export interface GroupedListGroup<T> {
+  key: string
+  label: string
+  items: T[]
+}
+
+export interface GroupedListViewProps<T> {
+  groups: GroupedListGroup<T>[]
+  renderRow: (item: T, index: number) => React.ReactNode
+  getItemKey: (item: T) => string
+  selectedKey?: string
+  onItemClick?: (item: T) => void
+  emptyMessage?: string
+  className?: string
+}
+
+export function GroupedListView<T>({
+  groups,
+  renderRow,
+  getItemKey,
+  selectedKey,
+  onItemClick,
+  emptyMessage = "No items found",
+  className,
+}: GroupedListViewProps<T>) {
+  const [expandedGroups, setExpandedGroups] = React.useState<Record<string, boolean>>(() => {
+    const init: Record<string, boolean> = {}
+    groups.forEach((g) => { init[g.key] = true })
+    return init
+  })
+
+  React.useEffect(() => {
+    setExpandedGroups((prev) => {
+      const next: Record<string, boolean> = {}
+      groups.forEach((g) => { next[g.key] = prev[g.key] ?? true })
+      return next
+    })
+  }, [groups])
+
+  if (groups.length === 0 || groups.every((g) => g.items.length === 0)) {
+    return (
+      <div className={cn("flex h-56 flex-col items-center justify-center gap-1 text-muted-foreground", className)}>
+        <SearchX className="h-7 w-7 opacity-40" />
+        <p className="text-sm font-medium">{emptyMessage}</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className={className}>
+      {groups.map((group) => {
+        const isExpanded = expandedGroups[group.key] ?? true
+        return (
+          <div key={group.key}>
+            <button
+              type="button"
+              onClick={() =>
+                setExpandedGroups((prev) => ({ ...prev, [group.key]: !prev[group.key] }))
+              }
+              className="flex w-full cursor-pointer select-none items-center gap-2 border-b border-border bg-muted/30 px-4 py-2 text-left transition-colors hover:bg-muted/50"
+            >
+              <ChevronDown
+                className={cn(
+                  "h-3.5 w-3.5 text-muted-foreground transition-transform",
+                  !isExpanded && "-rotate-90",
+                )}
+              />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                {group.label}
+              </span>
+              <span className="rounded border border-border bg-background px-1.5 py-0 text-[10px] font-medium text-muted-foreground">
+                {group.items.length}
+              </span>
+            </button>
+            {isExpanded &&
+              group.items.map((item, idx) => {
+                const key = getItemKey(item)
+                return (
+                  <div
+                    key={key}
+                    onClick={() => onItemClick?.(item)}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-2.5 border-b border-border/50 text-[13px] cursor-pointer transition-colors",
+                      selectedKey === key
+                        ? "bg-muted/30 border-l-2 border-l-primary"
+                        : "border-l-2 border-l-transparent hover:bg-muted/40",
+                    )}
+                  >
+                    {renderRow(item, idx)}
+                  </div>
+                )
+              })}
+          </div>
+        )
+      })}
     </div>
   )
 }

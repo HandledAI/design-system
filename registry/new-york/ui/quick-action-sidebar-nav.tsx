@@ -4,105 +4,260 @@ import * as React from "react"
 import {
   Activity,
   BarChart2,
-  Briefcase,
+  Building,
   ChevronDown,
-  ChevronRight,
-  ClipboardList,
-  FileText,
+  Code,
   Inbox,
+  Link as LinkIcon,
+  LogOut,
   MessageSquare,
+  MoreHorizontal,
+  MoreVertical,
   PanelLeftClose,
   PanelLeftOpen,
-  Zap,
+  Plus,
+  Search,
+  Settings,
+  Users,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { Avatar, AvatarFallback } from "@/registry/new-york/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/registry/new-york/ui/dropdown-menu"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/registry/new-york/ui/tooltip"
 import { QuickActionModal, type QuickActionTaskDraft } from "./quick-action-modal"
 
-type NavBadge = "for-review" | "coming-soon" | null
+export interface SidebarNavItem {
+  id: string
+  label: string
+  icon: React.ComponentType<{ className?: string }>
+}
+
+export interface SidebarNavSection {
+  title?: string
+  items: SidebarNavItem[]
+  moreItems?: SidebarNavItem[]
+}
+
+export interface SidebarUserProfile {
+  name: string
+  email: string
+  initials?: string
+}
+
+export interface UserMenuItem {
+  id: string
+  label: string
+  icon: React.ComponentType<{ className?: string }>
+  destructive?: boolean
+}
 
 interface QuickActionSidebarNavProps extends React.ComponentProps<"aside"> {
+  brandLabel?: string
+  brandSubtitle?: string
+  navSections?: SidebarNavSection[]
+  activeItemId?: string
+  onNavigate?: (itemId: string) => void
+  user?: SidebarUserProfile
+  userMenuItems?: UserMenuItem[]
+  onUserMenuAction?: (itemId: string) => void
   onCreateTask?: (draft: QuickActionTaskDraft) => void
   defaultCollapsed?: boolean
 }
 
-type NavItem = {
-  id: string
-  label: string
-  icon: React.ComponentType<{ className?: string }>
-  badge: NavBadge
-  active?: boolean
-}
-
-const PRIMARY_NAV_ITEMS: NavItem[] = [
-  { id: "dashboard", label: "Dashboard", icon: BarChart2, badge: "for-review", active: true },
-  { id: "conversations", label: "Conversations", icon: MessageSquare, badge: "for-review" },
-  { id: "inbox", label: "My Inbox", icon: Inbox, badge: "coming-soon" },
-  { id: "insights", label: "Insights", icon: Activity, badge: "for-review" },
+const DEFAULT_NAV_SECTIONS: SidebarNavSection[] = [
+  {
+    items: [
+      { id: "home", label: "Home", icon: Inbox },
+      { id: "inbox", label: "Inbox", icon: Inbox },
+    ],
+  },
+  {
+    title: "Focus",
+    items: [
+      { id: "inbox", label: "Unibox", icon: Inbox },
+      { id: "accounts", label: "My Accounts", icon: Building },
+      { id: "activity", label: "Activity", icon: Activity },
+      { id: "dashboard", label: "Insights", icon: BarChart2 },
+    ],
+    moreItems: [
+      { id: "search", label: "Search", icon: Search },
+    ],
+  },
+  {
+    title: "Assistant",
+    items: [
+      { id: "new-chat", label: "New chat", icon: Plus },
+      { id: "chats", label: "Chats", icon: MessageSquare },
+    ],
+  },
+  {
+    title: "Your Teams",
+    items: [
+      { id: "account-dev", label: "Account Development", icon: Users },
+      { id: "rel-mgmt", label: "Relationship Management", icon: Users },
+    ],
+    moreItems: [
+      { id: "more-teams", label: "More", icon: MoreHorizontal },
+    ],
+  },
 ]
 
-const WORK_QUEUE_ITEMS: NavItem[] = [
-  { id: "referrals", label: "Referrals", icon: FileText, badge: "coming-soon" },
-  { id: "intake", label: "Intake", icon: ClipboardList, badge: "coming-soon" },
-]
-
-function NavBadgePill({ badge }: { badge: NavBadge }) {
-  if (!badge) {
-    return null
-  }
-
-  if (badge === "for-review") {
-    return (
-      <span className="rounded-full border border-[#b7cdfb] bg-[#eef5ff] px-3 py-1 text-xs font-semibold text-[#466dcf]">
-        For Review
-      </span>
-    )
-  }
-
-  return (
-    <span className="rounded-full border border-[#efcf7f] bg-[#fff8e8] px-3 py-1 text-xs font-semibold text-[#bd7704]">
-      Coming Soon
-    </span>
-  )
+const DEFAULT_USER: SidebarUserProfile = {
+  name: "John Doe",
+  email: "jdoe@acmeco.com",
+  initials: "JD",
 }
 
-function SidebarNavRow({ item, collapsed }: { item: NavItem; collapsed: boolean }) {
-  if (collapsed) {
-    return (
-      <button
-        type="button"
-        className={cn(
-          "flex w-full items-center justify-center rounded-md p-2.5 transition-colors",
-          item.active ? "bg-[#ebf7f1]" : "hover:bg-slate-100"
-        )}
-        title={item.label}
-      >
-        <item.icon className={cn("h-5 w-5", item.active ? "text-[#2c9b69]" : "text-[#74839d]")} />
-      </button>
-    )
-  }
+const DEFAULT_USER_MENU: UserMenuItem[] = [
+  { id: "settings", label: "Settings", icon: Settings },
+  { id: "dev", label: "Dev", icon: Code },
+  { id: "integrations", label: "Integrations", icon: LinkIcon },
+  { id: "sign-out", label: "Sign out", icon: LogOut, destructive: true },
+]
 
-  return (
+function NavItemRow({
+  item,
+  isActive,
+  isCollapsed,
+  onClick,
+}: {
+  item: SidebarNavItem
+  isActive: boolean
+  isCollapsed: boolean
+  onClick?: () => void
+}) {
+  const content = (
     <button
       type="button"
+      onClick={onClick}
       className={cn(
-        "flex w-full items-center justify-between rounded-md px-3 py-2.5 text-left transition-colors",
-        item.active ? "bg-[#ebf7f1]" : "hover:bg-slate-100"
+        "flex w-full items-center gap-3 rounded-lg text-sm font-medium transition-colors",
+        isCollapsed ? "justify-center p-2" : "px-3 py-2",
+        isActive
+          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+          : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent",
       )}
     >
-      <span className="flex items-center gap-3">
-        <item.icon className={cn("h-4 w-4", item.active ? "text-[#2c9b69]" : "text-[#74839d]")} />
-        <span className={cn("text-base font-semibold", item.active ? "text-[#2b6b53]" : "text-[#4b5b78]")}>
-          {item.label}
-        </span>
-      </span>
-      <NavBadgePill badge={item.badge} />
+      <item.icon className={cn("shrink-0", isCollapsed ? "w-5 h-5" : "w-4 h-4")} />
+      {!isCollapsed && <span className="flex-1 truncate text-left">{item.label}</span>}
     </button>
+  )
+
+  if (isCollapsed) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{content}</TooltipTrigger>
+        <TooltipContent side="right">{item.label}</TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  return content
+}
+
+function NavSection({
+  section,
+  activeItemId,
+  isCollapsed,
+  onNavigate,
+}: {
+  section: SidebarNavSection
+  activeItemId?: string
+  isCollapsed: boolean
+  onNavigate?: (id: string) => void
+}) {
+  const [isExpanded, setIsExpanded] = React.useState(true)
+  const hasTitle = !isCollapsed && section.title
+
+  return (
+    <div className="px-3 py-2">
+      {hasTitle && (
+        <button
+          type="button"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="flex w-full items-center gap-1.5 mb-1 px-3 group cursor-pointer"
+        >
+          <ChevronDown
+            className={cn(
+              "w-3 h-3 text-sidebar-foreground/40 transition-transform duration-200",
+              !isExpanded && "-rotate-90",
+            )}
+          />
+          <span className="text-[10px] font-bold tracking-widest text-sidebar-foreground/50 uppercase">
+            {section.title}
+          </span>
+        </button>
+      )}
+      {(isExpanded || isCollapsed || !section.title) && (
+        <div className="space-y-0.5">
+          {section.items.map((item) => (
+            <NavItemRow
+              key={item.id}
+              item={item}
+              isActive={activeItemId === item.id}
+              isCollapsed={isCollapsed}
+              onClick={() => onNavigate?.(item.id)}
+            />
+          ))}
+          {!isCollapsed && section.moreItems && section.moreItems.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors outline-none">
+                <MoreHorizontal className="shrink-0 w-4 h-4" />
+                <span className="flex-1 text-left">More</span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" side="bottom" className="w-48">
+                {section.moreItems.map((item) => (
+                  <DropdownMenuItem
+                    key={item.id}
+                    onClick={() => onNavigate?.(item.id)}
+                    className="cursor-pointer"
+                  >
+                    <item.icon className="mr-2 w-4 h-4 text-muted-foreground" />
+                    <span>{item.label}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          {isCollapsed &&
+            section.moreItems?.map((item) => (
+              <NavItemRow
+                key={item.id}
+                item={item}
+                isActive={activeItemId === item.id}
+                isCollapsed={isCollapsed}
+                onClick={() => onNavigate?.(item.id)}
+              />
+            ))}
+        </div>
+      )}
+    </div>
   )
 }
 
 export function QuickActionSidebarNav({
   className,
+  brandLabel = "ACME CO",
+  brandSubtitle = "Relationship Intelligence",
+  navSections = DEFAULT_NAV_SECTIONS,
+  activeItemId = "inbox",
+  onNavigate,
+  user = DEFAULT_USER,
+  userMenuItems = DEFAULT_USER_MENU,
+  onUserMenuAction,
   onCreateTask,
   defaultCollapsed = false,
   ...props
@@ -110,178 +265,202 @@ export function QuickActionSidebarNav({
   const [isQuickActionOpen, setIsQuickActionOpen] = React.useState(false)
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed)
 
+  const initials =
+    user.initials ??
+    (user.name
+      ? user.name.charAt(0).toUpperCase()
+      : user.email
+        ? user.email.charAt(0).toUpperCase()
+        : "U")
+
   return (
-    <>
+    <TooltipProvider delayDuration={0}>
       <aside
         className={cn(
-          "flex h-[860px] flex-col overflow-hidden rounded-md border border-slate-200 bg-[#f8f9fb] shadow-sm transition-all duration-300",
-          isCollapsed ? "w-[72px]" : "w-[340px]",
+          "flex h-full flex-col overflow-hidden bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-200",
+          isCollapsed ? "w-16" : "w-64",
           className,
         )}
         {...props}
       >
-        <div className={cn(
-          "relative flex shrink-0 items-center transition-all duration-300",
-          isCollapsed ? "justify-center h-16" : "justify-center h-auto pt-4 pb-2",
-        )}>
-          {!isCollapsed ? (
-            <div className="w-full px-5 text-center">
-              <h2 className="text-5xl font-black tracking-tight text-[#111827]">ACME</h2>
-              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#7ea095]">
-                Company
-              </p>
-            </div>
-          ) : null}
-
-          {isCollapsed ? (
-            <button
-              type="button"
-              onClick={() => setIsCollapsed(false)}
-              className="flex h-8 w-8 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-              title="Expand sidebar"
-            >
-              <PanelLeftOpen className="h-4 w-4" />
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setIsCollapsed(true)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-              title="Collapse sidebar"
-            >
-              <PanelLeftClose className="h-4 w-4" />
-            </button>
+        {/* Header */}
+        <div
+          className={cn(
+            "relative flex shrink-0 items-center border-b border-sidebar-border",
+            isCollapsed ? "justify-center h-16 px-2" : "h-20 px-5",
           )}
-        </div>
-
-        <div className={cn("flex-1 overflow-y-auto pb-6", isCollapsed ? "px-2 pt-2" : "px-5")}>
-          {!isCollapsed ? (
-            <button
-              type="button"
-              className="flex w-full items-center gap-3 rounded-md border border-slate-200 bg-white px-4 py-3 text-left shadow-sm transition-colors hover:bg-slate-50"
-            >
-              <div className="rounded-md bg-[#1f4f3d] p-2 text-white">
-                <Briefcase className="h-4 w-4" />
+        >
+          {!isCollapsed && (
+            <div className="flex items-center gap-2.5 pr-10">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-sidebar-foreground text-sidebar">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
+                  <circle cx="12" cy="12" r="10" />
+                </svg>
               </div>
-              <span className="text-lg font-semibold text-[#1f314a]">Patient Access</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="flex w-full items-center justify-center rounded-md border border-slate-200 bg-white p-2.5 shadow-sm transition-colors hover:bg-slate-50"
-              title="Patient Access"
-            >
-              <div className="rounded-md bg-[#1f4f3d] p-2 text-white">
-                <Briefcase className="h-4 w-4" />
-              </div>
-            </button>
-          )}
-
-          <div className={cn("space-y-1.5", isCollapsed ? "mt-4" : "mt-10")}>
-            {PRIMARY_NAV_ITEMS.map((item) => (
-              <SidebarNavRow key={item.id} item={item} collapsed={isCollapsed} />
-            ))}
-          </div>
-
-          <div className={cn(isCollapsed ? "mt-4" : "mt-8")}>
-            {!isCollapsed ? (
-              <div className="mb-2 flex items-center justify-between px-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8ea0be]">
-                  Work Queues
+              <div className="flex flex-col gap-0.5">
+                <span className="text-sm font-bold tracking-tight">
+                  {brandLabel}
                 </span>
-                <ChevronDown className="h-4 w-4 text-[#8ea0be]" />
+                {brandSubtitle && (
+                  <span className="text-[10px] font-medium text-sidebar-foreground/50 uppercase tracking-wide">
+                    {brandSubtitle}
+                  </span>
+                )}
               </div>
-            ) : (
-              <div className="mb-2 h-px bg-slate-200" />
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className={cn(
+              "p-1.5 rounded-md text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors",
+              isCollapsed ? "" : "absolute right-4 top-4",
             )}
-            <div className="space-y-1.5">
-              {WORK_QUEUE_ITEMS.map((item) => (
-                <SidebarNavRow key={item.id} item={item} collapsed={isCollapsed} />
-              ))}
-            </div>
-          </div>
-
-          {!isCollapsed ? (
-            <div className="mt-8 space-y-5 px-2">
-              <button
-                type="button"
-                className="flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-[0.18em] text-[#8ea0be]"
-              >
-                <span>Platform</span>
-                <ChevronRight className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                className="flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-[0.18em] text-[#8ea0be]"
-              >
-                <span>Admin</span>
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          ) : null}
+            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {isCollapsed ? (
+              <PanelLeftOpen className="w-4 h-4" />
+            ) : (
+              <PanelLeftClose className="w-4 h-4" />
+            )}
+          </button>
         </div>
 
-        <div className={cn(
-          "space-y-4 border-t border-slate-200 bg-[#f8f9fb] py-4",
-          isCollapsed ? "px-2" : "px-5",
-        )}>
-          {!isCollapsed ? (
-            <button
-              type="button"
-              onClick={() => setIsQuickActionOpen(true)}
-              className="flex w-full items-center justify-between rounded-md bg-[#1b4332] px-4 py-3 text-white shadow-sm transition-colors hover:bg-[#245240]"
-            >
-              <span className="flex items-center gap-2 text-lg font-semibold">
-                <Zap className="h-4 w-4" />
-                Quick Action
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="rounded-md border border-white/25 bg-white/10 px-2 py-0.5 text-[11px] font-semibold">
-                  CMD
-                </span>
-                <span className="rounded-md border border-white/25 bg-white/10 px-2 py-0.5 text-[11px] font-semibold">
-                  K
-                </span>
-              </span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setIsQuickActionOpen(true)}
-              className="flex w-full items-center justify-center rounded-md bg-[#1b4332] p-2.5 text-white shadow-sm transition-colors hover:bg-[#245240]"
-              title="Quick Action (⌘K)"
-            >
-              <Zap className="h-5 w-5" />
-            </button>
-          )}
+        {/* Navigation */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden py-3 space-y-1">
+          {navSections.map((section, idx) => (
+            <React.Fragment key={section.title ?? idx}>
+              {idx > 0 && <div className="mx-4 my-2 border-t border-sidebar-border" />}
+              <NavSection
+                section={section}
+                activeItemId={activeItemId}
+                isCollapsed={isCollapsed}
+                onNavigate={onNavigate}
+              />
+            </React.Fragment>
+          ))}
+        </div>
 
-          {!isCollapsed ? (
-            <button
-              type="button"
-              className="flex w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2.5 text-left shadow-sm transition-colors hover:bg-slate-50"
+        {/* Quick Action Button */}
+        <div className={cn("px-3 pb-3", isCollapsed ? "hidden" : "block")}>
+          <button
+            type="button"
+            onClick={() => setIsQuickActionOpen(true)}
+            className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg border border-sidebar-border bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90 transition-colors group shadow-sm"
+          >
+            <div className="flex items-center gap-2">
+              <svg
+                className="w-4 h-4 text-sidebar-primary-foreground/80 group-hover:text-sidebar-primary-foreground transition-colors"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+              <span className="text-sm font-medium">Quick Action</span>
+            </div>
+            <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[11px] font-mono rounded bg-sidebar-primary-foreground/20 text-sidebar-primary-foreground">
+              <span className="text-xs">&#8984;</span>K
+            </kbd>
+          </button>
+        </div>
+
+        {isCollapsed && (
+          <div className="px-2 pb-3">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => setIsQuickActionOpen(true)}
+                  className="flex w-full items-center justify-center rounded-lg bg-sidebar-primary p-2.5 text-sidebar-primary-foreground shadow-sm transition-colors hover:bg-sidebar-primary/90"
+                  title="Quick Action (⌘K)"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
+                  </svg>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Quick Action (⌘K)</TooltipContent>
+            </Tooltip>
+          </div>
+        )}
+
+        {/* User Profile Footer */}
+        <div className="p-3 border-t border-sidebar-border shrink-0">
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={cn(
+                "flex items-center w-full rounded-lg hover:bg-sidebar-accent transition-colors outline-none",
+                isCollapsed ? "justify-center p-1" : "p-2 gap-3",
+              )}
             >
-              <span className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-200 text-sm font-bold text-slate-700">
-                  JC
+              <Avatar className="h-8 w-8 rounded-md">
+                <AvatarFallback className="rounded-md bg-primary/10 text-primary text-xs font-medium">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+
+              {!isCollapsed && (
+                <div className="flex flex-col items-start flex-1 truncate">
+                  <span className="text-sm font-medium leading-none truncate">
+                    {user.name}
+                  </span>
+                  <span className="text-xs text-sidebar-foreground/50 truncate mt-0.5">
+                    {user.email}
+                  </span>
                 </div>
-                <span className="flex flex-col">
-                  <span className="text-base font-semibold text-[#1f314a]">Jay Corralejo</span>
-                  <span className="text-sm text-[#6c7b95]">jcorralejo@acmeco.com</span>
-                </span>
-              </span>
-              <ChevronRight className="h-4 w-4 text-[#8ea0be]" />
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="flex w-full items-center justify-center rounded-md border border-slate-200 bg-white p-1.5 shadow-sm transition-colors hover:bg-slate-50"
-              title="Jay Corralejo"
-            >
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-700">
-                JC
-              </div>
-            </button>
-          )}
+              )}
+
+              {!isCollapsed && (
+                <MoreVertical className="w-4 h-4 text-sidebar-foreground/50 shrink-0" />
+              )}
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" side="right" sideOffset={8} className="w-56">
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{user.name}</p>
+                  <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {userMenuItems.map((item, idx) => {
+                const isLast = idx === userMenuItems.length - 1
+                const showSepBefore = item.destructive && idx > 0
+                return (
+                  <React.Fragment key={item.id}>
+                    {showSepBefore && <DropdownMenuSeparator />}
+                    <DropdownMenuItem
+                      onClick={() => onUserMenuAction?.(item.id)}
+                      className={cn(
+                        "cursor-pointer",
+                        item.destructive && "text-destructive focus:text-destructive",
+                      )}
+                    >
+                      <item.icon className="mr-2 h-4 w-4" />
+                      <span>{item.label}</span>
+                    </DropdownMenuItem>
+                  </React.Fragment>
+                )
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </aside>
 
@@ -290,6 +469,6 @@ export function QuickActionSidebarNav({
         onOpenChange={setIsQuickActionOpen}
         onCreateTask={onCreateTask}
       />
-    </>
+    </TooltipProvider>
   )
 }
