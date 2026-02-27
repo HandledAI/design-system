@@ -62,8 +62,16 @@ Optional (only if using charts/3D): `recharts`, `@nivo/sankey`, `@nivo/core`, `t
   - `buildSourceItems` -- source context for the detail view
   - `getSignalScore` -- signal score breakdown
   - `getTimelineEvents` -- activity timeline
-  - `accountContacts` -- email To/Cc/Bcc suggestions
+  - `buildAccountContacts` (preferred) or `accountContacts` -- email To/Cc/Bcc suggestions
   - `emailSignature` -- default signature
+- Inbox contact seeding must be account-specific:
+  - Every email action should include a recommended contact (`emailMeta.to`)
+  - Contact picker suggestions should include additional contacts for that same account
+  - Do not use one global mixed-company contact list
+  - All seeded contacts MUST have `confirmed: false` so they render in the yellow "requires confirmation" state -- never derive `confirmed` from internal flags like isPowerUser
+- Admin/Settings pages MUST use the built-in `views.admin` config (AdminViewConfig) so they render inside the shell with the sidebar visible. Do NOT conditionally replace the entire PrototypeShell with a full-page settings component.
+  - Define admin tabs in the config with `id`, `label`, `icon`, and `content` (ReactNode)
+  - Add `"admin"` to `navigableViews` and sidebar sections
 - The resulting app should look identical to the design system preview at `design.withhandled.app/preview`.
 
 # How to Change Components

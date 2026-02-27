@@ -210,6 +210,7 @@ You now have a working prototype with sidebar, inbox, insights, accounts, and wo
 | `filterCategories` | `InboxFilterCategory[]` | Auto-derived from items | Category/account filter dropdowns in the toolbar. |
 | `detailSections` | `InboxDetailSections` | All enabled | Toggle `signalBrief`, `suggestedActions`, `timeline` on/off. |
 | `accountContacts` | `SuggestedContact[]` | `[]` | Contacts shown in the suggested actions contact picker. |
+| `buildAccountContacts` | `(item) => SuggestedContact[]` | — | Builds account-specific contact suggestions for To/Cc/Bcc pickers. |
 | `emailSignature` | `string` | `""` | Default email signature for draft emails. |
 | `buildSuggestedActions` | `(item) => SuggestedAction[]` | No-op | Generates suggested actions for each queue item. |
 | `buildSourceItems` | `(item) => SourceDef[]` | No-op | Generates citation sources for the signal brief. |
@@ -252,6 +253,75 @@ The `variant` field controls styling: `"default"` (muted), `"attention"` (green)
 
 Currently renders the `ItemList` component with its built-in data and interactions. Pass an empty object `{}` to enable the view.
 
+### Admin (`views.admin`: `AdminViewConfig`)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `title` | `string` | `"Admin"` | Header title displayed above the tabs. |
+| `icon` | `ComponentType` | `Settings` | Lucide icon rendered next to the title. |
+| `tabs` | `AdminTab[]` | **Required** | Array of tab definitions. |
+| `defaultTab` | `string` | First tab's id | Which tab is active on initial render. |
+
+**`AdminTab`**:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | Unique tab identifier. |
+| `label` | `string` | Yes | Display label in the tab bar. |
+| `icon` | `ComponentType` | No | Icon rendered in the tab trigger. |
+| `content` | `ReactNode` | Yes | The content rendered when this tab is active. |
+
+The admin view renders inside the shell layout with the sidebar visible, just like inbox/accounts/insights. Consumers own the tab content -- the design system provides the page chrome (header, tab bar, scroll container).
+
+**Example**:
+
+```tsx
+import { Settings, Users, Link as LinkIcon } from "lucide-react"
+import type { AdminViewConfig } from "@handled-ai/design-system"
+
+const adminConfig: AdminViewConfig = {
+  title: "Admin",
+  icon: Settings,
+  tabs: [
+    {
+      id: "general",
+      label: "General",
+      icon: Settings,
+      content: <GeneralSettings />,
+    },
+    {
+      id: "integrations",
+      label: "Integrations",
+      icon: LinkIcon,
+      content: <IntegrationsPanel />,
+    },
+    {
+      id: "team",
+      label: "Team",
+      icon: Users,
+      content: <TeamManagement />,
+    },
+  ],
+}
+```
+
+Add `"admin"` to the sidebar and include it in `navigableViews`:
+
+```ts
+sidebar: [
+  // ... other sections ...
+  {
+    title: "Settings",
+    items: [{ id: "admin", label: "Admin", icon: Settings }],
+  },
+],
+navigableViews: ["inbox", "accounts", "insights", "admin"],
+views: {
+  // ... other views ...
+  admin: adminConfig,
+},
+```
+
 ---
 
 ## Feature Toggle Checklist
@@ -264,6 +334,7 @@ Quick reference for enabling/disabling features:
 | **Insights view** | Include/omit `views.insights` |
 | **Accounts view** | Include/omit `views.accounts` |
 | **Work Queue view** | Include/omit `views.workQueue` |
+| **Admin view** | Include/omit `views.admin` |
 | **Chat in sidebar** | Include/omit chat items from `sidebar` sections |
 | **Teams in sidebar** | Include/omit team items from `sidebar` sections |
 | **Signal brief** | `views.inbox.detailSections.signalBrief: false` |
@@ -326,6 +397,7 @@ import {
   PrototypeInsightsView,
   PrototypeAccountsView,
   PrototypeWorkQueueView,
+  PrototypeAdminView,
 } from "@handled-ai/design-system"
 ```
 
@@ -413,7 +485,41 @@ export const config: PrototypeConfig = {
         suggestedActions: true,
         timeline: false,
       },
-      buildSuggestedActions: buildActions,
+      accountContacts: [
+        { name: "Fallback Contact", role: "VP Finance", email: "contact@example.com", confirmed: false },
+      ],
+      buildAccountContacts: (item) => {
+        if (item.company === "Acme Corp") {
+          return [
+            { name: "Scott Mitchell", role: "CFO", email: "scott@acme.com", confirmed: false },
+            { name: "Priya Shah", role: "VP Finance", email: "priya@acme.com", confirmed: false },
+            { name: "Lena Park", role: "Controller", email: "lena@acme.com", confirmed: false },
+          ]
+        }
+        return [{ name: "General Contact", role: "Finance Lead", email: "finance@example.com", confirmed: false }]
+      },
+      buildSuggestedActions: (item) => {
+        const [recommended] = item.company === "Acme Corp"
+          ? [
+              { name: "Scott Mitchell", role: "CFO", email: "scott@acme.com", confirmed: false },
+            ]
+          : [{ name: "General Contact", role: "Finance Lead", email: "finance@example.com", confirmed: false }]
+        return [
+          {
+            id: `${item.id}-email`,
+            type: "email",
+            label: `Reply to ${item.company}`,
+            status: "pending",
+            emailMeta: {
+              from: "You",
+              fromEmail: "you@company.com",
+              to: recommended,
+              subject: `Re: ${item.title}`,
+            },
+            content: `Hi,\\n\\nFollowing up on ${item.title}.\\n\\nBest,\\nYou`,
+          },
+        ]
+      },
     },
     insights: {
       tabs: { overview: true, analytics: false },

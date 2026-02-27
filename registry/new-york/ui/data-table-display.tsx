@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import { ArrowDown, ArrowUp, ArrowUpDown, LayoutGrid } from "lucide-react"
 import type { SortingState } from "@tanstack/react-table"
 

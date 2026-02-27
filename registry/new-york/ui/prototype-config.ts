@@ -1,3 +1,4 @@
+import * as React from "react"
 import type { ReactNode } from "react"
 import type { SidebarNavSection } from "./quick-action-sidebar-nav"
 import type { ScoreFactor } from "./score-breakdown"
@@ -56,6 +57,7 @@ export interface InboxViewConfig {
   filterCategories?: InboxFilterCategory[]
   detailSections?: InboxDetailSections
   accountContacts?: SuggestedContact[]
+  buildAccountContacts?: (item: QueueItem) => SuggestedContact[]
   emailSignature?: string
   buildSuggestedActions?: (item: QueueItem) => SuggestedAction[]
   buildSourceItems?: (item: QueueItem) => SourceDef[]
@@ -151,6 +153,27 @@ export interface WorkQueueViewConfig {
 }
 
 // ---------------------------------------------------------------------------
+// Admin
+// ---------------------------------------------------------------------------
+
+export interface AdminTab {
+  id: string
+  label: string
+  icon?: React.ComponentType<{ className?: string }>
+  content: React.ReactNode
+}
+
+export interface AdminViewConfig {
+  /** View title displayed in the header. Defaults to "Admin". */
+  title?: string
+  /** Icon displayed next to the title. */
+  icon?: React.ComponentType<{ className?: string }>
+  tabs: AdminTab[]
+  /** Which tab is active initially. Defaults to first tab's id. */
+  defaultTab?: string
+}
+
+// ---------------------------------------------------------------------------
 // Entity Panel
 // ---------------------------------------------------------------------------
 
@@ -176,6 +199,7 @@ export interface PrototypeConfig {
     insights?: InsightsViewConfig
     accounts?: AccountsViewConfig
     workQueue?: WorkQueueViewConfig
+    admin?: AdminViewConfig
   }
   defaultView: string
   entityPanel?: EntityPanelConfig

@@ -16,6 +16,7 @@ import { PrototypeInboxView } from "./prototype-inbox-view"
 import { PrototypeInsightsView } from "./prototype-insights-view"
 import { PrototypeAccountsView } from "./prototype-accounts-view"
 import { PrototypeWorkQueueView } from "./prototype-work-queue-view"
+import { PrototypeAdminView } from "./prototype-admin-view"
 import type { PrototypeConfig, EntityPanelSection } from "./prototype-config"
 
 // ---------------------------------------------------------------------------
@@ -55,6 +56,8 @@ const VIEW_KEY_MAP: Record<string, keyof PrototypeConfig["views"]> = {
   activity: "workQueue",
   workQueue: "workQueue",
   "work-queue": "workQueue",
+  admin: "admin",
+  settings: "admin",
 }
 
 // ---------------------------------------------------------------------------
@@ -89,6 +92,7 @@ export function PrototypeShell({
     if (config.views.accounts) keys.push("accounts")
     if (config.views.workQueue) keys.push("activity", "workQueue", "work-queue")
     if (config.views.insights) keys.push("dashboard", "insights")
+    if (config.views.admin) keys.push("admin", "settings")
     return keys
   }, [config.navigableViews, config.views])
 
@@ -120,7 +124,7 @@ export function PrototypeShell({
       <QuickActionSidebarNav
         className="z-20 h-screen shrink-0"
         brandLabel={config.brand?.name}
-        brandSubtitle={undefined}
+        brandSubtitle=""
         navSections={config.sidebar}
         activeItemId={currentView}
         onNavigate={handleNavigate}
@@ -153,6 +157,11 @@ export function PrototypeShell({
             />
           ) : resolvedViewKey === "workQueue" && config.views.workQueue ? (
             <PrototypeWorkQueueView
+              headerActions={headerActions}
+            />
+          ) : resolvedViewKey === "admin" && config.views.admin ? (
+            <PrototypeAdminView
+              {...config.views.admin}
               headerActions={headerActions}
             />
           ) : null}

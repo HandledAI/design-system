@@ -79,6 +79,7 @@ export * from "./registry/new-york/ui/prototype-shell"
 export * from "./registry/new-york/ui/prototype-inbox-view"
 export * from "./registry/new-york/ui/prototype-insights-view"
 export * from "./registry/new-york/ui/prototype-accounts-view"
+export * from "./registry/new-york/ui/prototype-admin-view"
 export * from "./registry/new-york/ui/prototype-work-queue-view"
 
 // Recruiting patterns

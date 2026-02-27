@@ -378,10 +378,9 @@ import "./index.css";
 ## 5. Minimal App Example (PrototypeShell)
 
 ```tsx
-import { useState } from "react";
 import { PrototypeShell } from "@handled-ai/design-system";
 import type { PrototypeConfig } from "@handled-ai/design-system";
-import { Inbox, Database, BarChart3, Settings } from "lucide-react";
+import { Inbox, Database, BarChart3, Settings, Users, Link as LinkIcon } from "lucide-react";
 
 const config: PrototypeConfig = {
   brand: { name: "My App" },
@@ -393,6 +392,10 @@ const config: PrototypeConfig = {
         { id: "accounts", label: "Accounts", icon: Database },
         { id: "insights", label: "Insights", icon: BarChart3 },
       ],
+    },
+    {
+      title: "Settings",
+      items: [{ id: "admin", label: "Admin", icon: Settings }],
     },
   ],
   views: {
@@ -417,9 +420,18 @@ const config: PrototypeConfig = {
     accounts: {
       filterTabs: [{ label: "All", count: 0 }],
     },
+    admin: {
+      title: "Admin",
+      icon: Settings,
+      tabs: [
+        { id: "general", label: "General", icon: Settings, content: "General settings go here." },
+        { id: "integrations", label: "Integrations", icon: LinkIcon, content: "Integration cards go here." },
+        { id: "team", label: "Team", icon: Users, content: "Team management table goes here." },
+      ],
+    },
   },
   defaultView: "inbox",
-  navigableViews: ["inbox", "accounts", "insights"],
+  navigableViews: ["inbox", "accounts", "insights", "admin"],
 };
 
 export default function App() {
@@ -449,6 +461,7 @@ export default function App() {
 | `getSignalScore`       | `(company: string) => SignalScoreData`     | No       | Returns signal score for the detail view        |
 | `getTimelineEvents`    | `(item: QueueItem) => TimelineEvent[]`     | No       | Returns timeline events for the detail view     |
 | `accountContacts`      | `SuggestedContact[]`                       | No       | Contacts for email To/Cc/Bcc suggestions        |
+| `buildAccountContacts` | `(item: QueueItem) => SuggestedContact[]`  | No       | Builds account-specific contact suggestions      |
 | `emailSignature`       | `string`                                   | No       | Default email signature                         |
 | `iconMap`              | `Record<string, string>`                   | No       | Icon URLs for suggested action types            |
 
@@ -467,6 +480,17 @@ export default function App() {
 | ------------ | --------------------- | -------- | --------------------- |
 | `filterTabs` | `AccountFilterTab[]`  | No       | Filter tab bar items  |
 
+### `views.admin` (AdminViewConfig)
+
+| Field        | Type                                         | Required | Description                                |
+| ------------ | -------------------------------------------- | -------- | ------------------------------------------ |
+| `title`      | `string`                                     | No       | Header title (defaults to "Admin")         |
+| `icon`       | `ComponentType<{ className?: string }>`      | No       | Icon next to the title (defaults to Settings) |
+| `tabs`       | `AdminTab[]`                                 | Yes      | Tab definitions                            |
+| `defaultTab` | `string`                                     | No       | Initial active tab (defaults to first)     |
+
+Each `AdminTab` has: `id` (string), `label` (string), `icon` (optional ComponentType), `content` (ReactNode). The admin view renders inside the shell with the sidebar visible -- do NOT replace the shell with a full-page settings component.
+
 ## 7. Common Pitfalls
 
 1. **Pre-compiled CSS**: If your `index.css` contains thousands of lines of compiled Tailwind output, it is NOT a source file. Replace it with the template above. Tailwind v4 processes the source at build time.
@@ -479,4 +503,15 @@ export default function App() {
 
 5. **Missing inbox callbacks**: If `detailSections.timeline` is `true` but `getTimelineEvents` is not provided, the timeline section renders empty. Same for `getSignalScore` and `buildSourceItems`. Always provide all callbacks referenced by your `detailSections` config.
 
-6. **Sidebar section format**: Sidebar groups use `title` (not `label`) for the section heading.
+6. **Global contact pools in inbox actions**: Avoid a single mixed-company `accountContacts` array. Seed `emailMeta.to` on each email action and use `buildAccountContacts(item)` (or account-scoped `accountContacts`) so To/Cc/Bcc suggestions match the selected inbox account.
+
+7. **Sidebar section format**: Sidebar groups use `title` (not `label`) for the section heading.
+
+## 8. Inbox Contact Seeding Checklist
+
+For prototype-quality suggested actions, apply all four:
+
+1. Seed a recommended contact in each email action (`emailMeta.to`).
+2. Seed additional account contacts for pickers (`buildAccountContacts(item)` preferred, or account-scoped `accountContacts`).
+3. Keep contact lists account-specific (no cross-account mixed recipients).
+4. Set `confirmed: false` on all seeded contacts. The prototype UX shows contacts in a yellow "requires confirmation" state until the user explicitly confirms them. Do NOT derive `confirmed` from internal data like power-user flags.

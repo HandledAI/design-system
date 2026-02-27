@@ -18,12 +18,17 @@ import {
   Mail,
   CheckSquare,
   Phone,
+  Settings,
+  Link as LinkIcon,
+  Database,
+  Target,
+  Shield,
 } from "lucide-react"
 import { BRAND_ICONS } from "@/lib/icons"
 
 import { Button } from "@/registry/new-york/ui/button"
 import { PrototypeShell } from "@/registry/new-york/ui/prototype-shell"
-import type { PrototypeConfig, QueueItem, SignalScoreData } from "@/registry/new-york/ui/prototype-config"
+import type { PrototypeConfig, QueueItem, SignalScoreData, AdminTab } from "@/registry/new-york/ui/prototype-config"
 import type { SidebarNavSection } from "@/registry/new-york/ui/quick-action-sidebar-nav"
 import type { SuggestedAction, SuggestedContact } from "@/registry/new-york/ui/suggested-actions"
 import type { SourceDef } from "@/registry/new-york/ui/detail-view"
@@ -87,41 +92,73 @@ const MOCK_QUEUE: QueueItem[] = [
   },
 ]
 
-const ACCOUNT_CONTACTS: SuggestedContact[] = [
-  {
-    name: "Jackie Lee",
-    role: "VP Finance",
-    email: "jackie.lee@cloudkitchen.com",
-    emails: ["jackie.lee@cloudkitchen.com", "jlee@cloudkitchen.io"],
-    phone: "(415) 555-0142",
-    phones: ["(415) 555-0142", "(415) 555-0199"],
-    confirmed: false,
-    salesforceUrl: "https://acme.my.salesforce.com/lightning/r/Contact/003000000000001AAA/view",
-    lastActivity: { date: "1d ago", type: "Email thread" },
-  },
-  {
-    name: "Marcus Webb",
-    role: "CEO",
-    email: "marcus.webb@cloudkitchen.com",
-    phone: "(415) 555-0101",
-    confirmed: false,
-    salesforceUrl: "https://acme.my.salesforce.com/lightning/r/Contact/003000000000002AAA/view",
-    lastActivity: { date: "2d ago", type: "Gong meeting" },
-  },
-  {
-    name: "Priya Shah",
-    role: "Head of Ops",
-    email: "priya.shah@cloudkitchen.com",
-    emails: ["priya.shah@cloudkitchen.com", "pshah@cloudkitchen.io"],
-    phone: "(415) 555-0177",
-    confirmed: false,
-    salesforceUrl: "https://acme.my.salesforce.com/lightning/r/Contact/003000000000003AAA/view",
-  },
-]
+const ACCOUNT_CONTACTS_BY_COMPANY: Record<string, SuggestedContact[]> = {
+  Lunchclub: [
+    {
+      name: "Scott Mitchell",
+      role: "CFO",
+      email: "scott.mitchell@lunchclub.com",
+      emails: ["scott.mitchell@lunchclub.com", "smitchell@lunchclub.io"],
+      phone: "(415) 555-0188",
+      confirmed: false,
+      salesforceUrl: "https://acme.my.salesforce.com/lightning/r/Contact/003000000000004AAA/view",
+      lastActivity: { date: "2h ago", type: "Email thread" },
+    },
+    {
+      name: "Lena Park",
+      role: "VP Finance",
+      email: "lena.park@lunchclub.com",
+      confirmed: false,
+      lastActivity: { date: "1d ago", type: "Gong meeting" },
+    },
+    {
+      name: "James Lin",
+      role: "Controller",
+      email: "james.lin@lunchclub.com",
+      confirmed: false,
+    },
+  ],
+  CloudKitchen: [
+    {
+      name: "Jackie Lee",
+      role: "VP Finance",
+      email: "jackie.lee@cloudkitchen.com",
+      emails: ["jackie.lee@cloudkitchen.com", "jlee@cloudkitchen.io"],
+      phone: "(415) 555-0142",
+      phones: ["(415) 555-0142", "(415) 555-0199"],
+      confirmed: false,
+      salesforceUrl: "https://acme.my.salesforce.com/lightning/r/Contact/003000000000001AAA/view",
+      lastActivity: { date: "1d ago", type: "Email thread" },
+    },
+    {
+      name: "Marcus Webb",
+      role: "CEO",
+      email: "marcus.webb@cloudkitchen.com",
+      phone: "(415) 555-0101",
+      confirmed: false,
+      salesforceUrl: "https://acme.my.salesforce.com/lightning/r/Contact/003000000000002AAA/view",
+      lastActivity: { date: "2d ago", type: "Gong meeting" },
+    },
+    {
+      name: "Priya Shah",
+      role: "Head of Ops",
+      email: "priya.shah@cloudkitchen.com",
+      emails: ["priya.shah@cloudkitchen.com", "pshah@cloudkitchen.io"],
+      phone: "(415) 555-0177",
+      confirmed: false,
+      salesforceUrl: "https://acme.my.salesforce.com/lightning/r/Contact/003000000000003AAA/view",
+    },
+  ],
+}
+
+function buildAccountContacts(item: QueueItem): SuggestedContact[] {
+  return ACCOUNT_CONTACTS_BY_COMPANY[item.company] ?? ACCOUNT_CONTACTS_BY_COMPANY.CloudKitchen
+}
 
 const EMAIL_SIGNATURE = `Sarah Johnson\nSenior Account Executive\nAcme Financial · (415) 555-0100\nsarah.johnson@acmefinancial.com`
 
 function buildSuggestedActions(item: QueueItem): SuggestedAction[] {
+  const [recommended, secondary] = buildAccountContacts(item)
   return [
     {
       id: `${item.id}-email`,
@@ -132,13 +169,7 @@ function buildSuggestedActions(item: QueueItem): SuggestedAction[] {
       emailMeta: {
         from: "Sarah Johnson",
         fromEmail: "sarah.johnson@acmefinancial.com",
-        to: {
-          name: "Scott Mitchell",
-          role: "CFO",
-          email: "scott.mitchell@cloudkitchen.com",
-          emails: ["scott.mitchell@cloudkitchen.com", "smitchell@cloudkitchen.io"],
-          confirmed: false,
-        },
+        to: recommended,
       },
       replyTo: {
         from: "Scott Mitchell",
@@ -189,13 +220,7 @@ function buildSuggestedActions(item: QueueItem): SuggestedAction[] {
       emailMeta: {
         from: "Sarah Johnson",
         fromEmail: "sarah.johnson@acmefinancial.com",
-        to: {
-          name: "Jackie Lee",
-          role: "VP Finance",
-          email: "jackie.lee@cloudkitchen.com",
-          emails: ["jackie.lee@cloudkitchen.com", "jlee@cloudkitchen.io"],
-          confirmed: false,
-        },
+        to: secondary ?? recommended,
         subject: `Treasury optimization for ${item.company}`,
       },
       content: `Hi Jackie,\n\nI am reaching out because ${item.company} may benefit from our treasury management solutions. Based on recent account activity, there is an opportunity to optimize how idle cash is managed.\n\nWould you be available for a 15-minute call this week to explore options?\n\nBest,\nSarah`,
@@ -497,6 +522,157 @@ const ANALYTICS_VOLUME_KEYS = [
 ]
 
 // ---------------------------------------------------------------------------
+// Admin tabs (sample)
+// ---------------------------------------------------------------------------
+
+const ADMIN_TABS: AdminTab[] = [
+  {
+    id: "general",
+    label: "General",
+    icon: Settings,
+    content: (
+      <div className="space-y-6">
+        <div className="space-y-1">
+          <h2 className="text-xl font-bold tracking-tight">General</h2>
+          <p className="text-sm text-muted-foreground">Manage workspace settings and preferences.</p>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Workspace name</p>
+                <p className="text-xs text-muted-foreground">Acme Financial</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Timezone</p>
+                <p className="text-xs text-muted-foreground">Pacific Time (US & Canada)</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Default currency</p>
+                <p className="text-xs text-muted-foreground">USD ($)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "integrations",
+    label: "Integrations",
+    icon: LinkIcon,
+    content: (
+      <div className="space-y-6">
+        <div className="space-y-1">
+          <h2 className="text-xl font-bold tracking-tight">Integrations</h2>
+          <p className="text-sm text-muted-foreground">Connect to your data sources and tools.</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[
+            { name: "Salesforce", connected: true },
+            { name: "Slack", connected: true },
+            { name: "Gmail", connected: true },
+            { name: "HubSpot", connected: false },
+            { name: "Outlook", connected: false },
+          ].map((item) => (
+            <div key={item.name} className="rounded-lg border border-border bg-card p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold">{item.name}</p>
+                {item.connected && <div className="h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-emerald-100" />}
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {item.connected ? "Connected" : "Not connected"}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "team",
+    label: "Team",
+    icon: Users,
+    content: (
+      <div className="space-y-6">
+        <div className="space-y-1">
+          <h2 className="text-xl font-bold tracking-tight">Team</h2>
+          <p className="text-sm text-muted-foreground">Manage workspace members and roles.</p>
+        </div>
+        <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border/60">
+                <th className="px-6 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">User</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Role</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { name: "Sarah Johnson", role: "Admin", status: "Active" },
+                { name: "Mike Chen", role: "Editor", status: "Active" },
+                { name: "Emily Davis", role: "Viewer", status: "Invited" },
+              ].map((member) => (
+                <tr key={member.name} className="border-b border-border/40 last:border-0">
+                  <td className="px-6 py-3 font-medium">{member.name}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{member.role}</td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${member.status === "Active" ? "bg-emerald-50 text-emerald-700" : "bg-muted text-muted-foreground"}`}>
+                      {member.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "security",
+    label: "Security",
+    icon: Shield,
+    content: (
+      <div className="space-y-6">
+        <div className="space-y-1">
+          <h2 className="text-xl font-bold tracking-tight">Security</h2>
+          <p className="text-sm text-muted-foreground">Authentication and access controls.</p>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Two-factor authentication</p>
+                <p className="text-xs text-muted-foreground">Require 2FA for all workspace members</p>
+              </div>
+              <span className="text-xs font-medium text-emerald-600">Enabled</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">SSO provider</p>
+                <p className="text-xs text-muted-foreground">Okta — connected</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Session timeout</p>
+                <p className="text-xs text-muted-foreground">24 hours</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+]
+
+// ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
 
@@ -533,6 +709,12 @@ const SIDEBAR_SECTIONS: SidebarNavSection[] = [
       { id: "more-teams", label: "More", icon: MoreHorizontal },
     ],
   },
+  {
+    title: "Settings",
+    items: [
+      { id: "admin", label: "Admin", icon: Settings },
+    ],
+  },
 ]
 
 const PREVIEW_CONFIG: PrototypeConfig = {
@@ -545,7 +727,8 @@ const PREVIEW_CONFIG: PrototypeConfig = {
   views: {
     inbox: {
       items: MOCK_QUEUE,
-      accountContacts: ACCOUNT_CONTACTS,
+      accountContacts: ACCOUNT_CONTACTS_BY_COMPANY.CloudKitchen,
+      buildAccountContacts,
       emailSignature: EMAIL_SIGNATURE,
       buildSuggestedActions,
       buildSourceItems,
@@ -630,6 +813,11 @@ const PREVIEW_CONFIG: PrototypeConfig = {
     },
     accounts: {},
     workQueue: {},
+    admin: {
+      title: "Admin",
+      icon: Settings,
+      tabs: ADMIN_TABS,
+    },
   },
   entityPanel: {
     icons: {
