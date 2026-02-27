@@ -20,8 +20,6 @@ import {
   Phone,
   Settings,
   Link as LinkIcon,
-  Database,
-  Target,
   Shield,
 } from "lucide-react"
 import { BRAND_ICONS } from "@/lib/icons"
