@@ -248,6 +248,16 @@ export function PipelineOverview({
       ...dropOffNodes,
     ]
 
+    const nodeIds = new Set(nodes.map((n) => n.id))
+    for (const link of flowLinks) {
+      for (const endpoint of [link.source, link.target]) {
+        if (!nodeIds.has(endpoint)) {
+          nodes.push({ id: endpoint, nodeColor: dropOffNodeColor ?? "#F59E0B" })
+          nodeIds.add(endpoint)
+        }
+      }
+    }
+
     const links: { source: string; target: string; value: number }[] = []
 
     const firstFlowNode = flowNodes[0]?.id ?? "Contacted"
