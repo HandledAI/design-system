@@ -99,6 +99,7 @@ interface DetailViewProps {
   iconMap: Record<string, string>
   onOpenEntityPanel?: () => void
   onOpenRecentActivity?: () => void
+  onSuggestedActionFeedback?: (actionId: number | string, feedback: string, actionTitle?: string) => void
 }
 
 function DetailView({
@@ -113,6 +114,7 @@ function DetailView({
   iconMap,
   onOpenEntityPanel,
   onOpenRecentActivity,
+  onSuggestedActionFeedback,
 }: DetailViewProps) {
   const [evidenceExpanded, setEvidenceExpanded] = React.useState(false)
   const [showTimeline, setShowTimeline] = React.useState(false)
@@ -123,6 +125,11 @@ function DetailView({
     setEvidenceExpanded(false)
     setExtraActions([])
   }, [item.id])
+
+  const signalData = React.useMemo(
+    () => getSignalScore(item.company),
+    [getSignalScore, item.company],
+  )
 
   const suggestedActions = React.useMemo(
     () => [...buildSuggestedActions(item), ...extraActions],
@@ -156,9 +163,11 @@ function DetailView({
         console.log("Approved signal:", { taskId: item.id, company: item.company })
       }}
       onApproveFeedback={(reasons, detail) => {
+        signalData.onApproveFeedback?.(reasons, detail)
         console.log("Approval feedback:", { taskId: item.id, company: item.company, reasons, detail })
       }}
       onDismiss={(reasons, detail) => {
+        signalData.onDismissFeedback?.(reasons, detail)
         console.log("Dismissed signal:", { taskId: item.id, reasons, detail })
       }}
     >
@@ -203,7 +212,6 @@ function DetailView({
 
           {/* Signal Brief */}
           {sections.signalBrief && (() => {
-            const signalData = getSignalScore(item.company)
             const pct = signalData.score
             const scoreColor = pct >= 70 ? "text-emerald-600" : pct >= 40 ? "text-amber-600" : "text-red-600"
             const barColor = pct >= 70 ? "bg-emerald-500" : pct >= 40 ? "bg-amber-500" : "bg-red-500"
@@ -278,9 +286,9 @@ function DetailView({
                       </ul>
                       <ScoreBreakdown
                         factors={signalData.factors}
-                        onFactorFeedback={(key, type, detail) =>
+                        onFactorFeedback={signalData.onFactorFeedback ?? ((key, type, detail) =>
                           console.log("Signal factor feedback:", { company: item.company, factor: key, type, detail })
-                        }
+                        )}
                       />
                       <SignalApproval.Actions />
                     </div>
@@ -360,6 +368,9 @@ export function PrototypeInboxView({
   getSignalScore: getSignalScoreProp,
   getTimelineEvents,
   iconMap = {},
+  hideToolbarActions,
+  hideHoverActions,
+  onSuggestedActionFeedback,
   headerActions,
   onOpenEntityPanel,
   onOpenRecentActivity,
@@ -481,6 +492,7 @@ export function PrototypeInboxView({
     iconMap,
     onOpenEntityPanel,
     onOpenRecentActivity,
+    onSuggestedActionFeedback,
   }
 
   return (
@@ -550,17 +562,19 @@ export function PrototypeInboxView({
         <div className="flex h-full min-h-0 w-full flex-1">
           <div className="flex h-full min-w-[380px] w-[380px] flex-col border-r border-border bg-background shadow-sm z-10">
             <div className="flex flex-col gap-4 border-b border-border p-4 shrink-0">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground"><Eye className="w-4 h-4" /></Button>
-                  <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground"><FileText className="w-4 h-4" /></Button>
-                  <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground"><Clock className="w-4 h-4" /></Button>
-                  <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground"><CheckSquare className="w-4 h-4" /></Button>
+              {!hideToolbarActions && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground"><Eye className="w-4 h-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground"><FileText className="w-4 h-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground"><Clock className="w-4 h-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground"><CheckSquare className="w-4 h-4" /></Button>
+                  </div>
+                  <Button size="sm" className="h-8 px-4 bg-foreground text-background hover:bg-foreground/90 text-xs font-semibold gap-1.5 rounded-md">
+                    <Plus className="w-4 h-4" /> Add Task
+                  </Button>
                 </div>
-                <Button size="sm" className="h-8 px-4 bg-foreground text-background hover:bg-foreground/90 text-xs font-semibold gap-1.5 rounded-md">
-                  <Plus className="w-4 h-4" /> Add Task
-                </Button>
-              </div>
+              )}
               <div className="flex items-center gap-2">
                 <div className="relative flex-1">
                   <Filter className="absolute left-2.5 top-1.5 w-4 h-4 text-muted-foreground" />
@@ -602,12 +616,14 @@ export function PrototypeInboxView({
                     <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 ${item.statusColor === "red" ? "bg-[#f43f5e]" : "bg-[#3b82f6]"}`} />
                     <span className="text-xs text-muted-foreground leading-tight">{item.details}</span>
                   </div>
-                  <div className={`absolute right-4 bottom-4 flex items-center gap-1.5 bg-background shadow-sm rounded-md px-1 py-0.5 border border-border ${
-                    selectedTask.id === item.id ? "opacity-100" : "opacity-0 group-hover:opacity-100 transition-opacity"
-                  }`}>
-                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded text-muted-foreground hover:text-foreground"><CheckSquare className="w-3.5 h-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded text-muted-foreground hover:text-foreground"><Clock className="w-3.5 h-3.5" /></Button>
-                  </div>
+                  {!hideHoverActions && (
+                    <div className={`absolute right-4 bottom-4 flex items-center gap-1.5 bg-background shadow-sm rounded-md px-1 py-0.5 border border-border ${
+                      selectedTask.id === item.id ? "opacity-100" : "opacity-0 group-hover:opacity-100 transition-opacity"
+                    }`}>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 rounded text-muted-foreground hover:text-foreground"><CheckSquare className="w-3.5 h-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 rounded text-muted-foreground hover:text-foreground"><Clock className="w-3.5 h-3.5" /></Button>
+                    </div>
+                  )}
                 </div>
               ))}
               <div className="p-4">

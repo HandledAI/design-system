@@ -96,7 +96,7 @@ export function DonutChart({
                   style={{ backgroundColor: d.color }}
                 />
                 <span
-                  className="truncate font-medium text-slate-600"
+                  className="whitespace-nowrap font-medium text-slate-600"
                   title={d.name}
                 >
                   {d.name}

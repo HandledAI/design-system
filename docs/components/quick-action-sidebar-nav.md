@@ -30,6 +30,8 @@ import {
 | onUserMenuAction | (itemId: string) => void | — | User menu item click handler |
 | onCreateTask | (draft: QuickActionTaskDraft) => void | — | Quick Action create handler |
 | defaultCollapsed | boolean | false | Initial collapsed state |
+| brandImage | string | — | URL to a brand image. When provided, renders an `<img>` element instead of the default circle-and-text brand mark. |
+| hideQuickAction | boolean | — | When true, suppresses the Quick Action button, tooltip, and Cmd+K modal entirely. |
 | className | string | — | Additional CSS classes |
 | ...props | React.ComponentProps<"aside"> | — | Standard aside attributes |
 

@@ -31,7 +31,7 @@ import { MetricCard, type MetricDataPoint } from "@handled-ai/design-system"
 ## Variants (if applicable)
 
 - **Standard**: Title + big value + change + footer.
-- **Donut**: `dataPoints` — inline donut with center value + legend.
+- **Donut**: `dataPoints` — inline donut with center value + legend. Legend labels use `whitespace-nowrap` for better readability of long names.
 
 ## Basic Usage
 

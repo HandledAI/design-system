@@ -41,6 +41,7 @@ import {
 | title | string | — | Entity title |
 | badgeLabel | string | — | Badge (e.g. "Lead") |
 | subtitle | string | — | Optional subtitle |
+| headerAction | ReactNode | — | Custom content rendered in the header's action area before the Copy Link and Fullscreen buttons. |
 
 ### EntityPanelTabs
 

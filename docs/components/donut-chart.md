@@ -31,7 +31,7 @@ import { DonutChart, DonutSegment } from "@handled-ai/design-system"
 ## Variants (if applicable)
 
 - **Compact** (default): Chart only, optional center label.
-- **With legend**: `showLegend={true}` — legend shown to the right.
+- **With legend**: `showLegend={true}` — legend shown to the right. Legend labels use `whitespace-nowrap` for better readability of long names.
 
 ## Basic Usage
 

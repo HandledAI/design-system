@@ -34,7 +34,7 @@ import { ScoreAnalysisModal } from "./score-analysis-modal"
 import type { ScoreFactor } from "./score-breakdown"
 import { Citation, type SourceDef } from "./detail-view"
 
-type DataRow = {
+export type DataRow = {
   id: string
   name: string
   industry: string[]
@@ -488,7 +488,39 @@ function isRowMatchingCategoryFilter(
   }
 }
 
-export function DataTable({ onRowClick }: { onRowClick?: (row: DataRow) => void } = {}) {
+export interface DataTableProps {
+  onRowClick?: (row: DataRow) => void
+  rows?: DataRow[]
+  filterCategories?: DataTableFilterCategory[]
+  quickViews?: string[]
+  moreQuickViews?: string[]
+  quickViewFilters?: Record<string, (row: DataRow) => boolean>
+  iconMap?: { salesforce?: string }
+  entityUrlBuilder?: (row: DataRow) => string
+  onScoreFactorFeedback?: (account: string, scoreType: string, factorKey: string, type: "up" | "down" | null, detail?: string) => void
+  onScoreApproveFeedback?: (account: string, scoreType: string, reasons: string[], detail: string) => void
+  onScoreDismissFeedback?: (account: string, scoreType: string, reasons: string[], detail: string) => void
+}
+
+export function DataTable({
+  onRowClick,
+  rows: rowsProp,
+  filterCategories: filterCategoriesProp,
+  quickViews: quickViewsProp,
+  moreQuickViews: moreQuickViewsProp,
+  quickViewFilters: quickViewFiltersProp,
+  iconMap,
+  entityUrlBuilder,
+  onScoreFactorFeedback,
+  onScoreApproveFeedback,
+  onScoreDismissFeedback,
+}: DataTableProps = {}) {
+  const resolvedRows = rowsProp ?? ROWS
+  const resolvedFilterCategories = filterCategoriesProp ?? FILTER_CATEGORIES
+  const resolvedQuickViews = quickViewsProp ?? QUICK_VIEWS
+  const resolvedMoreQuickViews = moreQuickViewsProp ?? MORE_QUICK_VIEWS
+  const resolvedQuickViewFilters = quickViewFiltersProp ?? QUICK_VIEW_FILTERS
+
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(
     DEFAULT_COLUMN_VISIBILITY
@@ -524,9 +556,9 @@ export function DataTable({ onRowClick }: { onRowClick?: (row: DataRow) => void 
   }, [activeQuickView])
 
   const filteredRows = React.useMemo(() => {
-    return ROWS.filter((row) => {
+    return resolvedRows.filter((row) => {
       const quickViewMatches = activeQuickView
-        ? (QUICK_VIEW_FILTERS[activeQuickView]?.(row) ?? true)
+        ? (resolvedQuickViewFilters[activeQuickView]?.(row) ?? true)
         : true
 
       if (!quickViewMatches) {
@@ -537,7 +569,7 @@ export function DataTable({ onRowClick }: { onRowClick?: (row: DataRow) => void 
         isRowMatchingCategoryFilter(row, categoryId, options)
       )
     })
-  }, [activeQuickView, selectedFilters])
+  }, [activeQuickView, selectedFilters, resolvedRows, resolvedQuickViewFilters])
 
   const columns = React.useMemo(
     () => [
@@ -545,6 +577,7 @@ export function DataTable({ onRowClick }: { onRowClick?: (row: DataRow) => void 
         header: "Entity",
         cell: (info) => {
           const row = info.row.original
+          const sfUrl = entityUrlBuilder?.(row)
           return (
             <div className="flex min-w-max items-center gap-3">
               <div
@@ -558,6 +591,17 @@ export function DataTable({ onRowClick }: { onRowClick?: (row: DataRow) => void 
               <span className="text-sm font-medium text-foreground">
                 {row.name}
               </span>
+              {iconMap?.salesforce && (
+                <a
+                  href={sfUrl ?? "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <img src={iconMap.salesforce} alt="Salesforce" className="w-4 h-4 object-contain" />
+                </a>
+              )}
             </div>
           )
         },
@@ -717,7 +761,7 @@ export function DataTable({ onRowClick }: { onRowClick?: (row: DataRow) => void 
         ),
       }),
     ],
-    []
+    [iconMap, entityUrlBuilder]
   )
 
   const table = useReactTable({
@@ -752,7 +796,7 @@ export function DataTable({ onRowClick }: { onRowClick?: (row: DataRow) => void 
   return (
     <div className="flex h-full min-h-[560px] flex-col bg-background">
       <DataTableToolbar
-        categories={FILTER_CATEGORIES}
+        categories={resolvedFilterCategories}
         selectedFilters={selectedFilters}
         onToggleFilter={toggleCategoryFilter}
         sorting={sorting}
@@ -763,8 +807,8 @@ export function DataTable({ onRowClick }: { onRowClick?: (row: DataRow) => void 
       />
 
       <DataTableQuickViews
-        quickViews={QUICK_VIEWS}
-        moreViews={MORE_QUICK_VIEWS}
+        quickViews={resolvedQuickViews}
+        moreViews={resolvedMoreQuickViews}
         activeView={activeQuickView}
         onViewChange={setActiveQuickView}
       />
@@ -848,14 +892,21 @@ export function DataTable({ onRowClick }: { onRowClick?: (row: DataRow) => void 
             whyNow={data.whyNow}
             evidence={data.evidence}
             factors={data.factors}
-            onFactorFeedback={(key, type, detail) =>
-              console.log("Factor feedback:", { account: scoreModal.row.name, factor: key, type, detail })
+            onFactorFeedback={onScoreFactorFeedback
+              ? (key, type, detail) => onScoreFactorFeedback(scoreModal.row.name, scoreModal.type, key, type, detail)
+              : (key, type, detail) => console.log("Factor feedback:", { account: scoreModal.row.name, factor: key, type, detail })
             }
             companyName={scoreModal.row.name}
             opportunityUrl={`https://acme.lightning.force.com/lightning/r/Opportunity/006${scoreModal.row.id}/view`}
             onApprove={() => console.log("Approved signal — creating opportunity:", { account: scoreModal.row.name, type: scoreModal.type })}
-            onApproveFeedback={(reasons, detail) => console.log("Approval feedback:", { account: scoreModal.row.name, reasons, detail })}
-            onDismiss={(reasons, detail) => console.log("Dismissed signal:", { account: scoreModal.row.name, reasons, detail })}
+            onApproveFeedback={onScoreApproveFeedback
+              ? (reasons, detail) => onScoreApproveFeedback(scoreModal.row.name, scoreModal.type, reasons, detail)
+              : (reasons, detail) => console.log("Approval feedback:", { account: scoreModal.row.name, reasons, detail })
+            }
+            onDismiss={onScoreDismissFeedback
+              ? (reasons, detail) => onScoreDismissFeedback(scoreModal.row.name, scoreModal.type, reasons, detail)
+              : (reasons, detail) => console.log("Dismissed signal:", { account: scoreModal.row.name, reasons, detail })
+            }
           />
         )
       })()}

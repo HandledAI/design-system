@@ -30,7 +30,7 @@ import { TrendAreaChart } from "./trend-area-chart"
 import { BarChartComponent } from "./bar-chart-component"
 import { StyledBarList } from "./styled-bar-list"
 import { ReportCard } from "./report-card"
-import type { InsightsViewConfig } from "./prototype-config"
+import type { InsightsViewConfig, InsightsCustomTab } from "./prototype-config"
 
 // ---------------------------------------------------------------------------
 // Props
@@ -141,12 +141,18 @@ export function PrototypeInsightsView({
   assistantName,
   headerActions,
   onNavigateToInbox,
+  customTabs,
 }: PrototypeInsightsViewProps) {
   const showOverview = tabs?.overview !== false
   const showAnalytics = tabs?.analytics !== false
-  const [insightsTab, setInsightsTab] = React.useState<"overview" | "analytics">(
-    showOverview ? "overview" : "analytics",
+  const [insightsTab, setInsightsTab] = React.useState<string>(
+    showOverview ? "overview" : showAnalytics ? "analytics" : customTabs?.[0]?.id ?? "overview",
   )
+
+  const allTabs: { id: string; label: string; icon?: React.ComponentType<{ className?: string }> }[] = []
+  if (showOverview) allTabs.push({ id: "overview", label: "Overview", icon: BarChart2 })
+  if (showAnalytics) allTabs.push({ id: "analytics", label: "Analytics", icon: TrendingUp })
+  if (customTabs) allTabs.push(...customTabs)
   const [showAllMetrics, setShowAllMetrics] = React.useState(false)
   const [showCoaching, setShowCoaching] = React.useState(coaching?.enabled !== false)
 
@@ -180,38 +186,26 @@ export function PrototypeInsightsView({
       </div>
 
       {/* Tab switcher */}
-      {showOverview && showAnalytics && (
+      {allTabs.length >= 2 && (
         <div className="flex items-center gap-1 border-b border-border">
-          <button
-            type="button"
-            onClick={() => setInsightsTab("overview")}
-            className={`relative px-4 py-2 text-sm font-medium transition-colors ${
-              insightsTab === "overview" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <span className="flex items-center gap-2">
-              <BarChart2 className="h-3.5 w-3.5" />
-              Overview
-            </span>
-            {insightsTab === "overview" && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full" />
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => setInsightsTab("analytics")}
-            className={`relative px-4 py-2 text-sm font-medium transition-colors ${
-              insightsTab === "analytics" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <span className="flex items-center gap-2">
-              <TrendingUp className="h-3.5 w-3.5" />
-              Analytics
-            </span>
-            {insightsTab === "analytics" && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full" />
-            )}
-          </button>
+          {allTabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setInsightsTab(tab.id)}
+              className={`relative px-4 py-2 text-sm font-medium transition-colors ${
+                insightsTab === tab.id ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                {tab.icon && <tab.icon className="h-3.5 w-3.5" />}
+                {tab.label}
+              </span>
+              {insightsTab === tab.id && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full" />
+              )}
+            </button>
+          ))}
         </div>
       )}
 
@@ -377,6 +371,11 @@ export function PrototypeInsightsView({
             </div>
           )}
         </div>
+      )}
+
+      {/* Custom Tabs */}
+      {customTabs?.map(tab =>
+        insightsTab === tab.id ? <div key={tab.id}>{tab.content}</div> : null
       )}
     </div>
   )

@@ -33,6 +33,16 @@ export function PrototypeAccountsView({
   filterTabs,
   headerActions,
   onRowClick,
+  rows,
+  filterCategories,
+  quickViews,
+  moreQuickViews,
+  quickViewFilters,
+  iconMap,
+  entityUrlBuilder,
+  onScoreFactorFeedback,
+  onScoreApproveFeedback,
+  onScoreDismissFeedback,
 }: PrototypeAccountsViewProps) {
   const tabs = filterTabs ?? DEFAULT_FILTER_TABS
 
@@ -82,7 +92,19 @@ export function PrototypeAccountsView({
       </div>
 
       <div className="flex-1 overflow-auto">
-        <DataTable onRowClick={onRowClick} />
+        <DataTable
+          onRowClick={onRowClick}
+          rows={rows}
+          filterCategories={filterCategories}
+          quickViews={quickViews}
+          moreQuickViews={moreQuickViews}
+          quickViewFilters={quickViewFilters}
+          iconMap={iconMap}
+          entityUrlBuilder={entityUrlBuilder}
+          onScoreFactorFeedback={onScoreFactorFeedback}
+          onScoreApproveFeedback={onScoreApproveFeedback}
+          onScoreDismissFeedback={onScoreDismissFeedback}
+        />
       </div>
     </div>
   )

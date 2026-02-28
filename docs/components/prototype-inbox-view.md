@@ -17,6 +17,17 @@ Extends `InboxViewConfig` from `prototype-config.ts` plus:
 | `headerActions` | `ReactNode` | Extra content in the view header. |
 | `onOpenEntityPanel` | `() => void` | Called when entity panel should open. |
 | `onOpenRecentActivity` | `() => void` | Called when recent activity section should scroll into view. |
+| `hideToolbarActions` | `boolean` | Hides the Eye/FileText/Clock/CheckSquare icon buttons and "Add Task" CTA in the split-view toolbar. |
+| `hideHoverActions` | `boolean` | Hides the CheckSquare/Clock hover action buttons on inbox list items. |
+| `onSuggestedActionFeedback` | `(actionId: number \| string, feedback: string, actionTitle?: string) => void` | Callback for suggested action feedback events. |
+
+### SignalScoreData
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `onFactorFeedback` | `(factorKey: string, type: "up" \| "down" \| null, detail?: string) => void` | Callback when factor thumbs up/down is toggled. |
+| `onApproveFeedback` | `(reasons: string[], detail: string) => void` | Callback when score approval feedback is submitted. |
+| `onDismissFeedback` | `(reasons: string[], detail: string) => void` | Callback when score dismiss feedback is submitted. |
 
 ## Key Features
 

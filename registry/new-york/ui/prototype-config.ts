@@ -5,6 +5,8 @@ import type { ScoreFactor } from "./score-breakdown"
 import type { SuggestedAction, SuggestedContact } from "./suggested-actions"
 import type { SourceDef } from "./detail-view"
 import type { InboxFilterCategory } from "./inbox-toolbar"
+import type { DataTableFilterCategory } from "./data-table-filter"
+import type { DataRow } from "./data-table"
 import type { MetricCardProps } from "./metric-card"
 import type {
   PipelineStage,
@@ -40,6 +42,9 @@ export interface SignalScoreData {
   whyNow: string
   evidence: string[]
   confidence: number
+  onFactorFeedback?: (factorKey: string, type: "up" | "down" | null, detail?: string) => void
+  onApproveFeedback?: (reasons: string[], detail: string) => void
+  onDismissFeedback?: (reasons: string[], detail: string) => void
 }
 
 // ---------------------------------------------------------------------------
@@ -64,13 +69,24 @@ export interface InboxViewConfig {
   getSignalScore?: (company: string) => SignalScoreData
   getTimelineEvents?: (item: QueueItem) => TimelineEvent[]
   iconMap?: Record<string, string>
+  hideToolbarActions?: boolean
+  hideHoverActions?: boolean
+  onSuggestedActionFeedback?: (actionId: number | string, feedback: string, actionTitle?: string) => void
 }
 
 // ---------------------------------------------------------------------------
 // Insights
 // ---------------------------------------------------------------------------
 
+export interface InsightsCustomTab {
+  id: string
+  label: string
+  icon?: React.ComponentType<{ className?: string }>
+  content: React.ReactNode
+}
+
 export interface InsightsViewConfig {
+  customTabs?: InsightsCustomTab[]
   tabs?: {
     overview?: boolean
     analytics?: boolean
@@ -141,6 +157,16 @@ export interface AccountFilterTab {
 
 export interface AccountsViewConfig {
   filterTabs?: AccountFilterTab[]
+  rows?: DataRow[]
+  filterCategories?: DataTableFilterCategory[]
+  quickViews?: string[]
+  moreQuickViews?: string[]
+  quickViewFilters?: Record<string, (row: DataRow) => boolean>
+  iconMap?: { salesforce?: string }
+  entityUrlBuilder?: (row: DataRow) => string
+  onScoreFactorFeedback?: (account: string, scoreType: string, factorKey: string, type: "up" | "down" | null, detail?: string) => void
+  onScoreApproveFeedback?: (account: string, scoreType: string, reasons: string[], detail: string) => void
+  onScoreDismissFeedback?: (account: string, scoreType: string, reasons: string[], detail: string) => void
 }
 
 // ---------------------------------------------------------------------------

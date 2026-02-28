@@ -106,11 +106,13 @@ export function EntityPanelHeader({
   title,
   badgeLabel,
   subtitle,
+  headerAction,
 }: {
   icon?: React.ReactNode
   title: string
   badgeLabel?: string
   subtitle?: string
+  headerAction?: React.ReactNode
 }) {
   const { isFullscreen, setIsFullscreen, onClose } = useEntityPanel()
 
@@ -129,6 +131,7 @@ export function EntityPanelHeader({
         )}
       </div>
       <div className="flex items-center gap-1 shrink-0 ml-4 text-muted-foreground">
+        {headerAction}
         <button
           type="button"
           className="p-1.5 rounded-md hover:bg-secondary transition-colors"

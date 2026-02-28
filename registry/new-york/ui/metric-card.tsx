@@ -124,7 +124,7 @@ export function MetricCard({
                   <div key={dp.label} className="flex items-center justify-between gap-2 text-[11px] font-medium min-w-0">
                     <div className="flex items-center gap-1.5 text-muted-foreground min-w-0">
                       <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", dp.color ? "" : colors[i % colors.length])} style={dp.color ? { backgroundColor: dp.color } : {}} />
-                      <span className="truncate">{dp.label}</span>
+                      <span className="whitespace-nowrap">{dp.label}</span>
                     </div>
                     <span className="text-foreground font-semibold shrink-0">{dp.value}</span>
                   </div>
