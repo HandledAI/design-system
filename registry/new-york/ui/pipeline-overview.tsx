@@ -143,6 +143,22 @@ export interface PipelineOverviewProps {
   /** Flow links after the first stage (middle of pipeline onward) */
   flowLinks?: { source: string; target: string; value: number }[]
   totalReceived?: number
+  /** Dollar amounts to display on terminal node labels: { "Retained": "$18.2M" } */
+  nodeAmounts?: Record<string, string>
+  /** Unit noun for standard node/link tooltips (e.g. "signals", "accounts"). */
+  unitLabel?: string
+  /** Unit noun for terminal/drop-off node tooltips (e.g. "opportunities"). Defaults to unitLabel. */
+  terminalUnitLabel?: string
+  /** Node IDs that should use terminalUnitLabel. Defaults to keys of dropOffDistribution. */
+  terminalNodeIds?: string[]
+  /** Sankey chart margins, merged with defaults { top: 20, right: 120, bottom: 20, left: 140 }. */
+  sankeyMargin?: { top?: number; right?: number; bottom?: number; left?: number }
+  /** Gap between Sankey node bar and its outside label. */
+  sankeyLabelPadding?: number
+  /** When true, conversion badges use `flex`; when false, `hidden xl:flex`. */
+  alwaysShowConversionBadges?: boolean
+  /** Color for dynamically generated drop-off nodes. */
+  dropOffNodeColor?: string
   onViewInWorkQueue?: (stageId: string) => void
   className?: string
 }
@@ -178,11 +194,31 @@ export function PipelineOverview({
     { source: "Scheduled", target: "No Show/Cancel", value: 92 },
   ],
   totalReceived = 847,
+  nodeAmounts,
+  unitLabel,
+  terminalUnitLabel,
+  terminalNodeIds,
+  sankeyMargin,
+  sankeyLabelPadding,
+  alwaysShowConversionBadges = false,
+  dropOffNodeColor,
   onViewInWorkQueue,
   className,
 }: PipelineOverviewProps) {
   const [selectedFilter, setSelectedFilter] = React.useState(filterOptions[0])
   const [countingMode, setCountingMode] = React.useState(countingModes[0])
+
+  const effectiveUnitLabel = unitLabel ?? "items"
+  const effectiveTerminalUnitLabel = terminalUnitLabel ?? effectiveUnitLabel
+  const effectiveTerminalNodeIds = React.useMemo(
+    () => new Set(terminalNodeIds ?? Object.keys(dropOffDistribution)),
+    [terminalNodeIds, dropOffDistribution],
+  )
+  const effectiveMargin = React.useMemo(
+    () => ({ top: 20, right: 120, bottom: 20, left: 140, ...sankeyMargin }),
+    [sankeyMargin],
+  )
+  const effectiveLabelPadding = sankeyLabelPadding ?? 16
 
   const sankeyData = React.useMemo(() => {
     const breakdown =
@@ -198,45 +234,39 @@ export function PipelineOverview({
       value,
     }))
 
+    const dropOffKeys = Object.keys(dropOffDistribution)
+    const dropOffNodes = dropOffKeys.length > 0
+      ? dropOffKeys.map((reason) => ({
+          id: reason,
+          nodeColor: dropOffNodeColor ?? "#F59E0B",
+        }))
+      : DROP_OFF_NODES
+
     const nodes = [
       ...segments,
       ...flowNodes,
-      ...DROP_OFF_NODES,
+      ...dropOffNodes,
     ]
 
     const links: { source: string; target: string; value: number }[] = []
 
-    const totalDrops = Object.values(dropOffDistribution).reduce(
-      (a, b) => a + b,
-      0,
-    )
+    const firstFlowNode = flowNodes[0]?.id ?? "Contacted"
 
     segments.forEach((segment) => {
-      const ratio = segment.value / totalReceived
-
-      const segDrops: Record<string, number> = {}
-      let segTotalDrop = 0
-      for (const [reason, count] of Object.entries(dropOffDistribution)) {
-        const v = Math.round(count * ratio)
-        segDrops[reason] = v
-        segTotalDrop += v
-      }
-
-      const contacted = Math.max(0, segment.value - segTotalDrop)
-
-      if (contacted > 0) {
-        const firstFlowNode = flowNodes[0]?.id ?? "Contacted"
+      if (segment.value > 0) {
         links.push({
           source: segment.id,
           target: firstFlowNode,
-          value: contacted,
+          value: segment.value,
         })
       }
-
-      for (const [reason, v] of Object.entries(segDrops)) {
-        if (v > 0) links.push({ source: segment.id, target: reason, value: v })
-      }
     })
+
+    for (const [reason, count] of Object.entries(dropOffDistribution)) {
+      if (count > 0) {
+        links.push({ source: firstFlowNode, target: reason, value: count })
+      }
+    }
 
     flowLinks.forEach((link) => links.push({ ...link }))
 
@@ -248,6 +278,7 @@ export function PipelineOverview({
     totalReceived,
     flowNodes,
     dropOffDistribution,
+    dropOffNodeColor,
     flowLinks,
   ])
 
@@ -342,7 +373,10 @@ export function PipelineOverview({
 
                     {/* Conversion badge + timing between stages */}
                     {index < stages.length - 1 && stage.nextConversion && (
-                      <div className="absolute -right-2 top-1/2 z-10 hidden -translate-y-1/2 translate-x-1/2 flex-col items-center xl:flex">
+                      <div className={cn(
+                        alwaysShowConversionBadges ? "flex" : "hidden xl:flex",
+                        "absolute -right-2 top-1/2 z-10 -translate-y-1/2 translate-x-1/2 flex-col items-center",
+                      )}>
                         <span className="z-10 whitespace-nowrap rounded-full border border-slate-200 bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600 shadow-sm">
                           {stage.nextConversion}
                         </span>
@@ -389,7 +423,7 @@ export function PipelineOverview({
       >
         <ResponsiveSankey
           data={sankeyData}
-          margin={{ top: 20, right: 120, bottom: 20, left: 140 }}
+          margin={effectiveMargin}
           align="justify"
           colors={(node: any) => node.nodeColor || "#94a3b8"}
           nodeOpacity={1}
@@ -404,22 +438,29 @@ export function PipelineOverview({
           enableLinkGradient
           labelPosition="outside"
           labelOrientation="horizontal"
-          labelPadding={16}
+          labelPadding={effectiveLabelPadding}
+          label={(node: any) => nodeAmounts?.[node.id] ? `${node.id} (${nodeAmounts[node.id]})` : node.id}
           labelTextColor={{ from: "color", modifiers: [["darker", 1]] }}
-          nodeTooltip={({ node }: any) => (
-            <div className="rounded-md border border-slate-200 bg-white p-2 text-xs shadow-lg">
-              <span className="mb-1 block font-bold">{node.id}</span>
-              <span>{node.value} patients</span>
-            </div>
-          )}
-          linkTooltip={({ link }: any) => (
-            <div className="rounded-md border border-slate-200 bg-white p-2 text-xs shadow-lg">
-              <span className="mb-1 block font-bold">
-                {link.source.id} → {link.target.id}
-              </span>
-              <span>{link.value} patients</span>
-            </div>
-          )}
+          nodeTooltip={({ node }: any) => {
+            const unit = effectiveTerminalNodeIds.has(node.id) ? effectiveTerminalUnitLabel : effectiveUnitLabel
+            return (
+              <div className="rounded-md border border-slate-200 bg-white p-2 text-xs shadow-lg">
+                <span className="mb-1 block font-bold">{node.id}{nodeAmounts?.[node.id] ? ` — ${nodeAmounts[node.id]}` : ""}</span>
+                <span>{node.value} {unit}</span>
+              </div>
+            )
+          }}
+          linkTooltip={({ link }: any) => {
+            const unit = effectiveTerminalNodeIds.has(link.target.id) ? effectiveTerminalUnitLabel : effectiveUnitLabel
+            return (
+              <div className="rounded-md border border-slate-200 bg-white p-2 text-xs shadow-lg">
+                <span className="mb-1 block font-bold">
+                  {link.source.id} → {link.target.id}
+                </span>
+                <span>{link.value} {unit}</span>
+              </div>
+            )
+          }}
         />
       </div>
     </div>

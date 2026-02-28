@@ -84,6 +84,10 @@ function ScoreAnalysisModal({
           <div className="flex-1 overflow-y-auto px-6 py-6">
             <p className="text-sm text-muted-foreground mb-6">{description}</p>
 
+            <div className="mb-8">
+              <SignalApproval.Actions />
+            </div>
+
             <div className="space-y-6">
               <div className="flex flex-col items-center gap-3">
                 <ScoreRing score={score} denominator={denominator} size={120} strokeWidth={10} />
@@ -117,8 +121,6 @@ function ScoreAnalysisModal({
                   <ScoreBreakdown factors={factors} onFactorFeedback={onFactorFeedback} />
                 </div>
               )}
-
-              <SignalApproval.Actions />
             </div>
           </div>
         </SignalApproval.Root>

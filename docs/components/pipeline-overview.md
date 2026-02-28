@@ -21,7 +21,15 @@ import { PipelineOverview } from "@handled-ai/design-system"
 | `dropOffDistribution` | `number[]` | Source-defined defaults | Optional distribution values for drop-off charting. |
 | `flowLinks` | `{ source: number; target: number; value: number }[]` | Source-defined defaults | Link definitions between flow nodes. |
 | `totalReceived` | `number` | Source-defined default | Total incoming volume used in top-level summary. |
-| `onViewInWorkQueue` | `() => void` | `undefined` | Callback for "view in work queue" action. |
+| `nodeAmounts` | `Record<string, string>` | `undefined` | Dollar amounts to display on terminal node labels and tooltips (e.g. `{ "Retained": "$18.2M" }`). |
+| `unitLabel` | `string` | `"items"` | Unit noun for standard node/link tooltips (e.g. `"signals"`, `"accounts"`). |
+| `terminalUnitLabel` | `string` | Same as `unitLabel` | Unit noun for terminal/drop-off node tooltips (e.g. `"opportunities"`). |
+| `terminalNodeIds` | `string[]` | Keys of `dropOffDistribution` | Node IDs that should use `terminalUnitLabel` instead of `unitLabel`. |
+| `sankeyMargin` | `{ top?: number; right?: number; bottom?: number; left?: number }` | `{ top: 20, right: 120, bottom: 20, left: 140 }` | Sankey chart margins. Merged with defaults so consumers can override individual sides. |
+| `sankeyLabelPadding` | `number` | `16` | Gap between Sankey node bar and its outside label. |
+| `alwaysShowConversionBadges` | `boolean` | `false` | When `true`, conversion badges between stages use `flex`. When `false`, use `hidden xl:flex`. |
+| `dropOffNodeColor` | `string` | `"#F59E0B"` | Color for dynamically generated drop-off nodes from `dropOffDistribution` keys. |
+| `onViewInWorkQueue` | `(stageId: string) => void` | `undefined` | Callback for "view in work queue" action. |
 | `className` | `string` | `undefined` | Additional class names for wrapper styling. |
 
 Client-only: Yes (`"use client"`).
@@ -101,6 +109,25 @@ import { PipelineOverview } from "@handled-ai/design-system"
     proposal: { median: "1.7d", avg: "2.1d" },
   }}
   countingModes={["Current", "Trailing 30d"]}
+/>
+```
+
+### With custom unit labels and Sankey configuration
+```tsx
+import { PipelineOverview } from "@handled-ai/design-system"
+
+<PipelineOverview
+  stages={stages}
+  stageMetrics={stageMetrics}
+  stageTimings={stageTimings}
+  unitLabel="signals"
+  terminalUnitLabel="opportunities"
+  terminalNodeIds={["Won", "Lost"]}
+  nodeAmounts={{ Won: "$4.2M", Lost: "$1.1M" }}
+  sankeyMargin={{ left: 160 }}
+  sankeyLabelPadding={20}
+  alwaysShowConversionBadges
+  dropOffNodeColor="#EF4444"
 />
 ```
 

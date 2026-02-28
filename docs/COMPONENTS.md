@@ -49,6 +49,10 @@ import { ComponentName } from "@handled-ai/design-system"
 - [ScoreBreakdown](./components/score-breakdown.md) - Factor-by-factor score explanation with optional inline feedback.
 - [ScoreAnalysisModal](./components/score-analysis-modal.md) - Deep-dive score analysis panel/modal with evidence and actions.
 
+## Filters
+
+- [InsightsFilterBar](./components/insights-filter-bar.md) - Configuration-driven filter bar for insights dashboards with pill-style dropdown buttons and clear-all reset.
+
 ## Charts
 
 - [Chart](./components/chart.md) - Shared chart container, style, legend, and tooltip helpers for Recharts.
