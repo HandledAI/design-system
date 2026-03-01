@@ -315,7 +315,7 @@ export function QuickActionSidebarNav({
           {!isCollapsed && (
             <div className="flex items-center gap-2.5 pr-10">
               {brandImage ? (
-                <img src={brandImage} alt={brandLabel} className="h-6 object-contain" />
+                <img src={brandImage} alt={brandLabel} className="h-10 object-contain" />
               ) : (
                 <>
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-sidebar-foreground text-sidebar">
